@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     const where = orgId ? { orgId } : {};
     const periods = await prisma.reportingPeriod.findMany({
       where,
+      include: { organisation: { select: { name: true } } },
       orderBy: { startDate: 'desc' },
     });
     return NextResponse.json(periods);

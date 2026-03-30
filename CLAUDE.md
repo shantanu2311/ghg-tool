@@ -25,7 +25,7 @@ npm run db:reset         # Reset database (destructive)
 - **Framework**: Next.js 16 (App Router) + TypeScript
 - **Styling**: Tailwind CSS v4
 - **State**: Zustand (wizard multi-step form)
-- **Database**: SQLite via Prisma v7 (local dev); PostgreSQL/Supabase for production
+- **Database**: PostgreSQL (Neon) via Prisma v7 + `@prisma/adapter-pg`
 - **Charts**: Recharts
 - **PDF**: jsPDF
 - **Word**: docx (npm)
@@ -61,25 +61,38 @@ src/
       data-quality.ts      # PRIMARY/SECONDARY/ESTIMATED scoring
       brsr-mapper.ts       # Map outputs to BRSR Principle 6 fields
       index.ts             # Orchestrator
-    db.ts                  # Prisma singleton
+    rec-engine/            # Module 2: recommendation engine (pure functions)
+      matcher.ts           # 5-filter cascade matching
+      impact-calculator.ts # Per-tech CO2/energy/cost impact
+      funding-matcher.ts   # Scheme eligibility + net capex
+      index.ts             # Orchestrator + sequential combinedImpact
+      types.ts             # All Module 2/3 types
+    what-if-store.ts       # Zustand store for recommendation simulator
+    export/
+      reduction-plan-pdf.ts  # PDF export for reduction plan
+      reduction-plan-word.ts # Word export for reduction plan
+    db.ts                  # Prisma singleton (PostgreSQL via pg adapter)
     utils.ts               # Utility functions (cn, etc.)
   components/
     wizard/                # Wizard step components
     dashboard/             # Chart & table components
+    recommendations/       # Module 2: tech cards, charts, funding panel
     ui/                    # Shared UI primitives
   generated/prisma/        # Prisma v7 generated client
 prisma/
-  schema.prisma            # 11 models (7 core + 4 reference)
-  seed.ts                  # Reference data seeder
+  schema.prisma            # 14 models (7 core + 4 reference + 3 module 2/3)
+  seed.ts                  # Reference data seeder (incl. 23 techs, 10 schemes, 56 links)
 data/
   source-audit.xlsx        # Audit trail: every data point mapped to its source
 ```
 
-### Database Schema (11 models)
+### Database Schema (14 models)
 
 **Core (7)**: Organisation, Facility, ReportingPeriod, ActivityData, EmissionFactor, CalculatedEmission, Report
 
 **Reference (4)**: FuelProperty, GwpValue, UnitConversion, SectorBenchmark
+
+**Module 2/3 (3)**: ReductionTechnology, FundingScheme, TechFundingLink
 
 ### Methodology
 
@@ -123,10 +136,44 @@ For each activity data entry:
 
 - **Prisma v7**: Uses `prisma.config.ts` for datasource URL, NOT `url` in schema.prisma
 - **Prisma v7 client import**: `import { PrismaClient } from '@/generated/prisma/client'`
-- **Prisma v7 SQLite adapter**: Must use `@prisma/adapter-better-sqlite3` — `new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) })`
-- **Seed script**: Uses absolute path `path.resolve(__dirname, '..', 'dev.db')` — the DB lives at project root, not `prisma/`
+- **Prisma v7 PostgreSQL adapter**: Uses `@prisma/adapter-pg` with `pg.Pool` — `new PrismaClient({ adapter: new PrismaPg(pool) })`
+- **Database**: Neon PostgreSQL (free tier, serverless). Connection string in `.env`
 - **Blueprint corrections**: NCV Diesel=43.0 (not 43.33), CEA grid=0.710 (not 0.708), R22 GWP=1760 (not 1810, that was AR4), HFC-134a GWP=1300 (not 1430). See `data/source-audit.xlsx` "Blueprint Corrections" sheet.
 - **Financial Year**: Indian FY is April-March; BRSR reporting follows this
 - **Biogenic CO2**: From biomass combustion — reported separately, NOT added to Scope 1 total (GHG Protocol rule)
 - **Spend-based fallback**: When MSME enters INR spent instead of quantity, divide by fuel price to estimate quantity. Always flag as ESTIMATED quality.
 - **Unit chaos**: Indian MSMEs use litres, kg, tonnes, cylinders (14.2kg domestic, 19kg commercial), bags (50kg), units (=kWh), lakh units (100,000 kWh)
+
+### Module 2: Emission Reduction Recommendations
+
+- **Matching**: 5-filter cascade (sector → subSector → fuelType → category → threshold) in `rec-engine/matcher.ts`
+- **Sequential combination**: Reductions applied to residual, NOT additive. 3×20% = 48.8%, not 60%. Sorted by payback ascending. Critical logic in `rec-engine/index.ts:calculateCombinedImpact()`
+- **Client-side recalculation**: `what-if-store.ts` fetches recommendations once via POST, then all toggle/recalculation is client-side using imported pure functions
+- **JSON arrays in DB**: `matchesFuelTypes`, `matchesCategories`, etc. stored as JSON strings in PostgreSQL, parsed in JS (23 techs = trivial)
+- **Seed data**: 23 technologies (T001-T023), 10 funding schemes (S001-S010), 56 tech-funding links
+
+### Module 3: Funding Directory
+
+- Standalone page at `/funding` — not tied to any inventory period
+- Searchable/filterable by status and text search
+- Funding matches also shown per-tech in the recommendations page's right panel
+
+### New Pages (v2)
+
+| Route | Purpose |
+|-------|---------|
+| `/recommendations` | Period picker for reduction simulator |
+| `/recommendations/[periodId]` | 3-column what-if simulator |
+| `/recommendations/[periodId]/report` | Exportable reduction plan (PDF/Word) |
+| `/funding` | Standalone funding directory |
+
+### New API Routes (v2)
+
+| Method | Route | Purpose |
+|--------|-------|---------|
+| GET | `/api/technologies` | List techs with optional filters |
+| GET | `/api/technologies/[techId]` | Single tech + funding links |
+| POST | `/api/recommendations/[periodId]` | Run engine for a period |
+| GET | `/api/funding` | List schemes with optional filters |
+| GET | `/api/funding/[schemeId]` | Single scheme detail |
+| GET | `/api/funding/for-tech/[techId]` | Schemes for a tech |

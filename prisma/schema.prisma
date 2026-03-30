@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ── Organisation ────────────────────────────────────────────────────────────
@@ -203,4 +203,86 @@ model SectorBenchmark {
   year          Int
 
   @@unique([sector, subSector, metric])
+}
+
+// ── Module 2: Emission Reduction Technologies ──────────────────────────────
+
+model ReductionTechnology {
+  id                   String   @id @default(cuid())
+  techId               String   @unique  // T001, T002, etc.
+  name                 String           // "Variable Frequency Drives (VFDs)"
+  category             String           // "Energy Efficiency - Cross Sector", "Sector Specific", etc.
+  applicableSectors    String           // JSON array: ["iron_steel","textiles",...]
+  scopeAddressed       String           // "Scope 1" | "Scope 2" | "Scope 1 + Scope 2"
+  energyTypeSaved      String           // "Electrical" | "Thermal" | "Both"
+  description          String           // Full description
+  // ── Impact Metrics ──
+  energySavingMinPct   Float            // e.g. 20
+  energySavingMaxPct   Float            // e.g. 40
+  co2ReductionMinPct   Float            // e.g. 20
+  co2ReductionMaxPct   Float            // e.g. 40
+  paybackMinYears      Float            // e.g. 0.5
+  paybackMaxYears      Float            // e.g. 1.5
+  capexMinLakhs        Float?           // e.g. 1
+  capexMaxLakhs        Float?           // e.g. 15
+  // ── Maturity & Evidence ──
+  technologyReadiness  String           // "Commercially mature" | "Early commercial" | "Emerging"
+  demonstratedInIndia  Boolean
+  indianClusters       String?          // JSON array of cluster names
+  // ── Matching Rules ──
+  matchesFuelTypes     String?          // JSON array: ["COAL_INDIAN","COKE","FURNACE_OIL"]
+  matchesCategories    String?          // JSON array: ["stationary_combustion"]
+  matchesSubSectors    String?          // JSON array: ["eaf_mini_mill","induction_furnace"]
+  minEmissionThreshold Float?           // Only recommend if source > X tCO2e/yr
+  // ── Source Traceability ──
+  source               String
+  sourceUrl            String?
+  // ── Relations ──
+  fundingLinks         TechFundingLink[]
+}
+
+// ── Module 3: Funding Schemes ──────────────────────────────────────────────
+
+model FundingScheme {
+  id                  String   @id @default(cuid())
+  schemeId            String   @unique  // S001, S002, etc.
+  name                String           // "ADEETIE Scheme"
+  implementingAgency  String           // "BEE, Ministry of Power"
+  targetBeneficiary   String           // "Udyam-registered MSMEs"
+  supportType         String           // "Interest subvention + Energy Audit + DPR"
+  financialDetails    String           // Full description of financial support
+  sectorsCovered      String           // JSON array or description
+  // ── Eligibility ──
+  eligibilityCriteria String           // Key requirements
+  requiredDocuments   String?          // JSON array: ["Udyam certificate","DPR",...]
+  minEnergySaving     Float?           // e.g. 10 (% minimum saving required)
+  turnoverBrackets    String?          // JSON: ["micro","small","medium"]
+  applicableStates    String?          // JSON array or null for pan-India
+  // ── Status ──
+  status              String           // "Active" | "Proposed" | "Concluded"
+  validFrom           DateTime?
+  validTo             DateTime?
+  applicationUrl      String?          // Direct link to apply
+  // ── Impact ──
+  reportedImpact      String?          // Summary of results achieved
+  // ── Source ──
+  source              String
+  sourceUrl           String?
+  // ── Relations ──
+  techLinks           TechFundingLink[]
+}
+
+// ── Technology ↔ Funding Link (many-to-many) ───────────────────────────────
+
+model TechFundingLink {
+  id              String              @id @default(cuid())
+  techId          String
+  technology      ReductionTechnology @relation(fields: [techId], references: [id], onDelete: Cascade)
+  fundingId       String
+  funding         FundingScheme       @relation(fields: [fundingId], references: [id], onDelete: Cascade)
+  subsidyPct      Float?              // e.g. 5 (interest subvention %)
+  maxAmountLakhs  Float?              // cap on subsidy amount
+  notes           String?             // special conditions
+
+  @@unique([techId, fundingId])
 }

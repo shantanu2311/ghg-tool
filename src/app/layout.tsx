@@ -51,6 +51,18 @@ export default function RootLayout({
               >
                 Dashboard
               </Link>
+              <Link
+                href="/recommendations"
+                className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+              >
+                Reduce
+              </Link>
+              <Link
+                href="/funding"
+                className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+              >
+                Funding
+              </Link>
             </div>
           </div>
         </nav>

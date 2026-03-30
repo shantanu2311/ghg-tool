@@ -179,6 +179,20 @@ export default function DashboardPage() {
         {/* KPI Cards */}
         <KpiCards result={result} />
 
+        {/* Reduction CTA */}
+        <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-teal-900">Ready to reduce your emissions?</p>
+            <p className="text-xs text-teal-600">Explore matched technologies, simulate impact, and find funding schemes.</p>
+          </div>
+          <Link
+            href={`/recommendations/${result.periodId}`}
+            className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 transition-colors whitespace-nowrap"
+          >
+            Explore Reduction Technologies →
+          </Link>
+        </div>
+
         {/* Scope Chart + Top Sources */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ScopeChart result={result} />
