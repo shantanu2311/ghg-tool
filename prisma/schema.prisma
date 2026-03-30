@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ── Organisation ────────────────────────────────────────────────────────────
+
+model Organisation {
+  id              String   @id @default(cuid())
+  name            String
+  udyamNumber     String?  @unique  // UDYAM registration (unique MSME identifier in India)
+  sector          String   // NIC code or slug e.g. "iron_steel"
+  subSector       String   // e.g. "eaf_mini_mill", "induction_furnace"
+  state           String
+  district        String?
+  employeeCount   Int?
+  turnoverBracket String?  // "micro" | "small" | "medium"
+  contactEmail    String?
+  contactPhone    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  facilities       Facility[]
+  reportingPeriods ReportingPeriod[]
+}
+
+// ── Facility ────────────────────────────────────────────────────────────────
+
+model Facility {
+  id             String   @id @default(cuid())
+  orgId          String
+  organisation   Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name           String
+  address        String?
+  state          String
+  district       String?
+  gridRegion     String   // NORTHERN, SOUTHERN, WESTERN, EASTERN, NORTHEASTERN
+  activityType   String   // facility type e.g. "eaf_mini_mill"
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  activityData   ActivityData[]
+}
+
+// ── Reporting Period ────────────────────────────────────────────────────────
+
+model ReportingPeriod {
+  id             String   @id @default(cuid())
+  orgId          String
+  organisation   Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  startDate      DateTime
+  endDate        DateTime
+  baseYearFlag   Boolean  @default(false)
+  status         String   @default("draft") // draft | calculated | finalised
+  createdAt      DateTime @default(now())
+  activityData        ActivityData[]
+  calculatedEmissions CalculatedEmission[]
+  reports             Report[]
+}
+
+// ── Activity Data ───────────────────────────────────────────────────────────
+
+model ActivityData {
+  id               String   @id @default(cuid())
+  facilityId       String
+  facility         Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  periodId         String
+  period           ReportingPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  scope            Int      // 1, 2, 3
+  sourceCategory   String   // e.g. "stationary_combustion", "grid_electricity", "purchased_goods"
+  fuelType         String   // matches FuelProperty.code or free text for Scope 3
+  description      String?
+  inputMode        String   // "quantity" | "spend"
+  quantity         Float?
+  unit             String?
+  spendInr         Float?   // spend in INR (for spend-based fallback)
+  dataQualityFlag  String   @default("SECONDARY") // PRIMARY | SECONDARY | ESTIMATED
+  month            Int?     // 1-12 for monthly; null = annual total
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  calculatedEmission CalculatedEmission?
+}
+
+// ── Emission Factor ─────────────────────────────────────────────────────────
+
+model EmissionFactor {
+  id             String    @id @default(cuid())
+  fuelOrActivity String    // matches FuelProperty.code or activity key
+  scope          Int       // 1, 2, 3
+  scopeCategory  String    // e.g. "stationary_combustion", "process", "fugitive"
+  co2Ef          Float     // kgCO2 per efUnit
+  ch4Ef          Float?    // kgCH4 per efUnit
+  n2oEf          Float?    // kgN2O per efUnit
+  efUnit         String    // unit the EF expects (TJ, kWh, tonne, kg, km, tonne_km)
+  region         String?   // null = national; NORTHERN/SOUTHERN etc for grid
+  source         String    // IPCC, CEA, DEFRA, INDIA_GHG
+  sourceVersion  String?   // e.g. "IPCC 2006 Vol 2 Table 2.2"
+  sourceUrl      String?   // URL to source document
+  validFrom      DateTime
+  validTo        DateTime?
+  active         Boolean   @default(true)
+  notes          String?
+  calculatedEmissions CalculatedEmission[]
+
+  @@unique([fuelOrActivity, scope, scopeCategory])
+}
+
+// ── Calculated Emission ─────────────────────────────────────────────────────
+
+model CalculatedEmission {
+  id               String   @id @default(cuid())
+  activityDataId   String   @unique
+  activityData     ActivityData @relation(fields: [activityDataId], references: [id], onDelete: Cascade)
+  efId             String
+  emissionFactor   EmissionFactor @relation(fields: [efId], references: [id])
+  periodId         String
+  period           ReportingPeriod @relation(fields: [periodId], references: [id])
+  co2Tonnes        Float
+  ch4Co2eTonnes    Float
+  n2oCo2eTonnes    Float
+  totalCo2eTonnes  Float
+  calculationMethod String  // description of method used
+  calculationSteps String?  // JSON: full audit trail
+  calculatedAt     DateTime @default(now())
+}
+
+// ── Report ──────────────────────────────────────────────────────────────────
+
+model Report {
+  id                  String   @id @default(cuid())
+  orgId               String
+  periodId            String
+  period              ReportingPeriod @relation(fields: [periodId], references: [id])
+  scope1Total         Float
+  scope2Total         Float
+  scope3Total         Float
+  scope3ByCategory    String?  // JSON
+  energyConsumedGj    Float
+  renewablePercent    Float?
+  intensityPerTurnover Float?
+  intensityPerProduct  Float?
+  intensityPerEmployee Float?
+  dataQualityScore    Float
+  reportFormat        String   // BRSR | ISO | DETAILED | BENCHMARK
+  generatedAt         DateTime @default(now())
+}
+
+// ── Reference Tables ────────────────────────────────────────────────────────
+
+model FuelProperty {
+  id              String  @id @default(cuid())
+  code            String  @unique // e.g. "DIESEL_HSD"
+  name            String
+  category        String  // fuel | refrigerant | material | electricity
+  baseUnit        String
+  density         Float?  // kg/L
+  ncvTjPerGg      Float?  // Net Calorific Value in TJ/Gg
+  co2EfKgPerTj    Float?  // kgCO2/TJ (from blueprint fuel table)
+  defaultPriceInr Float?  // INR per common purchase unit
+  alternateUnits  String? // JSON array of alternate units
+  commonMsmeUse   String?
+  source          String? // source document reference
+  sourceUrl       String? // URL to source
+  notes           String?
+}
+
+model GwpValue {
+  id               String  @id @default(cuid())
+  gas              String  // CO2, CH4, N2O, SF6, R22, etc.
+  gwp              Float
+  assessmentReport String  // AR5, AR6
+  isDefault        Boolean @default(false)
+  source           String? // e.g. "IPCC AR5 WG1 Table 8.A.1"
+  sourceUrl        String?
+
+  @@unique([gas, assessmentReport])
+}
+
+model UnitConversion {
+  id        String  @id @default(cuid())
+  fromUnit  String
+  toUnit    String
+  factor    Float
+  fuelCode  String? // null = universal; else fuel-specific
+  source    String? // source reference
+  notes     String?
+
+  @@unique([fromUnit, toUnit, fuelCode])
+}
+
+model SectorBenchmark {
+  id            String @id @default(cuid())
+  sector        String
+  subSector     String
+  metric        String // e.g. "tCO2e_per_tonne"
+  bestPractice  Float
+  sectorAverage Float
+  worstQuartile Float
+  source        String
+  sourceUrl     String?
+  year          Int
+
+  @@unique([sector, subSector, metric])
+}
