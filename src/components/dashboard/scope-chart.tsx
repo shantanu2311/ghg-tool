@@ -2,6 +2,8 @@
 
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { InventoryResult } from '@/lib/calc-engine/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { PieChart as PieChartIcon } from 'lucide-react';
 
 interface ScopeChartProps {
   result: InventoryResult;
@@ -34,6 +36,14 @@ function renderCustomLabel(props: any) {
   );
 }
 
+const tooltipStyle = {
+  borderRadius: '10px',
+  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
+  padding: '10px 14px',
+  backgroundColor: 'var(--color-card, white)',
+  border: '1px solid var(--color-border)',
+};
+
 export default function ScopeChart({ result }: ScopeChartProps) {
   const data = [
     { name: 'Scope 1', value: result.scope1.total },
@@ -43,59 +53,63 @@ export default function ScopeChart({ result }: ScopeChartProps) {
 
   if (data.length === 0) {
     return (
-      <div className="flex h-[300px] items-center justify-center text-sm text-zinc-400">
-        No emission data to display
-      </div>
+      <Card>
+        <CardContent className="flex h-[300px] items-center justify-center">
+          <div className="text-center">
+            <PieChartIcon className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No emission data to display</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-zinc-900">Scope Breakdown</h3>
-      <p className="text-[11px] text-zinc-500">Distribution by scope category</p>
-      <div className="mt-4 h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={110}
-              paddingAngle={2}
-              dataKey="value"
-              labelLine={false}
-              label={renderCustomLabel}
-            >
-              {data.map((entry, index) => {
-                const colorIndex = LABELS.indexOf(entry.name);
-                return (
-                  <Cell
-                    key={`cell-${entry.name}`}
-                    fill={COLORS[colorIndex >= 0 ? colorIndex : index]}
-                    strokeWidth={1}
-                  />
-                );
-              })}
-            </Pie>
-            <Tooltip
-              formatter={(value) => [`${Number(value).toFixed(2)} tCO2e`, '']}
-              contentStyle={{
-                borderRadius: '10px',
-                boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-                padding: '10px 14px',
-                border: '1px solid #e4e4e7',
-              }}
-            />
-            <Legend
-              verticalAlign="bottom"
-              iconType="circle"
-              iconSize={8}
-              formatter={(value) => <span className="text-xs text-zinc-600">{String(value)}</span>}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-semibold">Scope Breakdown</CardTitle>
+        <CardDescription className="text-[11px]">Distribution by scope category</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={110}
+                paddingAngle={2}
+                dataKey="value"
+                labelLine={false}
+                label={renderCustomLabel}
+              >
+                {data.map((entry, index) => {
+                  const colorIndex = LABELS.indexOf(entry.name);
+                  return (
+                    <Cell
+                      key={`cell-${entry.name}`}
+                      fill={COLORS[colorIndex >= 0 ? colorIndex : index]}
+                      strokeWidth={1}
+                    />
+                  );
+                })}
+              </Pie>
+              <Tooltip
+                formatter={(value) => [`${Number(value).toFixed(2)} tCO2e`, '']}
+                contentStyle={tooltipStyle}
+              />
+              <Legend
+                verticalAlign="bottom"
+                iconType="circle"
+                iconSize={8}
+                formatter={(value) => <span className="text-xs text-muted-foreground">{String(value)}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -41,6 +41,7 @@ export function generateRecommendations(input: RecommendationInput): Recommendat
     activityData,
     calculations: calculations.length > 0 ? calculations : inventoryResult.calculations,
     allTechnologies,
+    fuelProperties: input.fuelProperties,
   });
 
   // Step 2: Calculate impact and match funding for each
@@ -175,10 +176,11 @@ export function calculateCombinedImpact(
   const totalReduction = baselineTotal - residual;
   const totalReductionPct = baselineTotal > 0 ? (totalReduction / baselineTotal) * 100 : 0;
 
-  // Blended payback: total capex / total annual saving
+  // Blended payback: total capex / total annual saving (capped at 50 years)
   const capexMidInr = ((totalCapexMin + totalCapexMax) / 2) * 100000;
   const savingMidInr = (totalSavingMin + totalSavingMax) / 2;
-  const blendedPaybackYears = savingMidInr > 0 ? capexMidInr / savingMidInr : null;
+  let blendedPaybackYears: number | null = savingMidInr > 0 ? capexMidInr / savingMidInr : null;
+  if (blendedPaybackYears !== null && blendedPaybackYears > 50) blendedPaybackYears = 50;
 
   return {
     baselineTotalTonnes: baselineTotal,

@@ -215,7 +215,10 @@ export function fuelToEnergyTJ(
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 function normalize(unit: string): string {
-  return unit.toLowerCase().replace(/[\s_-]/g, '');
+  let u = unit.toLowerCase().replace(/[\s_-]/g, '');
+  // Normalize common plurals: litres→litre, tonnes→tonne, etc.
+  if (u.endsWith('s') && !u.endsWith('ss')) u = u.slice(0, -1);
+  return u;
 }
 
 function findConversion(from: string, to: string, fuelCode: string, conversions: UnitConversionData[]): UnitConversionData | undefined {

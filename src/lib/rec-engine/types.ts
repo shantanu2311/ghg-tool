@@ -1,7 +1,7 @@
 // ── Recommendation Engine Types ─────────────────────────────────────────────
 // All types for Module 2 (Reduction Recommendations) and Module 3 (Funding Matcher)
 
-import type { ActivityDataInput, InventoryResult, CalculationRecord } from '@/lib/calc-engine/types';
+import type { ActivityDataInput, InventoryResult, CalculationRecord, FuelPropertyData } from '@/lib/calc-engine/types';
 
 // ── Technology Data (parsed from Prisma model) ─────────────────────────────
 
@@ -185,5 +185,6 @@ export interface RecommendationInput {
   allTechnologies: TechnologyData[];
   allFunding: FundingData[];
   allLinks: TechFundingLinkData[];
+  fuelProperties?: FuelPropertyData[];
   energyCostPerGj?: number; // INR per GJ, default derived from fuel prices
 }

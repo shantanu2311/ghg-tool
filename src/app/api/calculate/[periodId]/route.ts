@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
 import { calculateInventory } from '@/lib/calc-engine';
+import { decryptActivityData, encryptEmissionData } from '@/lib/analysis-crypto';
 import type {
   CalculationInput,
   ActivityDataInput,
@@ -20,6 +22,9 @@ export async function POST(
   { params }: { params: Promise<{ periodId: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId; // 401 response
+
     const { periodId } = await params;
 
     // Parse optional body
@@ -37,15 +42,19 @@ export async function POST(
         organisation: true,
       },
     });
-    if (!period) {
-      return NextResponse.json({ error: 'Reporting period not found' }, { status: 404 });
+    if (!period || period.organisation.userId !== userId) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
     // 2. Fetch all activity data for this period with facility
-    const activityRows = await prisma.activityData.findMany({
+    const activityRowsRaw = await prisma.activityData.findMany({
       where: { periodId },
       include: { facility: true },
     });
+    // Decrypt activity data to get real quantities
+    const activityRows = activityRowsRaw.map((row) =>
+      decryptActivityData(row as unknown as Record<string, unknown>)
+    ) as typeof activityRowsRaw;
     if (activityRows.length === 0) {
       return NextResponse.json(
         { error: 'No activity data found for this period' },
@@ -174,17 +183,25 @@ export async function POST(
 
       // Create new records
       for (const calc of result.calculations) {
+        const encryptedEmission = encryptEmissionData({
+          co2Tonnes: calc.co2Tonnes,
+          ch4Co2eTonnes: calc.ch4Co2eTonnes,
+          n2oCo2eTonnes: calc.n2oCo2eTonnes,
+          totalCo2eTonnes: calc.totalCo2eTonnes,
+          calculationSteps: JSON.stringify(calc.calculationSteps),
+        });
         await tx.calculatedEmission.create({
           data: {
             activityDataId: calc.activityDataId,
             efId: calc.efId,
             periodId,
-            co2Tonnes: calc.co2Tonnes,
-            ch4Co2eTonnes: calc.ch4Co2eTonnes,
-            n2oCo2eTonnes: calc.n2oCo2eTonnes,
-            totalCo2eTonnes: calc.totalCo2eTonnes,
+            co2Tonnes: encryptedEmission.co2Tonnes,
+            ch4Co2eTonnes: encryptedEmission.ch4Co2eTonnes,
+            n2oCo2eTonnes: encryptedEmission.n2oCo2eTonnes,
+            totalCo2eTonnes: encryptedEmission.totalCo2eTonnes,
             calculationMethod: `${calc.efSource}${calc.efVersion ? ` (${calc.efVersion})` : ''}`,
-            calculationSteps: JSON.stringify(calc.calculationSteps),
+            calculationSteps: encryptedEmission.calculationSteps,
+            encryptedData: encryptedEmission.encryptedData,
           },
         });
       }

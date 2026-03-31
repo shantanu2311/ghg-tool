@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
+import { decryptActivityData, decryptEmissionData } from '@/lib/analysis-crypto';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ periodId: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId; // 401 response
+
     const { periodId } = await params;
 
     // 1. Fetch period with organisation
@@ -13,8 +18,8 @@ export async function GET(
       where: { id: periodId },
       include: { organisation: true },
     });
-    if (!period) {
-      return NextResponse.json({ error: 'Reporting period not found' }, { status: 404 });
+    if (!period || period.organisation.userId !== userId) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
     // 2. Fetch calculated emissions with related data
@@ -33,6 +38,14 @@ export async function GET(
         { error: 'No calculated emissions found. Run calculation first.' },
         { status: 404 }
       );
+    }
+
+    // Decrypt emission and activity data
+    for (let i = 0; i < calculations.length; i++) {
+      const decryptedEmission = decryptEmissionData(calculations[i] as unknown as Record<string, unknown>);
+      const decryptedActivity = decryptActivityData(calculations[i].activityData as unknown as Record<string, unknown>);
+      Object.assign(calculations[i], decryptedEmission);
+      Object.assign(calculations[i].activityData, decryptedActivity);
     }
 
     // 3. Group by scope and compute totals
@@ -56,9 +69,12 @@ export async function GET(
     const grandTotal = scope1Total + scope2Total + scope3Total;
 
     // 4. Data quality breakdown
-    const activityRows = await prisma.activityData.findMany({
+    const activityRowsRaw = await prisma.activityData.findMany({
       where: { periodId },
     });
+    const activityRows = activityRowsRaw.map((row) =>
+      decryptActivityData(row as unknown as Record<string, unknown>)
+    ) as typeof activityRowsRaw;
 
     const dataQualityBreakdown = {
       primary: 0,

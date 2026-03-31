@@ -1,176 +1,201 @@
 'use client';
 
 import { useWizardStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 import { IRON_STEEL_SUB_SECTORS, INDIAN_STATES, TURNOVER_BRACKETS } from '@/lib/calc-engine/constants';
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-        {required && <span className="ml-0.5 text-red-500">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-const inputClass =
-  'block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500';
-
-const selectClass =
-  'block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Building2, Mail, Phone, MapPin, Users, Landmark } from 'lucide-react';
 
 export default function StepOrganisation() {
   const org = useWizardStore((s) => s.organisation);
   const update = useWizardStore((s) => s.updateOrganisation);
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-base font-semibold text-gray-900">Organisation Profile</h2>
-      <p className="mt-1 text-sm text-gray-500">
-        Basic details about your company. This information will appear on the final report.
-      </p>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base font-semibold">Organisation Profile</CardTitle>
+        <CardDescription>
+          Basic details about your company. This information will appear on the final report.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {/* Company Name */}
+          <div className="space-y-1.5">
+            <Label htmlFor="org-name">
+              Company Name <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative">
+              <Building2 className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="org-name"
+                className="pl-8"
+                placeholder="e.g. Ramesh Steel Industries"
+                value={org.name}
+                onChange={(e) => update({ name: e.target.value })}
+              />
+            </div>
+          </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
-        {/* Company Name */}
-        <Field label="Company Name" required>
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="e.g. Ramesh Steel Industries"
-            value={org.name}
-            onChange={(e) => update({ name: e.target.value })}
-          />
-        </Field>
+          {/* UDYAM Number */}
+          <div className="space-y-1.5">
+            <Label htmlFor="org-udyam">UDYAM Number</Label>
+            <Input
+              id="org-udyam"
+              placeholder="UDYAM-XX-00-0000000"
+              value={org.udyamNumber}
+              onChange={(e) => update({ udyamNumber: e.target.value })}
+            />
+          </div>
 
-        {/* UDYAM Number */}
-        <Field label="UDYAM Number">
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="UDYAM-XX-00-0000000"
-            value={org.udyamNumber}
-            onChange={(e) => update({ udyamNumber: e.target.value })}
-          />
-        </Field>
+          {/* Sector (read-only) */}
+          <div className="space-y-1.5">
+            <Label>Sector</Label>
+            <Input
+              value="Iron & Steel"
+              readOnly
+              className="bg-muted text-muted-foreground"
+            />
+          </div>
 
-        {/* Sector (read-only) */}
-        <Field label="Sector">
-          <input
-            type="text"
-            className={cn(inputClass, 'bg-gray-50 text-gray-500')}
-            value="Iron & Steel"
-            readOnly
-          />
-        </Field>
+          {/* Sub-sector */}
+          <div className="space-y-1.5">
+            <Label>
+              Sub-sector <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={org.subSector}
+              onValueChange={(val) => update({ subSector: val ?? '' })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select sub-sector" />
+              </SelectTrigger>
+              <SelectContent>
+                {IRON_STEEL_SUB_SECTORS.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Sub-sector */}
-        <Field label="Sub-sector" required>
-          <select
-            className={selectClass}
-            value={org.subSector}
-            onChange={(e) => update({ subSector: e.target.value })}
-          >
-            <option value="">Select sub-sector</option>
-            {IRON_STEEL_SUB_SECTORS.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </Field>
+          {/* State */}
+          <div className="space-y-1.5">
+            <Label>
+              <MapPin className="h-3.5 w-3.5" />
+              State <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={org.state}
+              onValueChange={(val) => update({ state: val ?? '' })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select state" />
+              </SelectTrigger>
+              <SelectContent>
+                {INDIAN_STATES.map((state) => (
+                  <SelectItem key={state} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* State */}
-        <Field label="State" required>
-          <select
-            className={selectClass}
-            value={org.state}
-            onChange={(e) => update({ state: e.target.value })}
-          >
-            <option value="">Select state</option>
-            {INDIAN_STATES.map((state) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </select>
-        </Field>
+          {/* District */}
+          <div className="space-y-1.5">
+            <Label htmlFor="org-district">District</Label>
+            <Input
+              id="org-district"
+              placeholder="e.g. Ahmedabad"
+              value={org.district}
+              onChange={(e) => update({ district: e.target.value })}
+            />
+          </div>
 
-        {/* District */}
-        <Field label="District">
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="e.g. Ahmedabad"
-            value={org.district}
-            onChange={(e) => update({ district: e.target.value })}
-          />
-        </Field>
+          {/* Employee Count */}
+          <div className="space-y-1.5">
+            <Label htmlFor="org-employees">
+              <Users className="h-3.5 w-3.5" />
+              Employee Count
+            </Label>
+            <Input
+              id="org-employees"
+              type="number"
+              placeholder="e.g. 150"
+              min={0}
+              value={org.employeeCount ?? ''}
+              onChange={(e) =>
+                update({
+                  employeeCount: e.target.value ? Number(e.target.value) : null,
+                })
+              }
+            />
+          </div>
 
-        {/* Employee Count */}
-        <Field label="Employee Count">
-          <input
-            type="number"
-            className={inputClass}
-            placeholder="e.g. 150"
-            min={0}
-            value={org.employeeCount ?? ''}
-            onChange={(e) =>
-              update({
-                employeeCount: e.target.value ? Number(e.target.value) : null,
-              })
-            }
-          />
-        </Field>
+          {/* Turnover Bracket */}
+          <div className="space-y-1.5">
+            <Label>
+              <Landmark className="h-3.5 w-3.5" />
+              Turnover Bracket
+            </Label>
+            <Select
+              value={org.turnoverBracket}
+              onValueChange={(val) => update({ turnoverBracket: val ?? '' })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select bracket" />
+              </SelectTrigger>
+              <SelectContent>
+                {TURNOVER_BRACKETS.map((b) => (
+                  <SelectItem key={b.value} value={b.value}>
+                    {b.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Turnover Bracket */}
-        <Field label="Turnover Bracket">
-          <select
-            className={selectClass}
-            value={org.turnoverBracket}
-            onChange={(e) => update({ turnoverBracket: e.target.value })}
-          >
-            <option value="">Select bracket</option>
-            {TURNOVER_BRACKETS.map((b) => (
-              <option key={b.value} value={b.value}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-        </Field>
+          {/* Contact Email */}
+          <div className="space-y-1.5">
+            <Label htmlFor="org-email">
+              <Mail className="h-3.5 w-3.5" />
+              Contact Email
+            </Label>
+            <Input
+              id="org-email"
+              type="email"
+              placeholder="contact@company.com"
+              value={org.contactEmail}
+              onChange={(e) => update({ contactEmail: e.target.value })}
+            />
+          </div>
 
-        {/* Contact Email */}
-        <Field label="Contact Email">
-          <input
-            type="email"
-            className={inputClass}
-            placeholder="contact@company.com"
-            value={org.contactEmail}
-            onChange={(e) => update({ contactEmail: e.target.value })}
-          />
-        </Field>
-
-        {/* Contact Phone */}
-        <Field label="Contact Phone">
-          <input
-            type="tel"
-            className={inputClass}
-            placeholder="+91 98765 43210"
-            value={org.contactPhone}
-            onChange={(e) => update({ contactPhone: e.target.value })}
-          />
-        </Field>
-      </div>
-    </div>
+          {/* Contact Phone */}
+          <div className="space-y-1.5">
+            <Label htmlFor="org-phone">
+              <Phone className="h-3.5 w-3.5" />
+              Contact Phone
+            </Label>
+            <Input
+              id="org-phone"
+              type="tel"
+              placeholder="+91 98765 43210"
+              value={org.contactPhone}
+              onChange={(e) => update({ contactPhone: e.target.value })}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -7,12 +7,64 @@ datasource db {
   provider = "postgresql"
 }
 
+// ── User & Auth ────────────────────────────────────────────────────────────
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?   // encrypted
+  email          String    @unique
+  emailVerified  DateTime?
+  passwordHash   String    // bcrypt hash
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  organisations  Organisation[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 // ── Organisation ────────────────────────────────────────────────────────────
 
 model Organisation {
   id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name            String
-  udyamNumber     String?  @unique  // UDYAM registration (unique MSME identifier in India)
+  udyamNumber     String?  @unique
   sector          String   // NIC code or slug e.g. "iron_steel"
   subSector       String   // e.g. "eaf_mini_mill", "induction_furnace"
   state           String
@@ -78,6 +130,7 @@ model ActivityData {
   spendInr         Float?   // spend in INR (for spend-based fallback)
   dataQualityFlag  String   @default("SECONDARY") // PRIMARY | SECONDARY | ESTIMATED
   month            Int?     // 1-12 for monthly; null = annual total
+  encryptedData    String?  // AES-256-GCM encrypted JSON of sensitive values (quantity, spendInr)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   calculatedEmission CalculatedEmission?
@@ -123,6 +176,7 @@ model CalculatedEmission {
   totalCo2eTonnes  Float
   calculationMethod String  // description of method used
   calculationSteps String?  // JSON: full audit trail
+  encryptedData    String?  // AES-256-GCM encrypted JSON of sensitive values (co2, ch4, n2o, total)
   calculatedAt     DateTime @default(now())
 }
 
@@ -144,6 +198,7 @@ model Report {
   intensityPerEmployee Float?
   dataQualityScore    Float
   reportFormat        String   // BRSR | ISO | DETAILED | BENCHMARK
+  encryptedData       String?  // AES-256-GCM encrypted JSON of sensitive values (scope totals, intensity)
   generatedAt         DateTime @default(now())
 }
 

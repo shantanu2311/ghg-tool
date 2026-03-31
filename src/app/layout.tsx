@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
+import { ThemeProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
+import { SessionProvider } from "@/components/session-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,46 +30,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <nav className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-12 max-w-3xl items-center justify-between px-6">
-            <Link
-              href="/"
-              className="text-sm font-semibold text-zinc-900"
-            >
-              GHG Tool
-            </Link>
-            <div className="flex items-center gap-5">
-              <Link
-                href="/wizard"
-                className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-              >
-                Inventory
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/recommendations"
-                className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-              >
-                Reduce
-              </Link>
-              <Link
-                href="/funding"
-                className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-              >
-                Funding
-              </Link>
-            </div>
-          </div>
-        </nav>
-        <main className="flex-1">{children}</main>
+      <body className="min-h-full bg-background text-foreground">
+        <SessionProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

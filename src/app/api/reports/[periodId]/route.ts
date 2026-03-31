@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
 import { mapToBrsr, generateMethodologyNote } from '@/lib/calc-engine';
+import { decryptActivityData, decryptEmissionData, encryptReportData } from '@/lib/analysis-crypto';
 import type { ScopeTotal, IntensityMetrics } from '@/lib/calc-engine/types';
 
 export async function POST(
@@ -8,6 +10,9 @@ export async function POST(
   { params }: { params: Promise<{ periodId: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId; // 401 response
+
     const { periodId } = await params;
 
     // Parse request body
@@ -29,8 +34,8 @@ export async function POST(
       where: { id: periodId },
       include: { organisation: true },
     });
-    if (!period) {
-      return NextResponse.json({ error: 'Reporting period not found' }, { status: 404 });
+    if (!period || period.organisation.userId !== userId) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
     // 2. Fetch calculated emissions for this period (include activityData)
@@ -38,6 +43,14 @@ export async function POST(
       where: { periodId },
       include: { activityData: true },
     });
+
+    // Decrypt emission and activity data
+    for (let i = 0; i < calculatedEmissions.length; i++) {
+      const decryptedEmission = decryptEmissionData(calculatedEmissions[i] as unknown as Record<string, unknown>);
+      const decryptedActivity = decryptActivityData(calculatedEmissions[i].activityData as unknown as Record<string, unknown>);
+      Object.assign(calculatedEmissions[i], decryptedEmission);
+      Object.assign(calculatedEmissions[i].activityData, decryptedActivity);
+    }
 
     // 3. If no calculated emissions exist, return 400
     if (calculatedEmissions.length === 0) {
@@ -180,24 +193,37 @@ export async function POST(
       scope3ByCategory[cat.category] = cat.total;
     }
 
-    // 7. Store a Report record in the database
+    // 7. Store a Report record in the database (with encryption)
+    const encryptedReport = encryptReportData({
+      scope1Total: scope1.total,
+      scope2Total: scope2.total,
+      scope3Total: scope3.total,
+      scope3ByCategory: Object.keys(scope3ByCategory).length > 0
+        ? JSON.stringify(scope3ByCategory)
+        : null,
+      energyConsumedGj,
+      renewablePercent,
+      intensityPerTurnover: intensityMetrics.perTurnover,
+      intensityPerProduct: intensityMetrics.perProduct,
+      intensityPerEmployee: intensityMetrics.perEmployee,
+      dataQualityScore,
+    });
     const report = await prisma.report.create({
       data: {
         orgId: period.orgId,
         periodId,
-        scope1Total: scope1.total,
-        scope2Total: scope2.total,
-        scope3Total: scope3.total,
-        scope3ByCategory: Object.keys(scope3ByCategory).length > 0
-          ? JSON.stringify(scope3ByCategory)
-          : null,
-        energyConsumedGj,
-        renewablePercent,
-        intensityPerTurnover: intensityMetrics.perTurnover,
-        intensityPerProduct: intensityMetrics.perProduct,
-        intensityPerEmployee: intensityMetrics.perEmployee,
-        dataQualityScore,
+        scope1Total: encryptedReport.scope1Total as number,
+        scope2Total: encryptedReport.scope2Total as number,
+        scope3Total: encryptedReport.scope3Total as number,
+        scope3ByCategory: encryptedReport.scope3ByCategory as string | null,
+        energyConsumedGj: encryptedReport.energyConsumedGj as number,
+        renewablePercent: encryptedReport.renewablePercent as number | null,
+        intensityPerTurnover: encryptedReport.intensityPerTurnover as number | null,
+        intensityPerProduct: encryptedReport.intensityPerProduct as number | null,
+        intensityPerEmployee: encryptedReport.intensityPerEmployee as number | null,
+        dataQualityScore: encryptedReport.dataQualityScore as number,
         reportFormat: body.format,
+        encryptedData: encryptedReport.encryptedData,
       },
     });
 

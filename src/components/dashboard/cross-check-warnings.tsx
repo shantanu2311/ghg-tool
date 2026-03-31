@@ -2,66 +2,90 @@
 
 import { cn } from '@/lib/utils';
 import type { CrossCheckWarning } from '@/lib/calc-engine/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, AlertCircle, Info, CircleCheck } from 'lucide-react';
 
 interface CrossCheckWarningsProps {
   warnings: CrossCheckWarning[];
 }
 
-function severityStyles(severity: string) {
+function severityIcon(severity: string) {
   switch (severity) {
-    case 'error': return 'bg-red-50 text-red-700 border-red-200';
-    case 'warning': return 'bg-amber-50 text-amber-700 border-amber-200';
-    case 'info': return 'bg-blue-50 text-blue-700 border-blue-200';
-    default: return 'bg-zinc-50 text-zinc-600 border-zinc-200';
+    case 'error': return <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />;
+    case 'warning': return <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />;
+    case 'info': return <Info className="h-4 w-4 text-blue-500 shrink-0" />;
+    default: return <Info className="h-4 w-4 text-muted-foreground shrink-0" />;
   }
 }
 
-function severityBadge(severity: string) {
+function severityStyles(severity: string) {
   switch (severity) {
-    case 'error': return 'bg-red-100 text-red-800';
-    case 'warning': return 'bg-amber-100 text-amber-800';
-    case 'info': return 'bg-blue-100 text-blue-800';
-    default: return 'bg-zinc-100 text-zinc-700';
+    case 'error': return 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800';
+    case 'warning': return 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
+    case 'info': return 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+    default: return 'bg-muted text-muted-foreground border-border';
+  }
+}
+
+function severityBadgeColor(severity: string) {
+  switch (severity) {
+    case 'error': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
+    case 'warning': return 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300';
+    case 'info': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+    default: return 'bg-muted text-muted-foreground';
   }
 }
 
 export default function CrossCheckWarnings({ warnings }: CrossCheckWarningsProps) {
   if (warnings.length === 0) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-zinc-900">Cross-Check Warnings</h3>
-        <p className="mt-4 text-center text-sm text-emerald-600">
-          No warnings - all cross-checks passed
-        </p>
-      </div>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">Cross-Check Warnings</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-6 gap-2">
+          <CircleCheck className="h-4 w-4 text-emerald-500" />
+          <p className="text-sm text-emerald-600 dark:text-emerald-400">
+            No warnings - all cross-checks passed
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-zinc-900">Cross-Check Warnings</h3>
-      <p className="text-[11px] text-zinc-500">{warnings.length} issue{warnings.length !== 1 ? 's' : ''} detected</p>
-      <div className="mt-3 space-y-2">
-        {warnings.map((w, i) => (
-          <div
-            key={`${w.category}-${i}`}
-            className={cn('rounded-lg border p-3', severityStyles(w.severity))}
-          >
-            <div className="flex items-center gap-2">
-              <span className={cn('inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase', severityBadge(w.severity))}>
-                {w.severity}
-              </span>
-              <span className="text-xs font-medium">{w.category}</span>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-semibold">Cross-Check Warnings</CardTitle>
+        <CardDescription className="text-[11px]">
+          {warnings.length} issue{warnings.length !== 1 ? 's' : ''} detected
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {warnings.map((w, i) => (
+            <div
+              key={`${w.category}-${i}`}
+              className={cn('rounded-lg border p-3', severityStyles(w.severity))}
+            >
+              <div className="flex items-center gap-2">
+                {severityIcon(w.severity)}
+                <Badge className={cn('text-[10px] uppercase', severityBadgeColor(w.severity))}>
+                  {w.severity}
+                </Badge>
+                <span className="text-xs font-medium">{w.category}</span>
+              </div>
+              <p className="mt-1 text-sm ml-6">{w.message}</p>
+              {w.expectedRange && w.actualValue != null && (
+                <p className="mt-1 text-[11px] opacity-75 ml-6">
+                  Expected: {w.expectedRange.min}--{w.expectedRange.max} {w.expectedRange.unit} | Actual: {typeof w.actualValue === 'number' ? w.actualValue.toFixed(2) : w.actualValue}
+                </p>
+              )}
             </div>
-            <p className="mt-1 text-sm">{w.message}</p>
-            {w.expectedRange && w.actualValue != null && (
-              <p className="mt-1 text-[11px] opacity-75">
-                Expected: {w.expectedRange.min}–{w.expectedRange.max} {w.expectedRange.unit} | Actual: {w.actualValue}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

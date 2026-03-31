@@ -1,6 +1,8 @@
 'use client';
 
 import type { CombinedImpact } from '@/lib/rec-engine/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Leaf, Activity, Banknote, PiggyBank } from 'lucide-react';
 
 interface Props {
   impact: CombinedImpact;
@@ -13,47 +15,61 @@ function formatNum(n: number, decimals = 1): string {
   return n.toFixed(decimals);
 }
 
+const ICONS = [Leaf, Activity, Banknote, PiggyBank];
+
 export function ImpactSummary({ impact, enabledCount }: Props) {
   const cards = [
     {
       label: 'CO2 Reduction',
       value: `${formatNum(impact.totalReductionTonnes)} tCO2e`,
       sub: `${impact.totalReductionPct.toFixed(1)}% of baseline`,
-      color: impact.totalReductionTonnes > 0 ? 'text-emerald-600' : 'text-zinc-400',
+      accent: impact.totalReductionTonnes > 0,
     },
     {
       label: 'Baseline Emissions',
       value: `${formatNum(impact.baselineTotalTonnes)} tCO2e`,
       sub: `After: ${formatNum(impact.postReductionTotalTonnes)} tCO2e`,
-      color: 'text-zinc-900',
+      accent: false,
     },
     {
       label: 'Total CAPEX',
-      value: `₹${formatNum(impact.totalCapexMinLakhs)}–${formatNum(impact.totalCapexMaxLakhs)}L`,
-      sub: enabledCount > 0 ? `${enabledCount} technologies` : 'None selected',
-      color: 'text-zinc-900',
+      value: `Rs.${formatNum(impact.totalCapexMinLakhs)}--${formatNum(impact.totalCapexMaxLakhs)}L`,
+      sub: enabledCount > 0
+        ? `${enabledCount} ${enabledCount === 1 ? 'technology' : 'technologies'}`
+        : impact.totalCapexMinLakhs > 0 ? 'All matched' : 'None selected',
+      accent: false,
     },
     {
       label: 'Annual Savings',
       value: impact.totalAnnualSavingMaxInr > 0
-        ? `₹${formatNum(impact.totalAnnualSavingMinInr)}–${formatNum(impact.totalAnnualSavingMaxInr)}`
-        : '–',
+        ? `Rs.${formatNum(impact.totalAnnualSavingMinInr)}--${formatNum(impact.totalAnnualSavingMaxInr)}`
+        : '--',
       sub: impact.blendedPaybackYears
-        ? `Blended payback: ${impact.blendedPaybackYears.toFixed(1)} yrs`
+        ? impact.blendedPaybackYears >= 50
+          ? 'Blended payback: >50 yrs'
+          : `Blended payback: ${impact.blendedPaybackYears.toFixed(1)} yrs`
         : 'No cost data',
-      color: impact.totalAnnualSavingMaxInr > 0 ? 'text-teal-600' : 'text-zinc-400',
+      accent: impact.totalAnnualSavingMaxInr > 0,
     },
   ];
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      {cards.map((card) => (
-        <div key={card.label} className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <p className="text-[11px] text-zinc-500">{card.label}</p>
-          <p className={`mt-1 text-lg font-bold ${card.color}`}>{card.value}</p>
-          <p className="mt-0.5 text-[11px] text-zinc-400">{card.sub}</p>
-        </div>
-      ))}
+      {cards.map((card, i) => {
+        const Icon = ICONS[i];
+        return (
+          <Card key={card.label} className="hover:shadow-md transition-shadow">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                <p className="text-[11px] text-muted-foreground">{card.label}</p>
+              </div>
+              <p className={`text-lg font-semibold ${card.accent ? 'text-primary' : ''}`}>{card.value}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{card.sub}</p>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

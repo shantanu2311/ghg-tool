@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
 import { generateRecommendations } from '@/lib/rec-engine/index';
+import { decryptActivityData, decryptEmissionData } from '@/lib/analysis-crypto';
 import type { TechnologyData, FundingData, TechFundingLinkData, RecommendationInput } from '@/lib/rec-engine/types';
-import type { ActivityDataInput, CalculationRecord, ScopeTotal } from '@/lib/calc-engine/types';
+import type { ActivityDataInput, CalculationRecord, ScopeTotal, FuelPropertyData } from '@/lib/calc-engine/types';
 
 function parseJson(val: string | null): string[] | null {
   if (!val) return null;
@@ -14,6 +16,9 @@ export async function POST(
   { params }: { params: Promise<{ periodId: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId; // 401 response
+
     const { periodId } = await params;
 
     // 1. Fetch period + organisation
@@ -21,8 +26,8 @@ export async function POST(
       where: { id: periodId },
       include: { organisation: true },
     });
-    if (!period) {
-      return NextResponse.json({ error: 'Reporting period not found' }, { status: 404 });
+    if (!period || period.organisation.userId !== userId) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
     if (period.status === 'draft') {
       return NextResponse.json(
@@ -47,7 +52,14 @@ export async function POST(
       );
     }
 
-    // 3. Build InventoryResult-like structure from DB records
+    // 3. Decrypt DB records and build InventoryResult-like structure
+    for (let i = 0; i < calcRecords.length; i++) {
+      const decryptedEmission = decryptEmissionData(calcRecords[i] as unknown as Record<string, unknown>);
+      const decryptedActivity = decryptActivityData(calcRecords[i].activityData as unknown as Record<string, unknown>);
+      Object.assign(calcRecords[i], decryptedEmission);
+      Object.assign(calcRecords[i].activityData, decryptedActivity);
+    }
+
     let scope1Total = 0, scope2Total = 0, scope3Total = 0;
     const scope1Cats = new Map<string, number>();
     const scope2Cats = new Map<string, number>();
@@ -110,11 +122,12 @@ export async function POST(
 
     const grandTotal = scope1Total + scope2Total + scope3Total;
 
-    // 4. Fetch all technologies, funding schemes, and links in parallel
-    const [allTechsRaw, allFundingRaw, allLinksRaw] = await Promise.all([
+    // 4. Fetch all technologies, funding schemes, links, and fuel properties in parallel
+    const [allTechsRaw, allFundingRaw, allLinksRaw, allFuelPropsRaw] = await Promise.all([
       prisma.reductionTechnology.findMany(),
       prisma.fundingScheme.findMany(),
       prisma.techFundingLink.findMany(),
+      prisma.fuelProperty.findMany(),
     ]);
 
     const allTechnologies: TechnologyData[] = allTechsRaw.map((t) => ({
@@ -176,6 +189,18 @@ export async function POST(
       notes: l.notes,
     }));
 
+    const fuelProperties: FuelPropertyData[] = allFuelPropsRaw.map((fp) => ({
+      code: fp.code,
+      name: fp.name,
+      category: fp.category,
+      baseUnit: fp.baseUnit,
+      density: fp.density,
+      ncvTjPerGg: fp.ncvTjPerGg,
+      co2EfKgPerTj: fp.co2EfKgPerTj,
+      defaultPriceInr: fp.defaultPriceInr,
+      alternateUnits: fp.alternateUnits ? JSON.parse(fp.alternateUnits) : [],
+    }));
+
     // 5. Run recommendation engine
     const input: RecommendationInput = {
       inventoryResult: {
@@ -210,6 +235,7 @@ export async function POST(
       allTechnologies,
       allFunding,
       allLinks,
+      fuelProperties,
     };
 
     const result = generateRecommendations(input);

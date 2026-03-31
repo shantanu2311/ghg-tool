@@ -2,7 +2,7 @@
 // Pure function: no DB calls, no side effects.
 // Implements the 5-filter cascade from the spec (Section 4.2).
 
-import type { ActivityDataInput, CalculationRecord } from '@/lib/calc-engine/types';
+import type { ActivityDataInput, CalculationRecord, FuelPropertyData } from '@/lib/calc-engine/types';
 import type { TechnologyData, MatchedTechnology } from './types';
 import { KWH_TO_GJ } from '@/lib/calc-engine/constants';
 
@@ -11,6 +11,7 @@ interface MatchInput {
   activityData: ActivityDataInput[];
   calculations: CalculationRecord[];
   allTechnologies: TechnologyData[];
+  fuelProperties?: FuelPropertyData[];
 }
 
 /**
@@ -25,7 +26,7 @@ export function matchTechnologies(input: MatchInput): {
   matched: MatchedTechnology[];
   notApplicable: string[];
 } {
-  const { organisation, activityData, calculations, allTechnologies } = input;
+  const { organisation, activityData, calculations, allTechnologies, fuelProperties } = input;
   const matched: MatchedTechnology[] = [];
   const notApplicable: string[] = [];
 
@@ -33,6 +34,14 @@ export function matchTechnologies(input: MatchInput): {
   const activityMap = new Map<string, ActivityDataInput>();
   for (const ad of activityData) {
     if (ad.id) activityMap.set(ad.id, ad);
+  }
+
+  // Build fuel property lookup for proper energy estimation
+  const fuelMap = new Map<string, FuelPropertyData>();
+  if (fuelProperties) {
+    for (const fp of fuelProperties) {
+      fuelMap.set(fp.code, fp);
+    }
   }
 
   // Collect all fuel types and categories present in the user's inventory
@@ -80,7 +89,7 @@ export function matchTechnologies(input: MatchInput): {
 
     // Calculate matched emissions (sum of tCO2e from matching activities)
     const { matchedEmissions, matchedEnergyGj, matchedFuelTypes, matchedCategories } =
-      calculateMatchedEmissions(tech, activityData, calculations, activityMap);
+      calculateMatchedEmissions(tech, activityData, calculations, activityMap, fuelMap);
 
     // Filter 5: Emission threshold
     if (tech.minEmissionThreshold !== null && matchedEmissions < tech.minEmissionThreshold) {
@@ -107,13 +116,21 @@ export function matchTechnologies(input: MatchInput): {
 }
 
 /**
- * Sum emissions and energy from activities that match a technology's fuel types and categories.
+ * Sum emissions and energy from activities that match a technology's fuel types OR categories.
+ *
+ * Matching logic:
+ * - If tech specifies BOTH fuel types and categories: match if EITHER matches (OR).
+ *   This is because techs like "VFDs" match a category (motors) OR a fuel type (electricity).
+ * - If tech specifies ONLY fuel types: match on fuel type.
+ * - If tech specifies ONLY categories: match on category.
+ * - If tech specifies neither: match ALL activities (universal tech).
  */
 function calculateMatchedEmissions(
   tech: TechnologyData,
   activityData: ActivityDataInput[],
   calculations: CalculationRecord[],
   activityMap: Map<string, ActivityDataInput>,
+  fuelMap: Map<string, FuelPropertyData>,
 ): {
   matchedEmissions: number;
   matchedEnergyGj: number;
@@ -125,33 +142,39 @@ function calculateMatchedEmissions(
   const matchedFuelTypes = new Set<string>();
   const matchedCategories = new Set<string>();
 
+  const hasFuelFilter = tech.matchesFuelTypes !== null && tech.matchesFuelTypes.length > 0;
+  const hasCategoryFilter = tech.matchesCategories !== null && tech.matchesCategories.length > 0;
+
   for (const calc of calculations) {
     const activity = activityMap.get(calc.activityDataId);
     if (!activity) continue;
 
-    const fuelMatch =
-      tech.matchesFuelTypes === null ||
-      tech.matchesFuelTypes.length === 0 ||
-      tech.matchesFuelTypes.includes(activity.fuelType);
+    const fuelMatch = hasFuelFilter && tech.matchesFuelTypes!.includes(activity.fuelType);
+    const categoryMatch = hasCategoryFilter && tech.matchesCategories!.includes(activity.sourceCategory);
 
-    const categoryMatch =
-      tech.matchesCategories === null ||
-      tech.matchesCategories.length === 0 ||
-      tech.matchesCategories.includes(activity.sourceCategory);
+    // Determine if this activity matches:
+    // - Both filters set: OR (either fuel OR category matches)
+    // - Only fuel filter: must match fuel
+    // - Only category filter: must match category
+    // - Neither filter: universal tech, matches everything
+    let matches = false;
+    if (hasFuelFilter && hasCategoryFilter) {
+      matches = fuelMatch || categoryMatch;
+    } else if (hasFuelFilter) {
+      matches = fuelMatch;
+    } else if (hasCategoryFilter) {
+      matches = categoryMatch;
+    } else {
+      matches = true; // Universal tech
+    }
 
-    if (fuelMatch && categoryMatch) {
+    if (matches) {
       matchedEmissions += calc.totalCo2eTonnes;
       matchedFuelTypes.add(activity.fuelType);
       matchedCategories.add(activity.sourceCategory);
 
-      // Estimate energy: for electricity, use kWh → GJ conversion
-      if (activity.fuelType === 'GRID_ELECTRICITY' && activity.quantity) {
-        matchedEnergyGj += activity.quantity * KWH_TO_GJ;
-      } else if (activity.quantity) {
-        // For fuels, rough estimate: quantity in base unit → GJ
-        // This is approximate; exact conversion would need fuel properties
-        matchedEnergyGj += activity.quantity * 0.03; // rough default GJ/unit
-      }
+      // Estimate energy using fuel properties (NCV) when available
+      matchedEnergyGj += estimateEnergyGj(activity, fuelMap);
     }
   }
 
@@ -161,4 +184,53 @@ function calculateMatchedEmissions(
     matchedFuelTypes: Array.from(matchedFuelTypes),
     matchedCategories: Array.from(matchedCategories),
   };
+}
+
+/**
+ * Estimate energy content (GJ) of an activity entry using fuel properties.
+ * Uses NCV (Net Calorific Value) for combustion fuels, kWh conversion for electricity.
+ */
+function estimateEnergyGj(
+  activity: ActivityDataInput,
+  fuelMap: Map<string, FuelPropertyData>,
+): number {
+  if (!activity.quantity || activity.quantity <= 0) return 0;
+
+  // Electricity: direct kWh → GJ
+  if (activity.fuelType === 'GRID_ELECTRICITY' || activity.fuelType === 'RENEWABLE_ELECTRICITY') {
+    return activity.quantity * KWH_TO_GJ;
+  }
+
+  // Combustion fuels: use NCV from fuel properties
+  const fuel = fuelMap.get(activity.fuelType);
+  if (fuel?.ncvTjPerGg) {
+    // NCV is in TJ/Gg (= TJ per 1000 tonnes)
+    // Need to convert activity quantity to tonnes first
+    let tonnes = 0;
+    if (fuel.baseUnit === 'tonne') {
+      tonnes = activity.quantity;
+    } else if (fuel.baseUnit === 'kL' && fuel.density) {
+      tonnes = activity.quantity * fuel.density;
+    } else if (fuel.baseUnit === 'kg') {
+      tonnes = activity.quantity / 1000;
+    }
+
+    if (tonnes > 0) {
+      const energyTj = (tonnes / 1000) * fuel.ncvTjPerGg;
+      return energyTj * 1000; // TJ → GJ
+    }
+  }
+
+  // Fallback: use a reasonable default based on unit
+  // Diesel ~36 GJ/kL, coal ~20 GJ/tonne, LPG ~47 GJ/tonne
+  // Average ~25 GJ/tonne is a better fallback than 0.03 GJ/unit
+  const unit = (activity.unit ?? '').toLowerCase();
+  if (unit.includes('kwh')) return activity.quantity * KWH_TO_GJ;
+  if (unit.includes('tonne')) return activity.quantity * 25; // ~25 GJ/tonne average
+  if (unit.includes('kl') || unit.includes('kilolitre')) return activity.quantity * 35; // ~35 GJ/kL average
+  if (unit.includes('litre')) return activity.quantity * 0.035; // ~35 GJ/kL / 1000
+  if (unit.includes('kg')) return activity.quantity * 0.025; // ~25 GJ/tonne / 1000
+
+  // Last resort: skip energy estimation rather than using a meaningless number
+  return 0;
 }

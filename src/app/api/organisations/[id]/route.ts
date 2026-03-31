@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId;
+
     const { id } = await params;
     const org = await prisma.organisation.findUnique({
       where: { id },
       include: { facilities: true, reportingPeriods: true },
     });
-    if (!org) {
+    if (!org || org.userId !== userId) {
       return NextResponse.json({ error: 'Organisation not found' }, { status: 404 });
     }
     return NextResponse.json(org);
@@ -26,12 +30,17 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId;
+
     const { id } = await params;
+    const existing = await prisma.organisation.findUnique({ where: { id } });
+    if (!existing || existing.userId !== userId) {
+      return NextResponse.json({ error: 'Organisation not found' }, { status: 404 });
+    }
+
     const body = await request.json();
-    const org = await prisma.organisation.update({
-      where: { id },
-      data: body,
-    });
+    const org = await prisma.organisation.update({ where: { id }, data: body });
     return NextResponse.json(org);
   } catch (error) {
     console.error('PUT /api/organisations/[id] error:', error);
@@ -44,7 +53,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId;
+
     const { id } = await params;
+    const existing = await prisma.organisation.findUnique({ where: { id } });
+    if (!existing || existing.userId !== userId) {
+      return NextResponse.json({ error: 'Organisation not found' }, { status: 404 });
+    }
+
     await prisma.organisation.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {

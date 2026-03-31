@@ -2,18 +2,23 @@
 
 import { useEffect } from 'react';
 import { useWizardStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 import {
   INDIAN_STATES,
   STATE_GRID_MAP,
   IRON_STEEL_SUB_SECTORS,
 } from '@/lib/calc-engine/constants';
-
-const inputClass =
-  'block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500';
-
-const selectClass =
-  'block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardAction } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Plus, Trash2, Building2, Inbox } from 'lucide-react';
 
 function FacilityCard({
   facility,
@@ -33,107 +38,117 @@ function FacilityCard({
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-900">Facility {index + 1}</h3>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-semibold">
+          <Building2 className="inline h-4 w-4 mr-1.5 text-muted-foreground" />
+          Facility {index + 1}
+        </CardTitle>
         {canRemove && (
-          <button
-            type="button"
-            onClick={() => removeFacility(facility.id)}
-            className="rounded-md px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
-          >
-            Remove
-          </button>
+          <CardAction>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => removeFacility(facility.id)}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              Remove
+            </Button>
+          </CardAction>
         )}
-      </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Name */}
+          <div className="space-y-1.5">
+            <Label htmlFor={`fac-name-${facility.id}`}>
+              Facility Name <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id={`fac-name-${facility.id}`}
+              placeholder="e.g. Main Plant"
+              value={facility.name}
+              onChange={(e) => updateFacility(facility.id, { name: e.target.value })}
+            />
+          </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Name */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">
-            Facility Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="e.g. Main Plant"
-            value={facility.name}
-            onChange={(e) => updateFacility(facility.id, { name: e.target.value })}
-          />
-        </div>
+          {/* Address */}
+          <div className="space-y-1.5">
+            <Label htmlFor={`fac-addr-${facility.id}`}>Address</Label>
+            <Input
+              id={`fac-addr-${facility.id}`}
+              placeholder="Street address"
+              value={facility.address}
+              onChange={(e) => updateFacility(facility.id, { address: e.target.value })}
+            />
+          </div>
 
-        {/* Address */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">Address</label>
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="Street address"
-            value={facility.address}
-            onChange={(e) => updateFacility(facility.id, { address: e.target.value })}
-          />
-        </div>
+          {/* State */}
+          <div className="space-y-1.5">
+            <Label>
+              State <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={facility.state }
+              onValueChange={(val) => handleStateChange(val ?? '')}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select state" />
+              </SelectTrigger>
+              <SelectContent>
+                {INDIAN_STATES.map((state) => (
+                  <SelectItem key={state} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* State */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">
-            State <span className="text-red-500">*</span>
-          </label>
-          <select
-            className={selectClass}
-            value={facility.state}
-            onChange={(e) => handleStateChange(e.target.value)}
-          >
-            <option value="">Select state</option>
-            {INDIAN_STATES.map((state) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* District */}
+          <div className="space-y-1.5">
+            <Label htmlFor={`fac-dist-${facility.id}`}>District</Label>
+            <Input
+              id={`fac-dist-${facility.id}`}
+              placeholder="e.g. Ahmedabad"
+              value={facility.district}
+              onChange={(e) => updateFacility(facility.id, { district: e.target.value })}
+            />
+          </div>
 
-        {/* District */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">District</label>
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="e.g. Ahmedabad"
-            value={facility.district}
-            onChange={(e) => updateFacility(facility.id, { district: e.target.value })}
-          />
-        </div>
+          {/* Grid Region (auto-filled, read-only) */}
+          <div className="space-y-1.5">
+            <Label>Grid Region</Label>
+            <Input
+              value={facility.gridRegion || '(auto-filled from state)'}
+              readOnly
+              className="bg-muted text-muted-foreground"
+            />
+          </div>
 
-        {/* Grid Region (auto-filled, read-only) */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">Grid Region</label>
-          <input
-            type="text"
-            className={cn(inputClass, 'bg-gray-50 text-gray-500')}
-            value={facility.gridRegion || '(auto-filled from state)'}
-            readOnly
-          />
+          {/* Activity Type */}
+          <div className="space-y-1.5">
+            <Label>Activity Type</Label>
+            <Select
+              value={facility.activityType }
+              onValueChange={(val) => updateFacility(facility.id, { activityType: val ?? '' })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {IRON_STEEL_SUB_SECTORS.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-
-        {/* Activity Type */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">Activity Type</label>
-          <select
-            className={selectClass}
-            value={facility.activityType}
-            onChange={(e) => updateFacility(facility.id, { activityType: e.target.value })}
-          >
-            <option value="">Select type</option>
-            {IRON_STEEL_SUB_SECTORS.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -171,23 +186,22 @@ export default function StepFacilities() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+      <Card>
+        <CardHeader>
           <div>
-            <h2 className="text-base font-semibold text-gray-900">Facility Setup</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <CardTitle className="text-base font-semibold">Facility Setup</CardTitle>
+            <CardDescription>
               Add the facilities where your company operates. Most MSMEs have a single facility.
-            </p>
+            </CardDescription>
           </div>
-          <button
-            type="button"
-            onClick={handleAddFacility}
-            className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 transition-colors"
-          >
-            + Add Facility
-          </button>
-        </div>
-      </div>
+          <CardAction>
+            <Button onClick={handleAddFacility} size="sm" className="gap-1.5">
+              <Plus className="h-3.5 w-3.5" />
+              Add Facility
+            </Button>
+          </CardAction>
+        </CardHeader>
+      </Card>
 
       {facilities.map((facility, i) => (
         <FacilityCard
@@ -199,9 +213,16 @@ export default function StepFacilities() {
       ))}
 
       {facilities.length === 0 && (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-sm text-gray-400">No facilities added yet.</p>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Inbox className="h-12 w-12 text-muted-foreground/40 mb-3" />
+            <p className="text-sm text-muted-foreground">No facilities added yet.</p>
+            <Button onClick={handleAddFacility} variant="outline" size="sm" className="mt-3 gap-1.5">
+              <Plus className="h-3.5 w-3.5" />
+              Add Your First Facility
+            </Button>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

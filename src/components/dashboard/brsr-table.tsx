@@ -3,6 +3,8 @@
 import { mapToBrsr, generateMethodologyNote } from '@/lib/calc-engine/brsr-mapper';
 import { BRSR_FIELDS } from '@/lib/calc-engine/constants';
 import type { InventoryResult, BrsrOutput } from '@/lib/calc-engine/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface BrsrTableProps {
   result: InventoryResult;
@@ -30,45 +32,56 @@ export default function BrsrTable({ result }: BrsrTableProps) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-zinc-100">
-          <h3 className="text-sm font-semibold text-zinc-900">BRSR Principle 6 Disclosure</h3>
-          <p className="text-[11px] text-zinc-500">SEBI BRSR Core fields mapped from calculated inventory</p>
-        </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-zinc-100 bg-zinc-50/50">
-              <th className="px-5 py-2.5 text-left text-xs font-medium text-zinc-500">Field</th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium text-zinc-500">Value</th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium text-zinc-500 hidden sm:table-cell">Source</th>
-            </tr>
-          </thead>
-          <tbody>
-            {BRSR_FIELDS.map((f) => {
-              const value = brsr[f.field as keyof BrsrOutput];
-              return (
-                <tr key={f.field} className="border-b border-zinc-50 last:border-0">
-                  <td className="px-5 py-3 text-zinc-700">{f.label}</td>
-                  <td className="px-5 py-3 text-right font-mono text-zinc-900">
-                    {value != null ? String(value) : 'N/A'}
-                  </td>
-                  <td className="px-5 py-3 text-[11px] text-zinc-400 hidden sm:table-cell">
-                    {f.source}
-                  </td>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">BRSR Principle 6 Disclosure</CardTitle>
+          <CardDescription className="text-[11px]">SEBI BRSR Core fields mapped from calculated inventory</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ScrollArea className="w-full">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="px-5 py-2.5 text-left text-xs font-medium text-muted-foreground">Field</th>
+                  <th className="px-5 py-2.5 text-right text-xs font-medium text-muted-foreground">Value</th>
+                  <th className="px-5 py-2.5 text-left text-xs font-medium text-muted-foreground hidden sm:table-cell">Source</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {BRSR_FIELDS.map((f, i) => {
+                  const value = brsr[f.field as keyof BrsrOutput];
+                  return (
+                    <tr
+                      key={f.field}
+                      className="border-b border-border last:border-0 even:bg-muted/30"
+                    >
+                      <td className="px-5 py-3">{f.label}</td>
+                      <td className="px-5 py-3 text-right font-mono">
+                        {value != null ? String(value) : 'N/A'}
+                      </td>
+                      <td className="px-5 py-3 text-[11px] text-muted-foreground hidden sm:table-cell">
+                        {f.source}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </ScrollArea>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-zinc-900">Methodology Note</h3>
-        <p className="text-[11px] text-zinc-500 mb-3">ISO 14064-1 required disclosure</p>
-        <pre className="whitespace-pre-wrap text-xs leading-relaxed text-zinc-600 font-sans">
-          {methodology}
-        </pre>
-      </div>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">Methodology Note</CardTitle>
+          <CardDescription className="text-[11px]">ISO 14064-1 required disclosure</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <pre className="whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground font-sans">
+            {methodology}
+          </pre>
+        </CardContent>
+      </Card>
     </div>
   );
 }

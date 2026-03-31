@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { Scope, DataQuality, InputMode } from './calc-engine/types';
 import type { InventoryResult } from './calc-engine/types';
 
@@ -148,7 +149,9 @@ function scopeKey(scope: Scope): 'scope1Data' | 'scope2Data' | 'scope3Data' {
 
 // ── Store ──────────────────────────────────────────────────────────────────
 
-export const useWizardStore = create<WizardState & WizardActions>()((set) => ({
+export const useWizardStore = create<WizardState & WizardActions>()(
+  persist(
+    (set) => ({
   ...initialState,
 
   // Navigation
@@ -214,4 +217,21 @@ export const useWizardStore = create<WizardState & WizardActions>()((set) => ({
 
   // Reset
   reset: () => set({ ...initialState, organisation: { ...defaultOrganisation }, period: { ...defaultPeriod } }),
-}));
+}),
+    {
+      name: 'ghg-wizard-store',
+      partialize: (state) => ({
+        currentStep: state.currentStep,
+        organisation: state.organisation,
+        facilities: state.facilities,
+        period: state.period,
+        scope1Data: state.scope1Data,
+        scope2Data: state.scope2Data,
+        scope3Data: state.scope3Data,
+        productionTonnes: state.productionTonnes,
+        annualTurnoverLakhInr: state.annualTurnoverLakhInr,
+        calculationResult: state.calculationResult,
+      }),
+    }
+  )
+);

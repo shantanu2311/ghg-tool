@@ -72,7 +72,7 @@ export function calculateTechImpact(input: ImpactInput): TechImpact {
   let paybackEstimateYears: number | null = null;
   if (tech.capexMinLakhs !== null && tech.capexMaxLakhs !== null && costSavingMidInr > 0) {
     const capexMidInr = ((tech.capexMinLakhs + tech.capexMaxLakhs) / 2) * 100000; // lakhs → INR
-    paybackEstimateYears = capexMidInr / costSavingMidInr;
+    paybackEstimateYears = Math.min(capexMidInr / costSavingMidInr, 50); // Cap at 50 years
     steps.push({
       step: 'payback_estimate',
       description: `CAPEX ₹${(capexMidInr / 100000).toFixed(1)}L / annual saving ₹${(costSavingMidInr / 100000).toFixed(1)}L`,

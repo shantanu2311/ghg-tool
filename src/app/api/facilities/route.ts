@@ -1,33 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId;
+
     const body = await request.json();
+    const toNull = (v: unknown) => (typeof v === 'string' && v.trim() === '' ? null : v) as string | null;
+
+    const orgId = body.orgId || body.organisationId;
+    const org = await prisma.organisation.findUnique({ where: { id: orgId } });
+    if (!org || org.userId !== userId) {
+      return NextResponse.json({ error: 'Organisation not found' }, { status: 404 });
+    }
+
     const facility = await prisma.facility.create({
       data: {
-        orgId: body.orgId || body.organisationId,
-        name: body.name,
-        address: body.address ?? null,
-        state: body.state,
-        district: body.district ?? null,
-        gridRegion: body.gridRegion,
-        activityType: body.activityType,
+        orgId,
+        name: body.name || 'Unnamed Facility',
+        address: toNull(body.address),
+        state: body.state || 'Unknown',
+        district: toNull(body.district),
+        gridRegion: body.gridRegion || 'Unknown',
+        activityType: body.activityType || 'manufacturing',
       },
     });
     return NextResponse.json(facility, { status: 201 });
   } catch (error) {
     console.error('POST /api/facilities error:', error);
-    return NextResponse.json({ error: 'Failed to create facility' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create facility';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
+    const userId = await getAuthenticatedUserId();
+    if (!isUserId(userId)) return userId;
+
     const orgId = request.nextUrl.searchParams.get('orgId');
-    const where = orgId ? { orgId } : {};
+    if (orgId) {
+      const org = await prisma.organisation.findUnique({ where: { id: orgId } });
+      if (!org || org.userId !== userId) {
+        return NextResponse.json({ error: 'Organisation not found' }, { status: 404 });
+      }
+    }
+
     const facilities = await prisma.facility.findMany({
-      where,
+      where: orgId ? { orgId } : { organisation: { userId } },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(facilities);

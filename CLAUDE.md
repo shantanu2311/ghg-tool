@@ -30,7 +30,8 @@ npm run db:reset         # Reset database (destructive)
 - **PDF**: jsPDF
 - **Word**: docx (npm)
 - **Excel**: xlsx
-- **Auth**: Supabase Auth (planned)
+- **Auth**: NextAuth.js v5 (Auth.js) — JWT sessions, credentials provider
+- **Encryption**: AES-256-GCM field-level encryption for PII (name, email, address, udyam)
 
 ### Directory Structure
 
@@ -177,3 +178,32 @@ For each activity data entry:
 | GET | `/api/funding` | List schemes with optional filters |
 | GET | `/api/funding/[schemeId]` | Single scheme detail |
 | GET | `/api/funding/for-tech/[techId]` | Schemes for a tech |
+
+### Authentication & Encryption
+
+- **Auth**: NextAuth.js v5 with CredentialsProvider (email + bcrypt-hashed password)
+- **Session**: JWT strategy (no DB sessions) — `session.user.id` available in all routes
+- **Middleware**: `src/middleware.ts` protects `/dashboard`, `/wizard`, `/recommendations`, `/funding`
+- **Auth pages**: `/login` and `/signup` in `(auth)` route group
+- **Types**: `src/types/next-auth.d.ts` extends Session/JWT with `id` field
+
+### Data Encryption (AES-256-GCM)
+
+- **Implementation**: `src/lib/crypto.ts` — `encrypt()` / `decrypt()` functions
+- **Format**: `base64(iv + ciphertext + authTag)` — single string, safe for text columns
+- **Key**: `ENCRYPTION_KEY` env var (32 bytes hex). Without it, DB data is unreadable ciphertext.
+- **Encrypted fields**:
+  - `User.name`
+  - `Organisation.name`, `udyamNumber`, `district`, `contactEmail`, `contactPhone`
+  - `Facility.name`, `address`, `district`
+- **Plaintext fields** (needed for queries): sector, subSector, state, gridRegion, numeric values
+- **Migration safety**: `decrypt()` returns original string if decryption fails (handles pre-encryption data)
+- **All API routes**: Encrypt on write, decrypt on read. Auth check via `getAuthenticatedUserId()` from `src/lib/auth-helpers.ts`
+- **Row isolation**: Every query filters by `userId` (direct or via org→period chain). Users cannot see each other's data.
+
+### Database Schema (18 models)
+
+**Auth (4)**: User, Account, Session, VerificationToken
+**Core (7)**: Organisation (has userId FK), Facility, ReportingPeriod, ActivityData, EmissionFactor, CalculatedEmission, Report
+**Reference (4)**: FuelProperty, GwpValue, UnitConversion, SectorBenchmark
+**Module 2/3 (3)**: ReductionTechnology, FundingScheme, TechFundingLink
