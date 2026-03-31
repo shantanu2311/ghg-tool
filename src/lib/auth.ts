@@ -2,7 +2,6 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { prisma } from '@/lib/db';
-import { decrypt } from '@/lib/crypto';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -27,7 +26,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return {
           id: user.id,
           email: user.email,
-          name: decrypt(user.name) ?? user.email,
+          name: user.name ?? user.email,
         };
       },
     }),
