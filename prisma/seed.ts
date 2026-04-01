@@ -1069,75 +1069,95 @@ async function main() {
   console.log(`  ✓ ${unitConversions.length} unit conversions seeded\n`);
 
   // ── Sector Benchmarks ──────────────────────────────────────────────────────
-  // Sources: Worldsteel Association, BEE PAT Scheme, IEA Iron & Steel Roadmap
+  // All India-specific. Derived from BEE cluster profiles, SAMEEEKSHA/TERI
+  // compendiums, UNIDO technology studies, and academic research.
+  // Electricity-based values recalculated using CEA v21.0 grid EF = 0.710 tCO2/MWh.
+  // Gate-to-gate (Scope 1 + Scope 2 for the specific process only).
 
   const benchmarks = [
+    // EAF Mini Mill (scrap-based): 400-700 kWh/t × 0.710 grid EF + fuel/process add-on
     {
       sector: 'iron_steel',
       subSector: 'eaf_mini_mill',
       metric: 'tCO2e_per_tonne',
-      bestPractice: 0.4,
-      sectorAverage: 0.45,
-      worstQuartile: 0.55,
-      source: 'Worldsteel Association / IEA Iron & Steel Technology Roadmap 2020',
-      sourceUrl: 'https://www.iea.org/reports/iron-and-steel-technology-roadmap',
-      year: 2020,
+      bestPractice: 0.32,
+      sectorAverage: 0.40,
+      worstQuartile: 0.52,
+      source: 'SAMEEEKSHA EAF Compendium (TERI/UNDP); SEC 400-600 kWh/t × CEA v21.0 grid EF',
+      sourceUrl: 'https://www.sameeeksha.org/books/Electric-Arc-Furnace-Compendium.pdf',
+      year: 2023,
     },
+    // Induction Furnace (scrap-based): 500-900 kWh/t × 0.710 + fuel for ladle
     {
       sector: 'iron_steel',
       subSector: 'induction_furnace',
       metric: 'tCO2e_per_tonne',
-      bestPractice: 0.6,
-      sectorAverage: 0.75,
-      worstQuartile: 0.9,
-      source: 'BEE PAT Scheme / Worldsteel data for Indian MSME sector',
-      sourceUrl: 'https://beeindia.gov.in/en/programmes/perform-achieve-and-trade',
-      year: 2022,
+      bestPractice: 0.42,
+      sectorAverage: 0.56,
+      worstQuartile: 0.72,
+      source: 'BEE/SAMEEEKSHA IF cluster profiles; Coimbatore IF study (recalc with CEA v21.0)',
+      sourceUrl: 'https://www.sameeeksha.org',
+      year: 2023,
     },
+    // Re-Rolling Mill: fuel-fired reheating furnaces (80-200+ kgoe/t) + 30-80 kWh/t electricity
     {
       sector: 'iron_steel',
       subSector: 're_rolling',
       metric: 'tCO2e_per_tonne',
-      bestPractice: 0.15,
-      sectorAverage: 0.28,
-      worstQuartile: 0.40,
-      source: 'BEE PAT Scheme / Indian steel MSME data',
-      sourceUrl: 'https://beeindia.gov.in/en/programmes/perform-achieve-and-trade',
+      bestPractice: 0.27,
+      sectorAverage: 0.44,
+      worstQuartile: 0.70,
+      source: 'IspatGuru/BEE re-rolling mill energy benchmarks; UNDP-GEF 34-mill audit',
+      sourceUrl: 'https://www.ispatguru.com/energy-management-in-small-and-medium-sized-re-rolling-mills/',
       year: 2022,
     },
+    // Forging Unit: fuel-fired furnaces (0.14-0.18 L FO/kg) + 40-80 kWh/t electricity
     {
       sector: 'iron_steel',
       subSector: 'forging',
       metric: 'tCO2e_per_tonne',
-      bestPractice: 0.3,
-      sectorAverage: 0.45,
-      worstQuartile: 0.6,
-      source: 'BEE PAT Scheme / Industry estimates',
-      sourceUrl: 'https://beeindia.gov.in/en/programmes/perform-achieve-and-trade',
+      bestPractice: 0.46,
+      sectorAverage: 0.55,
+      worstQuartile: 0.65,
+      source: 'UNIDO Eastern Zone Forging Cluster Technology Compendium; SAMEEEKSHA Pune profile',
+      sourceUrl: 'https://decarbonization.unido.org/wp-content/uploads/Technology-Compedium-Eastern-Zone-Forging-Cluster_resized.pdf',
       year: 2022,
     },
+    // Casting/Foundry (IF-based, 83% of Indian production): 550-850 kWh/t liquid × yield loss
     {
       sector: 'iron_steel',
       subSector: 'casting_foundry',
       metric: 'tCO2e_per_tonne',
-      bestPractice: 0.5,
-      sectorAverage: 0.65,
-      worstQuartile: 0.8,
-      source: 'BEE PAT Scheme / Industry estimates',
-      sourceUrl: 'https://beeindia.gov.in/en/programmes/perform-achieve-and-trade',
+      bestPractice: 0.58,
+      sectorAverage: 0.77,
+      worstQuartile: 1.04,
+      source: 'BEE Foundry Sector Energy Mapping (PwC); Coimbatore IF foundry study (recalc with CEA v21.0)',
+      sourceUrl: 'https://beeindia.gov.in/sites/default/files/Foundry_Sector_Energy_Mapping_Report.pdf',
       year: 2022,
     },
-    // EAF electricity-specific benchmark
+    // EAF electricity-specific benchmark (kWh/t)
     {
       sector: 'iron_steel',
       subSector: 'eaf_mini_mill',
       metric: 'kWh_per_tonne',
       bestPractice: 400,
-      sectorAverage: 550,
-      worstQuartile: 700,
-      source: 'Worldsteel Association / IEA Iron & Steel Technology Roadmap 2020',
-      sourceUrl: 'https://www.iea.org/reports/iron-and-steel-technology-roadmap',
-      year: 2020,
+      sectorAverage: 500,
+      worstQuartile: 650,
+      source: 'SAMEEEKSHA EAF Compendium (TERI/UNDP); Ministry of Steel MSME audit data',
+      sourceUrl: 'https://www.sameeeksha.org/books/Electric-Arc-Furnace-Compendium.pdf',
+      year: 2023,
+    },
+    // Induction Furnace electricity-specific benchmark (kWh/t)
+    {
+      sector: 'iron_steel',
+      subSector: 'induction_furnace',
+      metric: 'kWh_per_tonne',
+      bestPractice: 520,
+      sectorAverage: 680,
+      worstQuartile: 870,
+      source: 'BEE/SAMEEEKSHA IF cluster profiles; Howrah cluster data',
+      sourceUrl: 'https://www.sameeeksha.org',
+      year: 2023,
     },
   ];
 

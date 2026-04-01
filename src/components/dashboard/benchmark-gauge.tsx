@@ -10,6 +10,8 @@ interface BenchmarkData {
   bestPractice: number;
   sectorAverage: number;
   worstQuartile: number;
+  source: string;
+  year: number;
 }
 
 interface BenchmarkGaugeProps {
@@ -39,6 +41,8 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
             bestPractice: b.bestPractice,
             sectorAverage: b.sectorAverage,
             worstQuartile: b.worstQuartile,
+            source: b.source || '',
+            year: b.year || 0,
           });
         }
       } catch {
@@ -146,6 +150,15 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
             ({intensity.toFixed(4)} tCO2e/t product)
           </span>
         </div>
+
+        {/* Source attribution */}
+        {benchmark.source && (
+          <div className="mt-3 pt-3 border-t border-border">
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+              Source: {benchmark.source}{benchmark.year ? ` (${benchmark.year})` : ''}. Gate-to-gate (Scope 1+2). Electricity emissions use CEA v21.0 regional grid EF.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
