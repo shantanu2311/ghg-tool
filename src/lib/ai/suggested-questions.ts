@@ -85,6 +85,24 @@ export const SUGGESTED_QUESTIONS: Record<string, string[]> = {
     'How can I reduce my emissions?',
     'Can I export my results as a PDF?',
   ],
+
+  // Recommendations
+  recommendations: [
+    'How are emission reduction recommendations generated?',
+    'What does payback period mean for a technology?',
+    'Can I combine multiple technologies?',
+    'How is the CO2 reduction calculated?',
+    'What funding schemes are available for my technology?',
+  ],
+
+  // Funding Directory
+  funding: [
+    'What government schemes support emission reduction?',
+    'Am I eligible for BEE PAT scheme?',
+    'What is the difference between subsidy and loan schemes?',
+    'How do I apply for MSME technology upgradation fund?',
+    'Are there state-specific funding schemes?',
+  ],
 };
 
 /**
