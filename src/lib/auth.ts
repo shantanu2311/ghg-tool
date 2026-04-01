@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { prisma } from '@/lib/db';
+import { decrypt } from '@/lib/crypto';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -26,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return {
           id: user.id,
           email: user.email,
-          name: user.name ?? user.email,
+          name: decrypt(user.name) ?? user.email,
         };
       },
     }),
@@ -40,12 +41,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
       if (token?.id) {
         session.user.id = token.id as string;
+      }
+      if (token?.name) {
+        session.user.name = token.name as string;
       }
       return session;
     },
