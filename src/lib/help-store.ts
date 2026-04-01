@@ -107,7 +107,8 @@ export const useHelpStore = create<HelpState & HelpActions>()(
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         messages: state.messages,
-        context: state.context,
+        // Persist context but exclude analysisSummary (rebuilt fresh on each panel open)
+        context: { ...state.context, analysisSummary: undefined },
       }),
     },
   ),

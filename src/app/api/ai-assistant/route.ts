@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
       organisationSubSector: context?.organisationSubSector,
       organisationState: context?.organisationState,
       language: context?.language,
+      analysisSummary: context?.analysisSummary,
     };
 
     const systemPrompt = buildSystemPrompt(assistantContext);
