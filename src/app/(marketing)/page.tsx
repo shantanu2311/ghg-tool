@@ -32,7 +32,7 @@ const capabilities = [
   'Scope 2 grid electricity (CEA factors)',
   'Scope 3 upstream (purchased goods, transport, waste, travel)',
   'BRSR Principle 6 disclosure mapping',
-  'IPCC 2006 Tier 1 emission factors',
+  'IPCC 2019 Refinement emission factors',
   'Unit conversion (litres, kg, cylinders, bags, lakh units, INR)',
   'Data quality scoring (Primary / Secondary / Estimated)',
   'Sector benchmarking (Worldsteel, BEE PAT)',
@@ -51,7 +51,7 @@ const workflow = [
     step: '02',
     title: 'Calculate emissions',
     description:
-      'IPCC 2006 factors applied per fuel type. Unit conversion, GWP weighting, and cross-checks run automatically.',
+      'IPCC 2019 Refinement factors applied per fuel type. Unit conversion, GWP weighting, and cross-checks run automatically.',
   },
   {
     icon: Lightbulb,
@@ -103,12 +103,12 @@ const sectors = [
 
 const sources = [
   {
-    name: 'IPCC 2006 Guidelines',
-    detail: 'Vol 2 Energy, Vol 3 IPPU. Combustion factors, process emissions, NCV values.',
+    name: 'IPCC 2019 Refinement',
+    detail: 'Refinement to 2006 Guidelines. Vol 2 Energy, Vol 3 IPPU. Updated combustion factors, process emissions, NCV values.',
   },
   {
     name: 'CEA CO2 Baseline Database',
-    detail: 'Version 21.0 (FY2024-25). Indian grid emission factor: 0.710 tCO2/MWh.',
+    detail: 'Version 21.0 (FY2024-25). National avg: 0.710 tCO2/MWh. Regional: N=0.898, W=0.672, S=0.617, E=0.826, NE=0.476.',
   },
   {
     name: 'DEFRA UK GHG Factors 2024',
@@ -123,7 +123,7 @@ const sources = [
 const faqs = [
   {
     q: 'What emission factors are used?',
-    a: 'IPCC 2006 Guidelines (Vol 2 Tables 1.2, 1.4, 2.3) for combustion. CEA CO2 Baseline Database v21.0 for grid electricity. DEFRA 2024 for Scope 3. Every factor is traceable to its source document.',
+    a: 'IPCC 2019 Refinement (Vol 2 Tables 1.2, 1.4, 2.3) for combustion. CEA CO2 Baseline Database v21.0 for grid electricity. DEFRA 2024 for Scope 3. Every factor is traceable to its source document.',
   },
   {
     q: 'Which reporting framework does this support?',
@@ -223,7 +223,7 @@ export default function Home() {
         <motion.div variants={fadeUp} className="mx-auto flex max-w-3xl items-center justify-center gap-2 text-center">
           <ShieldCheck className="h-4 w-4 text-muted-foreground shrink-0" />
           <p className="text-xs text-muted-foreground">
-            GHG Protocol Corporate Standard -- ISO 14064-1 -- SEBI BRSR Core -- IPCC 2006 -- CEA India
+            GHG Protocol Corporate Standard -- ISO 14064-1 -- SEBI BRSR Core -- IPCC 2019 -- CEA India
           </p>
         </motion.div>
       </Section>
@@ -393,7 +393,7 @@ export default function Home() {
       <footer className="border-t border-border bg-background px-6 py-8">
         <div className="mx-auto max-w-3xl">
           <p className="text-xs text-muted-foreground">
-            GHG Protocol Corporate Standard &middot; ISO 14064-1 &middot; SEBI BRSR Core &middot; IPCC 2006 &middot; CEA India
+            GHG Protocol Corporate Standard &middot; ISO 14064-1 &middot; SEBI BRSR Core &middot; IPCC 2019 &middot; CEA India
           </p>
         </div>
       </footer>

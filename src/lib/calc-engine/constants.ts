@@ -36,6 +36,13 @@ export const GWP_AR5: GwpSet = {
   N2O: 265,    // IPCC AR5 WG1 Table 8.A.1
 };
 
+export const GWP_AR6: GwpSet = {
+  report: 'AR6',
+  CO2: 1,
+  CH4: 28,     // IPCC AR6 WG1 Table 7.15 (27.9, rounded)
+  N2O: 273,    // IPCC AR6 WG1 Table 7.15
+};
+
 // ── Iron & Steel Sub-Sectors ────────────────────────────────────────────────
 
 export const IRON_STEEL_SUB_SECTORS = [

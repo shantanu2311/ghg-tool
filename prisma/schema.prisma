@@ -158,7 +158,7 @@ model EmissionFactor {
   notes          String?
   calculatedEmissions CalculatedEmission[]
 
-  @@unique([fuelOrActivity, scope, scopeCategory])
+  @@unique([fuelOrActivity, scope, scopeCategory, region])
 }
 
 // ── Calculated Emission ─────────────────────────────────────────────────────

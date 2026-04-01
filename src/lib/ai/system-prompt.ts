@@ -185,7 +185,7 @@ Southern Region (SR): AP, Telangana, Karnataka, Kerala, Tamil Nadu, Puducherry, 
 Eastern Region (ER): Bihar, Jharkhand, Odisha, Sikkim, West Bengal
 North-Eastern Region (NER): Arunachal Pradesh, Assam, Manipur, Meghalaya, Mizoram, Nagaland, Tripura
 
-The tool automatically assigns the correct grid region based on the facility's state. The latest CEA emission factor (2023 baseline) is approximately 0.710 tCO2/MWh (all-India weighted average), but varies by region.`;
+The tool automatically assigns the correct grid region based on the facility's state. The latest CEA emission factor (v21.0, FY2024-25) is 0.710 tCO2/MWh (all-India weighted average); regional factors available: Northern 0.898, Western 0.672, Southern 0.617, Eastern 0.826, Northeastern 0.476.`;
 
 const DATA_QUALITY = `
 DATA QUALITY LEVELS — the tool scores each data entry:
@@ -232,13 +232,13 @@ Q: Do I need to report biogenic CO2?
 A: Biogenic CO2 (from biomass like rice husk, bagasse, charcoal) is reported SEPARATELY and NOT added to your Scope 1 total. This is a GHG Protocol rule — biomass CO2 is considered part of the natural carbon cycle.
 
 Q: What GWP values should I use?
-A: The tool defaults to IPCC AR5 values (CH4=28, N2O=265). These are the most commonly used for current reporting. AR6 values are available as an option.
+A: The tool defaults to IPCC AR5 values (CH4=28, N2O=265). These are the most commonly used for current reporting. AR6 values are also available (CH4=28, N2O=273).
 
 Q: How do I convert units?
 A: The tool handles conversions automatically. Common ones: 1 unit of electricity = 1 kWh, 1 lakh units = 100,000 kWh, 1 commercial LPG cylinder = 19 kg, 1 domestic LPG cylinder = 14.2 kg, diesel density = 0.832 kg/litre.
 
 Q: What is an emission factor?
-A: A number that converts an activity (like burning 1 kg of coal) into CO2 equivalent emissions. Example: coal EF ≈ 96.1 kgCO2/GJ. The tool has built-in emission factors from IPCC, CEA, and DEFRA — you don't need to look them up.`;
+A: A number that converts an activity (like burning 1 kg of coal) into CO2 equivalent emissions. Example: coal EF ≈ 96.1 kgCO2/GJ. The tool has built-in emission factors from IPCC 2019 Refinement, CEA v21.0 (FY2024-25), and DEFRA 2024 — you don't need to look them up.`;
 
 // ---------------------------------------------------------------------------
 // Build prompt

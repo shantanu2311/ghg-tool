@@ -2,7 +2,7 @@
  * IPCC Emission Factor Lookup Table
  *
  * Used by the custom source AI-assisted matching feature.
- * All values sourced from IPCC 2006 Guidelines for National GHG Inventories,
+ * All values sourced from 2019 Refinement to the 2006 IPCC Guidelines for National GHG Inventories,
  * Volume 2 (Energy), Chapter 2, Tables 2.2–2.5 unless otherwise noted.
  *
  * Units: CO2/CH4/N2O in kg per TJ; NCV in TJ per Gg (= MJ/kg).
@@ -30,7 +30,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.1,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 32500,
-    source: 'IPCC 2006, Vol 2, Table 2.2 (Petroleum Coke)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.2 (Petroleum Coke)',
   },
   {
     name: 'Coal (Bituminous / Run of Mine)',
@@ -40,7 +40,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 1.5,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 25800,
-    source: 'IPCC 2006, Vol 2, Table 2.2 (Other Bituminous Coal)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.2 (Other Bituminous Coal)',
   },
   {
     name: 'Sub-Bituminous Coal',
@@ -50,7 +50,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 1.5,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 18900,
-    source: 'IPCC 2006, Vol 2, Table 2.2 (Sub-Bituminous Coal)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.2 (Sub-Bituminous Coal)',
   },
   {
     name: 'Coke Oven Coke',
@@ -60,7 +60,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.1,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 28200,
-    source: 'IPCC 2006, Vol 2, Table 2.2 (Coke Oven Coke)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.2 (Coke Oven Coke)',
   },
 
   // ── Liquid Fossil Fuels ─────────────────────────────────────────────
@@ -72,7 +72,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.6,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 43800,
-    source: 'IPCC 2006, Vol 2, Table 2.3 (Other Kerosene)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.3 (Other Kerosene)',
   },
   {
     name: 'Naphtha',
@@ -82,7 +82,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.6,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 44500,
-    source: 'IPCC 2006, Vol 2, Table 2.3 (Naphtha)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.3 (Naphtha)',
   },
   {
     name: 'Diesel (HSD)',
@@ -92,7 +92,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.6,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 43000,
-    source: 'IPCC 2006, Vol 2, Table 2.3 (Gas/Diesel Oil)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.3 (Gas/Diesel Oil)',
   },
   {
     name: 'Furnace Oil (Residual Fuel Oil)',
@@ -102,7 +102,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.6,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 40400,
-    source: 'IPCC 2006, Vol 2, Table 2.3 (Residual Fuel Oil)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.3 (Residual Fuel Oil)',
   },
   {
     name: 'LPG (Liquefied Petroleum Gas)',
@@ -112,7 +112,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.1,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 47300,
-    source: 'IPCC 2006, Vol 2, Table 2.3 (LPG)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.3 (LPG)',
   },
   {
     name: 'Petrol (Motor Spirit / Gasoline)',
@@ -122,7 +122,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.6,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 44300,
-    source: 'IPCC 2006, Vol 2, Table 2.3 (Motor Gasoline)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.3 (Motor Gasoline)',
   },
 
   // ── Gaseous Fossil Fuels ────────────────────────────────────────────
@@ -134,7 +134,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.1,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 48000,
-    source: 'IPCC 2006, Vol 2, Table 2.4 (Natural Gas)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.4 (Natural Gas)',
   },
   {
     name: 'Acetylene',
@@ -144,7 +144,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 0.1,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 48200,
-    source: 'IPCC 2006, Vol 2, Table 2.4 (derived — hydrocarbon gas)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.4 (derived — hydrocarbon gas)',
   },
 
   // ── Biomass / Biogenic Fuels ────────────────────────────────────────
@@ -156,7 +156,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 4,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 13800,
-    source: 'IPCC 2006, Vol 2, Table 2.5 (Other Primary Solid Biomass)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.5 (Other Primary Solid Biomass)',
     biogenic: true,
   },
   {
@@ -167,7 +167,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 4,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 7700,
-    source: 'IPCC 2006, Vol 2, Table 2.5 (Bagasse)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.5 (Bagasse)',
     biogenic: true,
   },
   {
@@ -178,7 +178,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 4,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 15600,
-    source: 'IPCC 2006, Vol 2, Table 2.5 (Other Primary Solid Biomass)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.5 (Other Primary Solid Biomass)',
     biogenic: true,
   },
   {
@@ -189,7 +189,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 4,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 29500,
-    source: 'IPCC 2006, Vol 2, Table 2.5 (Charcoal)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.5 (Charcoal)',
     biogenic: true,
   },
   {
@@ -200,7 +200,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: 4,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 15600,
-    source: 'IPCC 2006, Vol 2, Table 2.5 (Wood/Wood Waste)',
+    source: 'IPCC 2019 Refinement, Vol 2, Table 2.5 (Wood/Wood Waste)',
     biogenic: true,
   },
 
@@ -213,7 +213,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: null,
     efUnit: 'tCO2e/tonne product',
     ncvTjPerGg: null,
-    source: 'IPCC 2006, Vol 3, Ch 4 (Primary Aluminium — ~8.6 tCO2e/t from electrolysis + energy)',
+    source: 'IPCC 2019 Refinement, Vol 3, Ch 4 (Primary Aluminium — ~8.6 tCO2e/t from electrolysis + energy)',
   },
   {
     name: 'Copper (Primary Production)',
@@ -223,7 +223,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: null,
     efUnit: 'tCO2e/tonne product',
     ncvTjPerGg: null,
-    source: 'IPCC 2006, Vol 3, Ch 4 (Non-Ferrous Metals)',
+    source: 'IPCC 2019 Refinement, Vol 3, Ch 4 (Non-Ferrous Metals)',
   },
   {
     name: 'Cement (Clinker Production)',
@@ -233,7 +233,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: null,
     efUnit: 'tCO2/tonne clinker',
     ncvTjPerGg: null,
-    source: 'IPCC 2006, Vol 3, Ch 2 (Cement — 0.507 tCO2/t clinker from calcination)',
+    source: 'IPCC 2019 Refinement, Vol 3, Ch 2 (Cement — 0.507 tCO2/t clinker from calcination)',
   },
   {
     name: 'Plastic / Polymer (Waste Combustion)',
@@ -243,7 +243,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: null,
     efUnit: 'kg/TJ',
     ncvTjPerGg: 32000,
-    source: 'IPCC 2006, Vol 5, Ch 5 (Incineration — mixed plastics)',
+    source: 'IPCC 2019 Refinement, Vol 5, Ch 5 (Incineration — mixed plastics)',
   },
 
   // ── Transport / Scope 3 ────────────────────────────────────────────
@@ -255,7 +255,7 @@ export const IPCC_EF_LOOKUP: IpccEfEntry[] = [
     n2oEfKgPerTj: null,
     efUnit: 'kgCO2e/km',
     ncvTjPerGg: null,
-    source: 'DEFRA 2023, Business Travel — average car ~0.17 kgCO2e/km, motorbike ~0.11 kgCO2e/km',
+    source: 'DEFRA 2024, Business Travel — average car ~0.17 kgCO2e/km, motorbike ~0.11 kgCO2e/km',
   },
 ];
 

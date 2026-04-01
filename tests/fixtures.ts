@@ -24,6 +24,16 @@ export const GWP_AR5: GwpSet = {
   HFC134A: 1300,
 };
 
+export const GWP_AR6: GwpSet = {
+  report: 'AR6',
+  CO2: 1,
+  CH4: 28,
+  N2O: 273,
+  SF6: 23500,
+  R22: 1760,
+  HFC134A: 1300,
+};
+
 // ── Fuel Properties ─────────────────────────────────────────────────────────
 
 export const FUEL_PROPERTIES: FuelPropertyData[] = [
@@ -141,24 +151,24 @@ export const FUEL_PROPERTIES: FuelPropertyData[] = [
 // ── Emission Factors ────────────────────────────────────────────────────────
 
 export const EMISSION_FACTORS: EmissionFactorData[] = [
-  // Scope 1 — Stationary Combustion (IPCC 2006 Vol 2, Table 2.3 Manufacturing)
-  { id: 'ef-diesel-s1', fuelOrActivity: 'DIESEL_HSD', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 74100, ch4Ef: 10, n2oEf: 0.6, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-petrol-s1', fuelOrActivity: 'PETROL_MS', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 69300, ch4Ef: 10, n2oEf: 0.6, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-lpg-s1', fuelOrActivity: 'LPG', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 63100, ch4Ef: 5, n2oEf: 0.1, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-ng-s1', fuelOrActivity: 'NATURAL_GAS', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 56100, ch4Ef: 5, n2oEf: 0.1, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-coal-s1', fuelOrActivity: 'COAL_INDIAN', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 96100, ch4Ef: 10, n2oEf: 1.5, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-coking-s1', fuelOrActivity: 'COKING_COAL', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 94600, ch4Ef: 10, n2oEf: 1.5, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-coke-s1', fuelOrActivity: 'COKE', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 107000, ch4Ef: 10, n2oEf: 1.5, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-fo-s1', fuelOrActivity: 'FURNACE_OIL', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 77400, ch4Ef: 10, n2oEf: 0.6, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  { id: 'ef-biomass-s1', fuelOrActivity: 'BIOMASS_WOOD', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 112000, ch4Ef: 30, n2oEf: 4, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 2.3' },
-  // Scope 1 — Mobile Combustion (IPCC 2006 Vol 2, Table 3.2.2)
-  { id: 'ef-diesel-mob', fuelOrActivity: 'DIESEL_HSD', scope: 1, scopeCategory: 'mobile_combustion', co2Ef: 74100, ch4Ef: 3.9, n2oEf: 3.9, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 3.2.2' },
-  { id: 'ef-petrol-mob', fuelOrActivity: 'PETROL_MS', scope: 1, scopeCategory: 'mobile_combustion', co2Ef: 69300, ch4Ef: 33, n2oEf: 3.2, efUnit: 'TJ', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 2 Table 3.2.2' },
+  // Scope 1 — Stationary Combustion (IPCC 2019 Refinement, Vol 2, Table 2.3 Manufacturing)
+  { id: 'ef-diesel-s1', fuelOrActivity: 'DIESEL_HSD', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 74100, ch4Ef: 3, n2oEf: 0.6, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-petrol-s1', fuelOrActivity: 'PETROL_MS', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 69300, ch4Ef: 3, n2oEf: 0.6, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-lpg-s1', fuelOrActivity: 'LPG', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 63100, ch4Ef: 1, n2oEf: 0.1, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-ng-s1', fuelOrActivity: 'NATURAL_GAS', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 56100, ch4Ef: 1, n2oEf: 0.1, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-coal-s1', fuelOrActivity: 'COAL_INDIAN', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 96100, ch4Ef: 1, n2oEf: 1.5, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-coking-s1', fuelOrActivity: 'COKING_COAL', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 94600, ch4Ef: 1, n2oEf: 1.5, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-coke-s1', fuelOrActivity: 'COKE', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 107000, ch4Ef: 1, n2oEf: 1.5, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-fo-s1', fuelOrActivity: 'FURNACE_OIL', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 77400, ch4Ef: 3, n2oEf: 0.6, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  { id: 'ef-biomass-s1', fuelOrActivity: 'BIOMASS_WOOD', scope: 1, scopeCategory: 'stationary_combustion', co2Ef: 112000, ch4Ef: 30, n2oEf: 4, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 2.3' },
+  // Scope 1 — Mobile Combustion (IPCC 2019 Refinement, Vol 2, Table 3.2.2)
+  { id: 'ef-diesel-mob', fuelOrActivity: 'DIESEL_HSD', scope: 1, scopeCategory: 'mobile_combustion', co2Ef: 74100, ch4Ef: 3.9, n2oEf: 3.9, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 3.2.2' },
+  { id: 'ef-petrol-mob', fuelOrActivity: 'PETROL_MS', scope: 1, scopeCategory: 'mobile_combustion', co2Ef: 69300, ch4Ef: 33, n2oEf: 3.2, efUnit: 'TJ', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 2 Table 3.2.2' },
   // Scope 1 — Process
-  { id: 'ef-eaf-proc', fuelOrActivity: 'EAF_PROCESS', scope: 1, scopeCategory: 'process', co2Ef: 80, ch4Ef: null, n2oEf: null, efUnit: 'tonne_steel', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 3 Ch 4' },
+  { id: 'ef-eaf-proc', fuelOrActivity: 'EAF_PROCESS', scope: 1, scopeCategory: 'process', co2Ef: 80, ch4Ef: null, n2oEf: null, efUnit: 'tonne_steel', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 3 Ch 4' },
   { id: 'ef-graphite', fuelOrActivity: 'GRAPHITE_ELECTRODE', scope: 1, scopeCategory: 'process', co2Ef: 3.667, ch4Ef: null, n2oEf: null, efUnit: 'kg', region: null, source: 'Stoichiometric', sourceVersion: 'C → CO2 (12→44)' },
-  { id: 'ef-limestone', fuelOrActivity: 'LIMESTONE', scope: 1, scopeCategory: 'process', co2Ef: 440, ch4Ef: null, n2oEf: null, efUnit: 'tonne', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 3 Ch 2' },
-  { id: 'ef-dolomite', fuelOrActivity: 'DOLOMITE', scope: 1, scopeCategory: 'process', co2Ef: 477, ch4Ef: null, n2oEf: null, efUnit: 'tonne', region: null, source: 'IPCC 2006', sourceVersion: 'Vol 3 Ch 2' },
+  { id: 'ef-limestone', fuelOrActivity: 'LIMESTONE', scope: 1, scopeCategory: 'process', co2Ef: 440, ch4Ef: null, n2oEf: null, efUnit: 'tonne', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 3 Ch 2' },
+  { id: 'ef-dolomite', fuelOrActivity: 'DOLOMITE', scope: 1, scopeCategory: 'process', co2Ef: 477, ch4Ef: null, n2oEf: null, efUnit: 'tonne', region: null, source: 'IPCC 2019 Refinement', sourceVersion: 'Vol 3 Ch 2' },
   // Scope 1 — Fugitive
   { id: 'ef-r22', fuelOrActivity: 'R22_HCFC22', scope: 1, scopeCategory: 'fugitive', co2Ef: 1760, ch4Ef: null, n2oEf: null, efUnit: 'kg', region: null, source: 'IPCC AR5', sourceVersion: 'GWP 100yr' },
   { id: 'ef-hfc134a', fuelOrActivity: 'HFC134A', scope: 1, scopeCategory: 'fugitive', co2Ef: 1300, ch4Ef: null, n2oEf: null, efUnit: 'kg', region: null, source: 'IPCC AR5', sourceVersion: 'GWP 100yr' },

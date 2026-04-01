@@ -53,9 +53,11 @@ export function generateMethodologyNote(params: {
     '',
     `Emission Factor Sources: ${efSources.join(', ')}.`,
     '',
+    `GWP values: IPCC AR5 100-year (default). AR6 available.`,
+    '',
     `Scope 1: Direct emissions from stationary combustion, mobile combustion, process emissions, and fugitive emissions owned or controlled by the organisation.`,
     '',
-    `Scope 2: Indirect emissions from purchased grid electricity. Location-based method using CEA CO2 Baseline Database regional grid emission factors.`,
+    `Scope 2: Indirect emissions from purchased grid electricity. Location-based method using CEA CO2 Baseline Database v21.0 regional grid emission factors (FY2024-25).`,
     '',
     scope3Categories.length > 0
       ? `Scope 3: Value chain emissions for categories: ${scope3Categories.join(', ')}. Spend-based estimation used where primary data unavailable (flagged as ESTIMATED quality).`

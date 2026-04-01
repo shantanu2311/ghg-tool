@@ -60,7 +60,7 @@ export default function DashboardPage() {
       const efSources = [...new Set(result.calculations.map((c) => c.efSource))];
       const methodology = generateMethodologyNote({
         gwpReport: result.calculations[0]?.gwpReport ?? 'AR5',
-        efSources: efSources.length > 0 ? efSources : ['IPCC 2006', 'CEA'],
+        efSources: efSources.length > 0 ? efSources : ['IPCC 2019 Refinement', 'CEA v21.0 (FY2024-25)', 'DEFRA 2024'],
         boundaryApproach: 'Operational Control',
         scope3Categories: result.scope3.categories.map((c) => c.category),
       });

@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "GHG Tool — MSME Emissions Inventory",
   description:
-    "BRSR-ready greenhouse gas inventory tool for Indian MSMEs. GHG Protocol-compliant, IPCC 2006 emission factors, built for Iron & Steel sector.",
+    "BRSR-ready greenhouse gas inventory tool for Indian MSMEs. GHG Protocol-compliant, IPCC 2019 Refinement emission factors, built for Iron & Steel sector.",
 };
 
 export default function RootLayout({

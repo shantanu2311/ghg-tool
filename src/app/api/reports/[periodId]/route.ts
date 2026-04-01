@@ -181,7 +181,7 @@ export async function POST(
       const scope3Categories = scope3.categories.map((c) => c.category);
       methodologyNote = generateMethodologyNote({
         gwpReport: 'AR5',
-        efSources: efSources.length > 0 ? efSources : ['IPCC 2006 Guidelines', 'CEA CO2 Baseline Database'],
+        efSources: efSources.length > 0 ? efSources : ['IPCC 2019 Refinement', 'CEA CO2 Baseline Database v21.0 (FY2024-25)', 'DEFRA 2024'],
         boundaryApproach: 'Operational Control',
         scope3Categories,
       });

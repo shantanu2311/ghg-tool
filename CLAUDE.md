@@ -99,7 +99,7 @@ data/
 
 - **Primary Standard**: GHG Protocol Corporate Standard (Revised 2004)
 - **Supporting**: ISO 14064-1:2018
-- **India-Specific**: India GHG Program, CEA grid factors, BRSR alignment
+- **India-Specific**: India GHG Program, CEA grid factors v21.0 (FY2024-25, regional breakdown available), BRSR alignment
 - **Boundary**: Operational Control approach
 - **GWP**: AR5 default (CH4=28, N2O=265), configurable for AR6
 - **Scope 3**: Categories 1, 4, 5, 6, 9
@@ -127,9 +127,9 @@ For each activity data entry:
 - `data/source-audit.xlsx` master audit spreadsheet
 
 ### Key Sources
-- IPCC 2006 Guidelines (emission factors): efdb.ipcc.int
-- CEA CO2 Baseline Database (Indian grid factors): cea.nic.in
-- DEFRA UK GHG Conversion Factors (annual): gov.uk
+- IPCC 2019 Refinement to the 2006 IPCC Guidelines (emission factors): ipcc-nggip.iges.or.jp
+- CEA CO2 Baseline Database v21.0 (Indian grid factors, FY2024-25): cea.nic.in — national avg=0.710; regional: N=0.898, W=0.672, S=0.617, E=0.826, NE=0.476
+- DEFRA UK GHG Conversion Factors 2024: gov.uk
 - India GHG Program (transport EFs): indiaghgp.org
 - IPCC AR5/AR6 (GWP values): IPCC Assessment Reports
 
@@ -139,7 +139,7 @@ For each activity data entry:
 - **Prisma v7 client import**: `import { PrismaClient } from '@/generated/prisma/client'`
 - **Prisma v7 PostgreSQL adapter**: Uses `@prisma/adapter-pg` with `pg.Pool` — `new PrismaClient({ adapter: new PrismaPg(pool) })`
 - **Database**: Neon PostgreSQL (free tier, serverless). Connection string in `.env`
-- **Blueprint corrections**: NCV Diesel=43.0 (not 43.33), CEA grid=0.710 (not 0.708), R22 GWP=1760 (not 1810, that was AR4), HFC-134a GWP=1300 (not 1430). See `data/source-audit.xlsx` "Blueprint Corrections" sheet.
+- **Blueprint corrections**: NCV Diesel=43.0 (not 43.33), CEA national avg=0.710 (not 0.708; regional: N=0.898, W=0.672, S=0.617, E=0.826, NE=0.476), R22 GWP=1760 (not 1810, that was AR4), HFC-134a GWP=1300 (not 1430). See `data/source-audit.xlsx` "Blueprint Corrections" sheet.
 - **Financial Year**: Indian FY is April-March; BRSR reporting follows this
 - **Biogenic CO2**: From biomass combustion — reported separately, NOT added to Scope 1 total (GHG Protocol rule)
 - **Spend-based fallback**: When MSME enters INR spent instead of quantity, divide by fuel price to estimate quantity. Always flag as ESTIMATED quality.

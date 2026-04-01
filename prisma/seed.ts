@@ -3,7 +3,7 @@
 // See data/source-audit.xlsx for full audit trail.
 //
 // Primary Sources:
-// - IPCC 2006 Guidelines Vol 2 (Energy): Emission factors, NCV values
+// - IPCC 2019 Refinement to 2006 Guidelines Vol 2 (Energy): Emission factors, NCV values
 // - IPCC AR5 WG1 Table 8.A.1: GWP values (100-year)
 // - CEA CO2 Baseline Database v21.0 (FY2024-25): Indian grid emission factor
 // - Worldsteel Association: Sector benchmarks
@@ -349,6 +349,8 @@ async function main() {
     { gas: 'CH4',  gwp: 27.9,  assessmentReport: 'AR6', isDefault: false, source: 'IPCC AR6 WG1 Table 7.15 (fossil CH4=29.8, biogenic=27.0, blended~27.9)', sourceUrl: 'https://www.ipcc.ch/report/ar6/wg1/' },
     { gas: 'N2O',  gwp: 273,   assessmentReport: 'AR6', isDefault: false, source: 'IPCC AR6 WG1 Table 7.15', sourceUrl: 'https://www.ipcc.ch/report/ar6/wg1/' },
     { gas: 'SF6',  gwp: 24300, assessmentReport: 'AR6', isDefault: false, source: 'IPCC AR6 WG1 Table 7.15', sourceUrl: 'https://www.ipcc.ch/report/ar6/wg1/' },
+    { gas: 'R22',  gwp: 1960,  assessmentReport: 'AR6', isDefault: false, source: 'IPCC AR6 WG1 Table 7.15', sourceUrl: 'https://www.ipcc.ch/report/ar6/wg1/' },
+    { gas: 'HFC134A', gwp: 1530, assessmentReport: 'AR6', isDefault: false, source: 'IPCC AR6 WG1 Table 7.15', sourceUrl: 'https://www.ipcc.ch/report/ar6/wg1/' },
   ];
 
   console.log('  Seeding GWP values...');
@@ -375,65 +377,65 @@ async function main() {
       fuelOrActivity: 'DIESEL_HSD',
       scope: 1,
       scopeCategory: 'stationary_combustion',
-      co2Ef: 74100,  // kgCO2/TJ — IPCC 2006 Vol 2 Table 1.4
-      ch4Ef: 10,     // kgCH4/TJ — Table 2.3 (Mfg) for liquid fuels
-      n2oEf: 0.6,    // kgN2O/TJ — Table 2.3 (Mfg) for liquid fuels
+      co2Ef: 74100,  // kgCO2/TJ — IPCC 2019 Refinement Vol 2 Table 2.2 (unchanged from 2006)
+      ch4Ef: 3,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, liquid fuels; was 10 in 2006)
+      n2oEf: 0.6,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, liquid fuels)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'Table 2.3 CH4/N2O for Manufacturing Industries. Table 2.2 (Energy Industries) has CH4=3, N2O=0.6 — different values.',
+      notes: 'Table 2.6 CH4/N2O for Manufacturing Industries (2019 Refinement). CH4 reduced from 10 to 3 for liquid fuels.',
     },
     {
       fuelOrActivity: 'PETROL_MS',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 69300,
-      ch4Ef: 10,     // Table 2.3 (Mfg) liquid fuels
-      n2oEf: 0.6,    // Table 2.3 (Mfg) liquid fuels
+      ch4Ef: 3,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, liquid fuels; was 10 in 2006)
+      n2oEf: 0.6,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, liquid fuels)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: null,
+      notes: 'CH4 reduced from 10 to 3 for liquid fuels in 2019 Refinement.',
     },
     {
       fuelOrActivity: 'LPG',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 63100,
-      ch4Ef: 5,      // Table 2.3 (Mfg) gaseous fuels
-      n2oEf: 0.1,    // Table 2.3 (Mfg) gaseous fuels
+      ch4Ef: 5,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, gaseous fuels)
+      n2oEf: 0.1,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, gaseous fuels)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'LPG classified as gaseous fuel for CH4/N2O in Table 2.3.',
+      notes: 'LPG classified as gaseous fuel for CH4/N2O in Table 2.6.',
     },
     {
       fuelOrActivity: 'NATURAL_GAS',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 56100,
-      ch4Ef: 5,      // Table 2.3 (Mfg) gaseous fuels
-      n2oEf: 0.1,    // Table 2.3 (Mfg) gaseous fuels
+      ch4Ef: 5,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, gaseous fuels)
+      n2oEf: 0.1,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, gaseous fuels)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
@@ -444,81 +446,81 @@ async function main() {
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 96100,
-      ch4Ef: 10,     // Table 2.3 (Mfg) solid fuels
-      n2oEf: 1.5,    // Table 2.3 (Mfg) solid fuels
+      ch4Ef: 1,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, solid fuels; was 10 in 2006)
+      n2oEf: 1.5,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, solid fuels; unchanged)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'Sub-bituminous coal. Table 2.3 CH4=10 for solid fuels in manufacturing (Table 2.2 has CH4=1).',
+      notes: 'Sub-bituminous coal. CH4 reduced from 10 to 1 for solid fuels in manufacturing (2019 Refinement).',
     },
     {
       fuelOrActivity: 'COKING_COAL',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 94600,
-      ch4Ef: 10,
-      n2oEf: 1.5,
+      ch4Ef: 1,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, solid fuels; was 10 in 2006)
+      n2oEf: 1.5,    // kgN2O/TJ — unchanged
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: null,
+      notes: 'CH4 reduced from 10 to 1 for solid fuels in manufacturing (2019 Refinement).',
     },
     {
       fuelOrActivity: 'COKE',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 107000,
-      ch4Ef: 10,
-      n2oEf: 1.5,
+      ch4Ef: 1,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, solid fuels; was 10 in 2006)
+      n2oEf: 1.5,    // kgN2O/TJ — unchanged
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'Coke Oven Coke / Metallurgical Coke.',
+      notes: 'Coke Oven Coke / Metallurgical Coke. CH4 reduced from 10 to 1 (2019 Refinement).',
     },
     {
       fuelOrActivity: 'FURNACE_OIL',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 77400,
-      ch4Ef: 10,
-      n2oEf: 0.6,
+      ch4Ef: 3,      // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, liquid fuels; was 10 in 2006)
+      n2oEf: 0.6,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, liquid fuels)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'Residual Fuel Oil category.',
+      notes: 'Residual Fuel Oil category. CH4 reduced from 10 to 3 for liquid fuels (2019 Refinement).',
     },
     {
       fuelOrActivity: 'BIOMASS_WOOD',
       scope: 1,
       scopeCategory: 'stationary_combustion',
       co2Ef: 112000, // BIOGENIC — reported separately
-      ch4Ef: 30,     // Table 2.3 (Mfg) biomass
-      n2oEf: 4,      // Table 2.3 (Mfg) biomass
+      ch4Ef: 30,     // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, biomass)
+      n2oEf: 4,      // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 2.6 (Mfg, biomass)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 1.4 (CO2), Table 2.3 (CH4/N2O, Manufacturing)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 2.2 (CO2), Table 2.6 (CH4/N2O, Manufacturing)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
@@ -532,34 +534,34 @@ async function main() {
       scope: 1,
       scopeCategory: 'mobile_combustion',
       co2Ef: 74100,
-      ch4Ef: 3.9,    // Table 3.2.2 heavy-duty diesel vehicles
-      n2oEf: 3.9,    // Table 3.2.2 heavy-duty diesel vehicles
+      ch4Ef: 3.9,    // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 3.2.2 heavy-duty diesel (unchanged)
+      n2oEf: 3.9,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 3.2.2 heavy-duty diesel (unchanged)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 3.2.1 (CO2), Table 3.2.2 (CH4/N2O, Heavy-duty)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_3_Ch3_Mobile_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 3.2.1 (CO2), Table 3.2.2 (CH4/N2O, Heavy-duty)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'For MSME transport vehicles (trucks, loaders). CH4/N2O from Table 3.2.2 heavy-duty diesel.',
+      notes: 'For MSME transport vehicles (trucks, loaders). CH4/N2O from Table 3.2.2 heavy-duty diesel. Values unchanged from 2006.',
     },
     {
       fuelOrActivity: 'PETROL_MS',
       scope: 1,
       scopeCategory: 'mobile_combustion',
       co2Ef: 69300,
-      ch4Ef: 33,     // Table 3.2.2 uncontrolled gasoline light-duty
-      n2oEf: 3.2,    // Table 3.2.2
+      ch4Ef: 33,     // kgCH4/TJ — IPCC 2019 Refinement Vol 2 Table 3.2.2 (was 25 in 2006, updated to 33)
+      n2oEf: 3.2,    // kgN2O/TJ — IPCC 2019 Refinement Vol 2 Table 3.2.2 (was 8 in 2006, updated to 3.2)
       efUnit: 'TJ',
       region: null,
       source: 'IPCC',
-      sourceVersion: 'IPCC 2006 Vol 2 Table 3.2.1 (CO2), Table 3.2.2 (CH4/N2O, Light-duty)',
-      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_3_Ch3_Mobile_Combustion.pdf',
+      sourceVersion: 'IPCC 2019 Refinement Vol 2 Table 3.2.1 (CO2), Table 3.2.2 (CH4/N2O, Light-duty)',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp/public/2019rf/vol2.html',
       validFrom,
       validTo: null,
       active: true,
-      notes: 'For company-owned petrol vehicles.',
+      notes: 'For company-owned petrol vehicles. CH4 updated 25→33, N2O updated 8→3.2 (2019 Refinement).',
     },
 
     // ── Scope 1: Process Emissions (Iron & Steel) ───────────────────────────
@@ -707,6 +709,94 @@ async function main() {
       validTo: new Date('2025-03-31'),
       active: true,
       notes: 'Weighted average CO2 emission factor for Indian grid. 0.710 tCO2/MWh. India unified grid since 2013 — regional breakdowns are legacy.',
+    },
+    // ── Scope 2: Regional Grid Electricity ─────────────────────────────────
+    // Source: CEA CO2 Baseline Database Version 21.0, FY2024-25
+    // Regional weighted averages (tCO2/MWh = kgCO2/kWh)
+    {
+      fuelOrActivity: 'GRID_ELECTRICITY',
+      scope: 2,
+      scopeCategory: 'purchased_electricity',
+      co2Ef: 0.898,  // kgCO2/kWh — coal-heavy northern grid
+      ch4Ef: null,
+      n2oEf: null,
+      efUnit: 'kWh',
+      region: 'NORTHERN',
+      source: 'CEA',
+      sourceVersion: 'CEA CO2 Baseline Database v21.0 (FY2024-25)',
+      sourceUrl: 'https://cea.nic.in/wp-content/uploads/baseline/2025/01/Approved_report_for_upload.pdf',
+      validFrom: new Date('2024-04-01'),
+      validTo: new Date('2025-03-31'),
+      active: true,
+      notes: 'Northern regional grid. Coal-heavy generation mix.',
+    },
+    {
+      fuelOrActivity: 'GRID_ELECTRICITY',
+      scope: 2,
+      scopeCategory: 'purchased_electricity',
+      co2Ef: 0.672,  // kgCO2/kWh — mix of gas and renewables
+      ch4Ef: null,
+      n2oEf: null,
+      efUnit: 'kWh',
+      region: 'WESTERN',
+      source: 'CEA',
+      sourceVersion: 'CEA CO2 Baseline Database v21.0 (FY2024-25)',
+      sourceUrl: 'https://cea.nic.in/wp-content/uploads/baseline/2025/01/Approved_report_for_upload.pdf',
+      validFrom: new Date('2024-04-01'),
+      validTo: new Date('2025-03-31'),
+      active: true,
+      notes: 'Western regional grid. Mix of gas and renewables.',
+    },
+    {
+      fuelOrActivity: 'GRID_ELECTRICITY',
+      scope: 2,
+      scopeCategory: 'purchased_electricity',
+      co2Ef: 0.617,  // kgCO2/kWh — high renewable penetration
+      ch4Ef: null,
+      n2oEf: null,
+      efUnit: 'kWh',
+      region: 'SOUTHERN',
+      source: 'CEA',
+      sourceVersion: 'CEA CO2 Baseline Database v21.0 (FY2024-25)',
+      sourceUrl: 'https://cea.nic.in/wp-content/uploads/baseline/2025/01/Approved_report_for_upload.pdf',
+      validFrom: new Date('2024-04-01'),
+      validTo: new Date('2025-03-31'),
+      active: true,
+      notes: 'Southern regional grid. High renewable penetration.',
+    },
+    {
+      fuelOrActivity: 'GRID_ELECTRICITY',
+      scope: 2,
+      scopeCategory: 'purchased_electricity',
+      co2Ef: 0.826,  // kgCO2/kWh — coal-heavy
+      ch4Ef: null,
+      n2oEf: null,
+      efUnit: 'kWh',
+      region: 'EASTERN',
+      source: 'CEA',
+      sourceVersion: 'CEA CO2 Baseline Database v21.0 (FY2024-25)',
+      sourceUrl: 'https://cea.nic.in/wp-content/uploads/baseline/2025/01/Approved_report_for_upload.pdf',
+      validFrom: new Date('2024-04-01'),
+      validTo: new Date('2025-03-31'),
+      active: true,
+      notes: 'Eastern regional grid. Coal-heavy generation mix.',
+    },
+    {
+      fuelOrActivity: 'GRID_ELECTRICITY',
+      scope: 2,
+      scopeCategory: 'purchased_electricity',
+      co2Ef: 0.476,  // kgCO2/kWh — high hydro
+      ch4Ef: null,
+      n2oEf: null,
+      efUnit: 'kWh',
+      region: 'NORTHEASTERN',
+      source: 'CEA',
+      sourceVersion: 'CEA CO2 Baseline Database v21.0 (FY2024-25)',
+      sourceUrl: 'https://cea.nic.in/wp-content/uploads/baseline/2025/01/Approved_report_for_upload.pdf',
+      validFrom: new Date('2024-04-01'),
+      validTo: new Date('2025-03-31'),
+      active: true,
+      notes: 'Northeastern regional grid. High hydroelectric generation.',
     },
 
     // ── Scope 3: Purchased Goods (Iron & Steel relevant) ────────────────────
@@ -912,17 +1002,20 @@ async function main() {
 
   console.log('  Seeding emission factors...');
   for (const ef of emissionFactors) {
-    await prisma.emissionFactor.upsert({
+    // Use findFirst + create/update to handle nullable region in compound unique
+    const existing = await prisma.emissionFactor.findFirst({
       where: {
-        fuelOrActivity_scope_scopeCategory: {
-          fuelOrActivity: ef.fuelOrActivity,
-          scope: ef.scope,
-          scopeCategory: ef.scopeCategory ?? '',
-        },
+        fuelOrActivity: ef.fuelOrActivity,
+        scope: ef.scope,
+        scopeCategory: ef.scopeCategory ?? '',
+        region: ef.region ?? null,
       },
-      update: ef,
-      create: ef,
     });
+    if (existing) {
+      await prisma.emissionFactor.update({ where: { id: existing.id }, data: ef });
+    } else {
+      await prisma.emissionFactor.create({ data: ef });
+    }
   }
   console.log(`  ✓ ${emissionFactors.length} emission factors seeded\n`);
 
