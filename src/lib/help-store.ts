@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface HelpMessage {
   role: 'user' | 'assistant';
@@ -33,7 +34,9 @@ interface HelpActions {
   clearMessages: () => void;
 }
 
-export const useHelpStore = create<HelpState & HelpActions>((set, get) => ({
+export const useHelpStore = create<HelpState & HelpActions>()(
+  persist(
+    (set, get) => ({
   isOpen: false,
   messages: [],
   isLoading: false,
@@ -96,4 +99,14 @@ export const useHelpStore = create<HelpState & HelpActions>((set, get) => ({
   },
 
   clearMessages: () => set({ messages: [], error: null, suggestedQuestions: [] }),
-}));
+    }),
+    {
+      name: 'ghg-help-chat',
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
+        messages: state.messages,
+        context: state.context,
+      }),
+    },
+  ),
+);
