@@ -143,20 +143,6 @@ export function HelpPanel() {
               </div>
             )}
 
-            {/* Initial suggestions when no messages */}
-            {messages.length === 0 && suggestedQuestions.length > 0 && !isLoading && (
-              <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-                {suggestedQuestions.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSuggestion(q)}
-                    className="text-[11px] px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* Input */}
             <form
