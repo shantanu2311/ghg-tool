@@ -22,6 +22,8 @@ interface HelpState {
     organisationSector?: string;
     organisationSubSector?: string;
     organisationState?: string;
+    /** Pre-built summary of the user's analysis data for AI context */
+    analysisSummary?: string;
   };
 }
 

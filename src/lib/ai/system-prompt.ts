@@ -16,6 +16,8 @@ export interface AssistantContext {
   organisationSubSector?: string;
   organisationState?: string;
   language?: 'en' | 'hi';
+  /** Pre-built summary of the user's analysis — org, entries, results */
+  analysisSummary?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -293,6 +295,14 @@ export function buildSystemPrompt(context: AssistantContext): string {
   );
 
   sections.push(contextLines.join('\n'));
+
+  // Include analysis data if available — this lets the AI answer questions
+  // about the user's specific emissions, top sources, intensity, etc.
+  if (context.analysisSummary) {
+    sections.push(
+      `USER'S ANALYSIS DATA (from their current session):\n${context.analysisSummary}\n\nUse this data to answer questions about their specific emissions, top sources, intensity, and recommendations. Reference their actual numbers when relevant.`
+    );
+  }
 
   return sections.join('\n\n');
 }
