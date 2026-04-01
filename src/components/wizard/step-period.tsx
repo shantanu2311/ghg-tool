@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Info } from 'lucide-react';
+import { FieldHelpButton } from '@/components/ai/field-help-button';
 
 const PRESETS = [
   { label: 'FY 2023-24', start: '2023-04-01', end: '2024-03-31' },
@@ -37,10 +38,13 @@ export default function StepPeriod() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">
-          <Calendar className="inline h-4 w-4 mr-1.5 text-muted-foreground" />
-          Reporting Period
-        </CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-base font-semibold">
+            <Calendar className="inline h-4 w-4 mr-1.5 text-muted-foreground" />
+            Reporting Period
+          </CardTitle>
+          <FieldHelpButton step="period" />
+        </div>
         <CardDescription>
           Select the time period for this GHG inventory. Indian companies typically report on a
           financial year (April to March) basis.

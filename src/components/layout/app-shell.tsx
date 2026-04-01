@@ -3,6 +3,8 @@
 import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
 import { Breadcrumbs } from './breadcrumbs';
+import { HelpPanel } from '@/components/ai/help-panel';
+import { HelpFab } from '@/components/ai/help-fab';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -19,6 +21,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
+      <HelpPanel />
+      <HelpFab />
     </div>
   );
 }

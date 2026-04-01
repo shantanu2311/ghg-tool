@@ -77,6 +77,7 @@ model Organisation {
   updatedAt       DateTime @updatedAt
   facilities       Facility[]
   reportingPeriods ReportingPeriod[]
+  customSources    CustomEmissionSource[]
 }
 
 // ── Facility ────────────────────────────────────────────────────────────────
@@ -340,4 +341,36 @@ model TechFundingLink {
   notes           String?             // special conditions
 
   @@unique([techId, fundingId])
+}
+
+// ── Custom Emission Sources (user-defined) ────────────────────────────────
+
+model CustomEmissionSource {
+  id              String   @id @default(cuid())
+  orgId           String
+  organisation    Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name            String           // User's name: "Pet Coke", "Rice Husk Briquettes"
+  code            String           // Auto-generated: "CUSTOM_<slug>"
+  scope           Int              // 1, 2, or 3
+  sourceCategory  String           // "stationary_combustion", "process", "custom"
+  description     String?          // What this source is and how it's used
+  // ── Emission Factor ──
+  co2EfKgPerUnit  Float            // kgCO2 per baseUnit
+  ch4EfKgPerUnit  Float?           // kgCH4 per baseUnit
+  n2oEfKgPerUnit  Float?           // kgN2O per baseUnit
+  efSource        String           // "IPCC 2006", "Energy auditor", "Supplier datasheet", "AI-estimated"
+  efSourceUrl     String?
+  // ── Unit Information ──
+  baseUnit        String           // "tonne", "litre", "kg", "kWh", "m3"
+  density         Float?           // kg/L if liquid
+  ncvTjPerGg      Float?           // Net Calorific Value if fuel
+  defaultPriceInr Float?           // INR per baseUnit (for spend-based fallback)
+  // ── Metadata ──
+  verified        Boolean  @default(false)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  notes           String?
+
+  @@unique([orgId, code])
 }

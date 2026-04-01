@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Inbox, AlertTriangle } from 'lucide-react';
+import { FieldHelpButton } from '@/components/ai/field-help-button';
 
 const DATA_QUALITY_OPTIONS = [
   { value: 'PRIMARY', label: 'Primary', color: 'text-emerald-600 border-emerald-200 bg-emerald-50' },
@@ -344,7 +345,10 @@ export default function StepScope2() {
       {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Scope 2 -- Purchased Energy</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold">Scope 2 -- Purchased Energy</CardTitle>
+            <FieldHelpButton step="scope2" scope={2} />
+          </div>
           <CardDescription>
             Emissions from purchased electricity, steam, or heat consumed by your facilities.
             The grid emission factor is determined by your facility&apos;s state (CEA regional grid).

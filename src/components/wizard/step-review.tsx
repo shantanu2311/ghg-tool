@@ -25,6 +25,7 @@ import {
   CircleCheck,
   BarChart3,
 } from 'lucide-react';
+import { FieldHelpButton } from '@/components/ai/field-help-button';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -295,7 +296,10 @@ export default function StepReview() {
       {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Review &amp; Calculate</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold">Review &amp; Calculate</CardTitle>
+            <FieldHelpButton step="review" />
+          </div>
           <CardDescription>
             Review your data entries, add production and turnover figures, then calculate
             your GHG inventory.

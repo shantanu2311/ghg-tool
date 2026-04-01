@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Building2, Mail, Phone, MapPin, Users, Landmark } from 'lucide-react';
+import { FieldHelpButton } from '@/components/ai/field-help-button';
 
 export default function StepOrganisation() {
   const org = useWizardStore((s) => s.organisation);
@@ -21,7 +22,10 @@ export default function StepOrganisation() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Organisation Profile</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-base font-semibold">Organisation Profile</CardTitle>
+          <FieldHelpButton step="organisation" />
+        </div>
         <CardDescription>
           Basic details about your company. This information will appear on the final report.
         </CardDescription>

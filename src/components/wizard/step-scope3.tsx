@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Inbox, ChevronRight, Info } from 'lucide-react';
+import { FieldHelpButton } from '@/components/ai/field-help-button';
 
 const DATA_QUALITY_OPTIONS = [
   { value: 'PRIMARY', label: 'Primary', color: 'text-emerald-600 border-emerald-200 bg-emerald-50' },
@@ -364,7 +365,10 @@ export default function StepScope3() {
       {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Scope 3 -- Value Chain Emissions</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold">Scope 3 -- Value Chain Emissions</CardTitle>
+            <FieldHelpButton step="scope3" scope={3} />
+          </div>
           <CardDescription>
             Indirect emissions from your value chain: purchased materials, transportation,
             waste, and business travel. Mark categories as &quot;Not Applicable&quot; if they

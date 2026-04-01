@@ -19,6 +19,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Plus, Trash2, Building2, Inbox } from 'lucide-react';
+import { FieldHelpButton } from '@/components/ai/field-help-button';
 
 function FacilityCard({
   facility,
@@ -189,7 +190,10 @@ export default function StepFacilities() {
       <Card>
         <CardHeader>
           <div>
-            <CardTitle className="text-base font-semibold">Facility Setup</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base font-semibold">Facility Setup</CardTitle>
+              <FieldHelpButton step="facilities" />
+            </div>
             <CardDescription>
               Add the facilities where your company operates. Most MSMEs have a single facility.
             </CardDescription>
