@@ -2,7 +2,7 @@
 
 **Project**: GHG Inventorisation Tool for Indian MSMEs
 **Date**: 2026-03-30
-**Tested by**: Claude Reality Check Skill v1.0
+**Tested by**: Automated QA Suite v1.0
 **Source of truth**: `msme-ghg-tool-blueprint.docx` (full project blueprint)
 
 ---

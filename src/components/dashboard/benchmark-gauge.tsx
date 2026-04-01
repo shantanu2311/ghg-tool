@@ -231,13 +231,13 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
               </button>
               <span className="text-muted-foreground/30">|</span>
               <a
-                href="/api/benchmarks/methodology?format=html"
+                href="/api/benchmarks/methodology"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors font-medium"
               >
                 <FileText className="h-3 w-3" />
-                Full methodology
+                Full methodology (PDF)
                 <ExternalLink className="h-2.5 w-2.5" />
               </a>
             </div>
@@ -275,12 +275,13 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
                   </div>
                   <div className="pt-1 border-t border-border/50">
                     <a
-                      href="/api/benchmarks/methodology?format=md"
-                      download="Benchmark_Methodology_India_Steel_MSME.md"
+                      href="/api/benchmarks/methodology"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
                     >
                       <FileText className="h-3 w-3" />
-                      Download full methodology document
+                      Download full methodology (PDF)
                     </a>
                   </div>
                 </div>
