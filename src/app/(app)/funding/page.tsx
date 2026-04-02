@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, ClipboardList, Building2, Users } from 'lucide-react';
+import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, ClipboardList, Building2, Users, Sparkles, BookOpen } from 'lucide-react';
 import { InfoTip } from '@/components/ui/info-tip';
 import { JargonProvider } from '@/components/funding/jargon-provider';
 import { ActionPlan } from '@/components/funding/action-plan';
+import { CuratedPlan } from '@/components/funding/curated-plan';
 import { ServiceProviderSearch } from '@/components/funding/service-provider-search';
 import { CostWaterfall } from '@/components/funding/cost-waterfall';
 
@@ -121,7 +122,7 @@ export default function FundingDirectoryPage() {
   const [selectedTechId, setSelectedTechId] = useState<string | null>(null);
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
   const [showAllTechs, setShowAllTechs] = useState(false);
-  const [activeTab, setActiveTab] = useState<'action-plan' | 'all-schemes' | 'find-help'>('action-plan');
+  const [activeTab, setActiveTab] = useState<'your-plan' | 'scheme-guide' | 'all-schemes' | 'find-help'>('your-plan');
   const [actionPlanScheme, setActionPlanScheme] = useState('S001'); // Default to ADEETIE
 
   useEffect(() => {
@@ -339,7 +340,8 @@ export default function FundingDirectoryPage() {
       {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-border">
         {[
-          { id: 'action-plan' as const, label: 'Action Plan', icon: ClipboardList },
+          { id: 'your-plan' as const, label: 'Your Plan', icon: Sparkles },
+          { id: 'scheme-guide' as const, label: 'Scheme Guide', icon: BookOpen },
           { id: 'all-schemes' as const, label: 'All Schemes', icon: Building2 },
           { id: 'find-help' as const, label: 'Find Help', icon: Users },
         ].map((tab) => (
@@ -359,8 +361,13 @@ export default function FundingDirectoryPage() {
         ))}
       </div>
 
-      {/* ═══ TAB 1: Action Plan ═══ */}
-      {activeTab === 'action-plan' && (
+      {/* ═══ TAB 1: Your Plan (Curated) ═══ */}
+      {activeTab === 'your-plan' && (
+        <CuratedPlan />
+      )}
+
+      {/* ═══ TAB 2: Scheme Guide ═══ */}
+      {activeTab === 'scheme-guide' && (
         <div className="space-y-4">
           {/* Scheme selector */}
           <div className="flex items-center gap-3">
@@ -419,7 +426,7 @@ export default function FundingDirectoryPage() {
         </div>
       )}
 
-      {/* ═══ TAB 2: All Schemes (existing two-panel layout) ═══ */}
+      {/* ═══ TAB 3: All Schemes (existing two-panel layout) ═══ */}
       {activeTab === 'all-schemes' && <>
 
       {/* Selection summary bar */}
@@ -727,7 +734,7 @@ export default function FundingDirectoryPage() {
       </div>
       </>}
 
-      {/* ═══ TAB 3: Find Help ═══ */}
+      {/* ═══ TAB 4: Find Help ═══ */}
       {activeTab === 'find-help' && (
         <div className="space-y-4">
           <Card>
