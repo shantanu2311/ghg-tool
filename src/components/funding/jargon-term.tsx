@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { cn } from '@/lib/utils';
 import { useJargon } from './jargon-provider';
 
 interface JargonTermProps {
@@ -15,17 +16,21 @@ export function JargonTerm({ term, children }: JargonTermProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; showBelow: boolean } | null>(null);
 
-  // Position the popover above the trigger
+  // Position the popover relative to the trigger (fixed positioning = viewport coords)
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
     const popoverWidth = 288; // w-72 = 18rem = 288px
+    const popoverHeight = 200; // approximate max height
     let left = rect.left + rect.width / 2 - popoverWidth / 2;
     // Clamp to viewport
     left = Math.max(8, Math.min(left, window.innerWidth - popoverWidth - 8));
-    setPos({ top: rect.top + window.scrollY, left });
+    // Show above trigger; flip below if not enough space above
+    const showBelow = rect.top < popoverHeight + 8;
+    const top = showBelow ? rect.bottom + 8 : rect.top - 8;
+    setPos({ top, left, showBelow });
   }, []);
 
   // Close on outside click or scroll
@@ -67,7 +72,10 @@ export function JargonTerm({ term, children }: JargonTermProps) {
         <div
           ref={popoverRef}
           style={{ top: pos.top, left: pos.left }}
-          className="fixed z-[100] -translate-y-full -mt-2 w-72 rounded-lg border border-border bg-card shadow-lg animate-in fade-in-0 zoom-in-95 duration-150"
+          className={cn(
+            'fixed z-[100] w-72 rounded-lg border border-border bg-card shadow-lg animate-in fade-in-0 zoom-in-95 duration-150',
+            pos.showBelow ? '' : '-translate-y-full',
+          )}
         >
           <div className="relative p-3 space-y-2">
             {/* Header */}
