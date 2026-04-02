@@ -251,6 +251,26 @@ export default function FundingDirectoryPage() {
   // Count eligible schemes
   const eligibleCount = hasContext ? schemes.filter((s) => s.eligible).length : null;
 
+  // Scheme options for action plan selector — filter by eligibility when context exists
+  const schemesWithPlans = ['S001', 'S004', 'S005', 'S010'];
+  const eligibleSchemesWithPlans = hasContext
+    ? schemesWithPlans.filter((sid) => {
+        const s = schemes.find((sc) => sc.schemeId === sid);
+        return s?.eligible !== false; // show if eligible or unknown (null)
+      })
+    : schemesWithPlans;
+  // Ensure at least ADEETIE is always available (most universal)
+  const displayedPlanSchemes = eligibleSchemesWithPlans.length > 0
+    ? eligibleSchemesWithPlans
+    : ['S001'];
+
+  // Reset selected plan if it's no longer in the displayed list
+  useEffect(() => {
+    if (!displayedPlanSchemes.includes(actionPlanScheme)) {
+      setActionPlanScheme(displayedPlanSchemes[0]);
+    }
+  }, [displayedPlanSchemes, actionPlanScheme]);
+
   /* ---------------------------------------------------------------- */
   /*  Loading skeleton                                                 */
   /* ---------------------------------------------------------------- */
@@ -289,26 +309,6 @@ export default function FundingDirectoryPage() {
 
   const displayTechCount = hasContext && !showAllTechs ? relevantTechs.length : allTechs.length;
   const otherTechCount = allTechs.length - relevantTechs.length;
-
-  // Scheme options for action plan selector — filter by eligibility when context exists
-  const schemesWithPlans = ['S001', 'S004', 'S005', 'S010'];
-  const eligibleSchemesWithPlans = hasContext
-    ? schemesWithPlans.filter((sid) => {
-        const s = schemes.find((sc) => sc.schemeId === sid);
-        return s?.eligible !== false; // show if eligible or unknown (null)
-      })
-    : schemesWithPlans;
-  // Ensure at least ADEETIE is always available (most universal)
-  const displayedPlanSchemes = eligibleSchemesWithPlans.length > 0
-    ? eligibleSchemesWithPlans
-    : ['S001'];
-
-  // Reset selected plan if it's no longer in the displayed list
-  useEffect(() => {
-    if (!displayedPlanSchemes.includes(actionPlanScheme)) {
-      setActionPlanScheme(displayedPlanSchemes[0]);
-    }
-  }, [displayedPlanSchemes, actionPlanScheme]);
 
   return (
     <JargonProvider>
