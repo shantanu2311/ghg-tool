@@ -155,15 +155,19 @@ For each activity data entry:
 - **JSON arrays in DB**: `matchesFuelTypes`, `matchesCategories`, etc. stored as JSON strings in PostgreSQL, parsed in JS (23 techs = trivial)
 - **Seed data**: 23 technologies (T001-T023), 10 funding schemes (S001-S010), 56 tech-funding links
 
-### Module 3: Funding Directory
+### Module 3: Funding Directory & Financing Journey
 
 - Standalone page at `/funding` — not tied to any inventory period
-- **Two-panel layout**: Technologies grouped by category on left (w-[340px]), funding schemes on right
-- **Interactive mapping**: Click a tech → connected schemes highlight; click a scheme → connected techs highlight
-- **Context-aware**: When authenticated, filters techs by user's sector/sub-sector, shows eligibility badges on schemes based on turnover bracket and state
+- **3-tab layout**: Action Plan (default) | All Schemes | Find Help
+- **Tab 1 — Action Plan**: Step-by-step guided action plans per scheme (ADEETIE, EESL, SIDBI, Solar). Expandable steps with time/cost estimates, document checklists, jargon auto-linking, tips, and action URLs.
+- **Tab 2 — All Schemes**: Two-panel layout with technologies on left, schemes on right. Interactive mapping (click tech → schemes highlight, click scheme → techs highlight). Context-aware filtering by sector/sub-sector/state/turnover.
+- **Tab 3 — Find Help**: Service provider directory (SDAs, auditors, ESCOs, banks). Filterable by type.
+- **Jargon tooltips**: 15 technical terms (DEA, IGEA, DPR, ESCO, M&V, CGTMSE, etc.) with hover tooltips explaining full form, cost, reimbursement, and who does it. Auto-linked in action plan descriptions.
+- **JargonProvider**: React context wrapping the funding page, fetches `/api/jargon` once on mount.
+- **Cost calculator**: POST `/api/cost-calculator` with techId + schemeId, returns net cost after subsidy/subvention.
+- **New DB models**: JargonEntry (15 terms), ActionPlanStep (21 steps across 4 schemes), ServiceProvider (12 providers).
+- **Seed data**: 5 SDAs, 3 auditor bodies, 3 financing institutions, 1 portal.
 - `showAllTechs` toggle reveals non-relevant technologies (dimmed)
-- Searchable/filterable by status and text search
-- Funding matches also shown per-tech in the recommendations page's right panel
 - API response format: `{ schemes: [...with eligible/relevant flags], context: { sector, subSector, relevantTechIds } | null }`
 - Degrades gracefully when not authenticated (shows all data without context filtering)
 
@@ -186,6 +190,10 @@ For each activity data entry:
 | GET | `/api/funding` | List schemes with optional filters |
 | GET | `/api/funding/[schemeId]` | Single scheme detail |
 | GET | `/api/funding/for-tech/[techId]` | Schemes for a tech |
+| GET | `/api/jargon` | All jargon entries (no auth) |
+| GET | `/api/action-plans/[schemeId]` | Step-by-step plan for a scheme |
+| GET | `/api/service-providers` | Filterable provider directory |
+| POST | `/api/cost-calculator` | Net cost after subsidy/subvention |
 
 ### Authentication & Encryption
 
@@ -209,9 +217,10 @@ For each activity data entry:
 - **All API routes**: Encrypt on write, decrypt on read. Auth check via `getAuthenticatedUserId()` from `src/lib/auth-helpers.ts`
 - **Row isolation**: Every query filters by `userId` (direct or via org→period chain). Users cannot see each other's data.
 
-### Database Schema (18 models)
+### Database Schema (21 models)
 
 **Auth (4)**: User, Account, Session, VerificationToken
 **Core (7)**: Organisation (has userId FK), Facility, ReportingPeriod, ActivityData, EmissionFactor, CalculatedEmission, Report
 **Reference (4)**: FuelProperty, GwpValue, UnitConversion, SectorBenchmark
 **Module 2/3 (3)**: ReductionTechnology, FundingScheme, TechFundingLink
+**Financing Journey (3)**: JargonEntry, ActionPlanStep (FK to FundingScheme), ServiceProvider
