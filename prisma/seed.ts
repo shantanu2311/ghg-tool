@@ -2655,6 +2655,376 @@ async function main() {
     sourceUrl: null,
   });
 
+  // ── S002 BEE-GEF-UNIDO Programme: 5 steps ──
+  addStep('S002', 1, {
+    title: 'Check If Your Cluster Is Covered',
+    description: 'The BEE-GEF-UNIDO programme operates in 26 designated clusters across 5 sectors: foundry (Belgaum, Coimbatore, Rajkot, Kolhapur, Howrah), ceramics (Morbi, Khurja, Thanjavur), dairy (Mehsana, Anand), brass (Jamnagar, Moradabad), and hand tools (Jalandhar, Nagaur). Check if your factory is in one of these clusters. Contact the BEE facilitation centre or visit the SIDHIEE portal.',
+    estimatedTime: '15 minutes',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Factory address / location proof']),
+    actionUrl: 'https://sidhiee.beeindia.gov.in',
+    actionLabel: 'Visit SIDHIEE Portal',
+    tips: 'Even if your cluster isn\'t listed, check with BEE — some clusters have been added over time. If not eligible here, try ADEETIE (S001) which covers 60 clusters in 14 sectors.',
+    source: 'BEE-GEF-UNIDO Programme',
+    sourceUrl: 'https://sidhiee.beeindia.gov.in/ProjectComponent/GEF_UNIDO',
+  });
+
+  addStep('S002', 2, {
+    title: 'Register for Free Energy Audit',
+    description: 'Register with the programme\'s cluster-level facilitation centre. The programme provides a COMPLETELY FREE energy audit by a BEE-empaneled auditor — funded by the GEF grant. No cost to the MSME. The audit covers your entire factory: furnaces, motors, compressors, lighting, and process equipment.',
+    estimatedTime: '1-2 weeks (registration + scheduling)',
+    estimatedCost: '₹0 (fully funded by GEF grant)',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'Unit registration in cluster', '12 months electricity and fuel bills']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Keep your electricity and fuel bills ready — the auditor will need them. Take photos of your major equipment (nameplates showing capacity/rating) to speed up the audit.',
+    source: 'BEE-GEF-UNIDO Programme',
+    sourceUrl: null,
+  });
+
+  addStep('S002', 3, {
+    title: 'Free DPR Preparation',
+    description: 'After the energy audit identifies savings opportunities, the programme prepares a Detailed Project Report (DPR) at ZERO cost. The DPR includes technology specifications, vendor quotes, cost-benefit analysis, payback period, and financing recommendations. This is a bankable document you can take directly to SIDBI or any bank.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹0 (fully funded by GEF grant)',
+    documentsNeeded: JSON.stringify(['Energy audit report (provided by programme)', 'Production data']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'The DPR is the most valuable output — it normally costs ₹50K-₹2L. Use it to apply for SIDBI 4E (S004) or ADEETIE (S001) financing.',
+    source: 'BEE-GEF-UNIDO Programme',
+    sourceUrl: null,
+  });
+
+  addStep('S002', 4, {
+    title: 'Technology Demonstration',
+    description: 'For selected technologies, the programme may fund a technology demonstration in your cluster. This lets you see the technology working in a nearby factory before committing to full investment. Technologies demonstrated include efficient furnaces, WHRS, VFDs, and ISO 50001 implementation.',
+    estimatedTime: '1-3 months',
+    estimatedCost: '₹0 (demonstration funded by programme)',
+    documentsNeeded: null,
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Visit demonstration units in your cluster — seeing real results from a neighboring factory is the best way to build confidence in the technology.',
+    source: 'BEE-GEF-UNIDO Programme',
+    sourceUrl: null,
+  });
+
+  addStep('S002', 5, {
+    title: 'Implement with Financing Support',
+    description: 'Use the free DPR to secure financing from SIDBI, CGTMSE (collateral-free guarantee), or commercial banks. The programme provides hand-holding through the financing process. Some units in the programme have also achieved ISO 50001 certification (free training + certification support provided).',
+    estimatedTime: '3-12 months',
+    estimatedCost: 'Varies by technology (use DPR estimates)',
+    documentsNeeded: JSON.stringify(['DPR from programme', 'Bank loan application', 'Udyam certificate', 'Quotations from vendors']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Ask about ISO 50001 certification — the programme offers free training and certification support. ISO 50001 certified units get priority in many government subsidy schemes.',
+    source: 'BEE-GEF-UNIDO Programme',
+    sourceUrl: null,
+  });
+
+  // ── S003 SIDBI PRSF: 5 steps ──
+  addStep('S003', 1, {
+    title: 'Identify an ESCO Partner',
+    description: 'PRSF works through the ESCO model — an Energy Service Company implements the project at their risk and is paid from energy savings. Find a BEE-empaneled ESCO suitable for your project. SIDBI maintains a list of approved ESCOs. Alternatively, EESL (the government ESCO) can be approached directly.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Energy audit report', 'List of identified EE opportunities']),
+    actionUrl: 'https://prsf.sidbi.in',
+    actionLabel: 'Visit PRSF Portal',
+    tips: 'If you already have an energy audit (from ADEETIE or BEE-GEF-UNIDO), share it with potential ESCOs. It helps them assess the project quickly.',
+    source: 'SIDBI PRSF',
+    sourceUrl: 'https://prsf.sidbi.in/',
+  });
+
+  addStep('S003', 2, {
+    title: 'ESCO Project Assessment',
+    description: 'The ESCO conducts a detailed assessment of your factory, identifies energy-saving opportunities, and prepares a project proposal with guaranteed savings. The ESCO takes the performance risk — if savings don\'t materialize, they bear the cost. PRSF makes banks willing to lend for these projects by sharing the credit risk.',
+    estimatedTime: '4-6 weeks',
+    estimatedCost: '₹0 (ESCO bears assessment cost)',
+    documentsNeeded: JSON.stringify(['Factory access for assessment', 'Production and energy data', 'Equipment details']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Ask the ESCO for references — check with other factories where they\'ve implemented similar projects. Verify actual savings achieved vs projected.',
+    source: 'SIDBI PRSF',
+    sourceUrl: null,
+  });
+
+  addStep('S003', 3, {
+    title: 'Sign Energy Performance Contract',
+    description: 'Sign an Energy Performance Contract (EPC) with the ESCO. The contract specifies: guaranteed energy savings (minimum %), measurement methodology (M&V protocol), payment structure (shared savings or guaranteed savings model), contract tenure (typically 5-7 years), and risk allocation.',
+    estimatedTime: '2-4 weeks (negotiation)',
+    estimatedCost: '₹0 (ESCO invests upfront)',
+    documentsNeeded: JSON.stringify(['Energy Performance Contract', 'Baseline energy data', 'M&V protocol agreement']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Negotiate the savings share carefully. Typical split: 70-80% savings to MSME, 20-30% to ESCO. After contract ends, 100% savings are yours.',
+    source: 'SIDBI PRSF',
+    sourceUrl: null,
+  });
+
+  addStep('S003', 4, {
+    title: 'Bank Loan with PRSF Guarantee',
+    description: 'The ESCO applies for a bank loan (through SIDBI partner banks). PRSF provides a partial credit guarantee covering 50-75% of default risk, which makes the bank comfortable lending for EE projects. This typically reduces the interest rate by 1-2% compared to normal lending. CGTMSE collateral-free guarantee can also be layered on top.',
+    estimatedTime: '4-6 weeks',
+    estimatedCost: 'Guarantee fee: ~1% of loan amount (often absorbed by ESCO)',
+    documentsNeeded: JSON.stringify(['ESCO project proposal', 'Energy Performance Contract', 'Bank loan application', 'DPR']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'The PRSF guarantee means you don\'t need to provide additional collateral for the EE project loan. Combined with CGTMSE, the entire financing can be collateral-free.',
+    source: 'SIDBI PRSF',
+    sourceUrl: null,
+  });
+
+  addStep('S003', 5, {
+    title: 'Implementation & Savings Sharing',
+    description: 'ESCO implements the project (equipment purchase, installation, commissioning). After commissioning, independent M&V verifies actual savings. Savings are shared per the EPC agreement. Monthly energy bills drop immediately. After contract tenure ends (5-7 years), all equipment transfers to you and 100% of savings are yours.',
+    estimatedTime: '3-12 months (implementation) + 5-7 years (contract)',
+    estimatedCost: '₹0 upfront (ESCO invests)',
+    documentsNeeded: JSON.stringify(['M&V reports (periodic)', 'Energy bills for verification']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Monitor M&V reports closely. If actual savings exceed guaranteed savings, you benefit from the surplus. Maintain equipment properly to maximize lifetime savings.',
+    source: 'SIDBI PRSF',
+    sourceUrl: null,
+  });
+
+  // ── S006 CLCS-TUS (TEQUP): 5 steps ──
+  addStep('S006', 1, {
+    title: 'Identify Technology for Upgrade',
+    description: 'CLCS-TUS provides capital subsidy for technology upgradation. Eligible technologies include: EE motors, VFDs, LED lighting, compressed air optimization, waste heat recovery, and other EE equipment. The technology must demonstrably improve quality or energy efficiency. Consult an energy auditor or your industry association for recommendations.',
+    estimatedTime: '1-2 weeks',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Current equipment inventory', 'Energy audit report (if available)']),
+    actionUrl: 'https://msme.gov.in/technology-and-quality-upgradation',
+    actionLabel: 'Visit MoMSME Portal',
+    tips: 'If you don\'t have an energy audit, get one first via ADEETIE (free/reimbursable). The audit report strengthens your CLCS-TUS application.',
+    source: 'MoMSME CLCS-TUS',
+    sourceUrl: 'https://msme.gov.in/technology-and-quality-upgradation',
+  });
+
+  addStep('S006', 2, {
+    title: 'Get Bank Loan Sanctioned',
+    description: 'CLCS-TUS subsidy is linked to institutional finance (bank loan). Apply for a term loan at any scheduled commercial bank or SIDBI for the technology purchase. Get the loan sanctioned first — the subsidy is provided as a reimbursement on the loan amount. CGTMSE collateral-free guarantee is available for loans up to ₹5 Cr.',
+    estimatedTime: '2-6 weeks',
+    estimatedCost: 'Bank processing fee (~0.5-1% of loan)',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'Quotation from technology supplier', 'Bank loan application', 'Business plan / financials']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Apply through SIDBI or a bank that knows CLCS-TUS — they can process faster. Mention CGTMSE guarantee to avoid collateral requirements.',
+    source: 'MoMSME CLCS-TUS',
+    sourceUrl: null,
+  });
+
+  addStep('S006', 3, {
+    title: 'Submit Subsidy Application',
+    description: 'After loan sanction, submit the CLCS-TUS application through your nearest MSME-DI (Development Institute) or online portal. The subsidy is: 15% of project cost (max ₹15L) for general technology; 25% (max ₹10L) for EE-specific technology on projects up to ₹40L. Attach the loan sanction letter, supplier quotation, and Udyam certificate.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹0 (application is free)',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'Bank loan sanction letter', 'Supplier quotation/proforma invoice', 'CLCS-TUS application form', 'CA certificate for turnover']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'The EE component (25% subsidy) has a lower max project cost (₹40L) but higher subsidy rate. If your project is under ₹40L, apply under the EE component.',
+    source: 'MoMSME CLCS-TUS',
+    sourceUrl: null,
+  });
+
+  addStep('S006', 4, {
+    title: 'Procure & Install Technology',
+    description: 'After application approval, procure the technology from the approved supplier. Install and commission the equipment. Keep all invoices, delivery challans, and installation certificates. The MSME-DI may conduct a site inspection to verify installation.',
+    estimatedTime: '4-12 weeks',
+    estimatedCost: 'As per quotation (loan covers this)',
+    documentsNeeded: JSON.stringify(['Supplier invoice', 'Delivery challan', 'Installation certificate', 'Commissioning report']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Take dated photographs during installation — the MSME-DI inspection team may ask for them. Keep the old equipment records too for before/after comparison.',
+    source: 'MoMSME CLCS-TUS',
+    sourceUrl: null,
+  });
+
+  addStep('S006', 5, {
+    title: 'Receive Subsidy Reimbursement',
+    description: 'After installation verification by MSME-DI, the subsidy amount (15% or 25% of project cost) is credited to your bank loan account, reducing your outstanding principal. This effectively reduces your EMI going forward. Total processing time from application to disbursement: typically 3-6 months.',
+    estimatedTime: '2-3 months (after installation)',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Installation verification report', 'Bank loan account details', 'Utilization certificate']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Once subsidy is received, ask your bank to recalculate EMI based on reduced principal. The effective cost of technology drops significantly with both subsidy and energy savings.',
+    source: 'MoMSME CLCS-TUS',
+    sourceUrl: null,
+  });
+
+  // ── S007 ZED Certification: 4 steps ──
+  addStep('S007', 1, {
+    title: 'Register on ZED Portal',
+    description: 'Create an account on the ZED portal (zed.msme.gov.in) using your Udyam number. ZED (Zero Defect Zero Effect) is a quality + environment certification by QCI. It has 3 levels: Bronze, Silver, Gold. The certification assessment covers quality systems, energy efficiency, environmental compliance, and safety practices.',
+    estimatedTime: '30 minutes',
+    estimatedCost: '₹0 (registration is free)',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'PAN card', 'Aadhaar of proprietor/director']),
+    actionUrl: 'https://zed.msme.gov.in',
+    actionLabel: 'Register on ZED Portal',
+    tips: 'ZED certification gives you priority access to other government subsidies (CLCS-TUS, ADEETIE, procurement preference). It\'s worth doing even before applying for financing.',
+    source: 'MoMSME ZED',
+    sourceUrl: 'https://zed.msme.gov.in/',
+  });
+
+  addStep('S007', 2, {
+    title: 'Complete Self-Assessment & Apply',
+    description: 'Complete the online self-assessment questionnaire on the ZED portal. It covers 20 parameters including quality management, energy management, waste management, safety, and customer satisfaction. After self-assessment, apply for ZED certification. Certification cost subsidy: 80% for Micro, 60% for Small, 50% for Medium enterprises.',
+    estimatedTime: '2-3 hours (self-assessment)',
+    estimatedCost: 'Micro: ₹2,000-4,000 (after 80% subsidy). Small: ₹4,000-8,000. Medium: ₹5,000-10,000',
+    documentsNeeded: JSON.stringify(['Quality management documentation', 'Energy consumption data', 'Waste disposal records', 'Safety compliance certificates']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Women/SC/ST entrepreneurs get an additional 10% subsidy on certification cost. Complete the self-assessment honestly — it helps identify improvement areas.',
+    source: 'MoMSME ZED',
+    sourceUrl: null,
+  });
+
+  addStep('S007', 3, {
+    title: 'ZED Assessment & Certification',
+    description: 'QCI assigns a certified assessor who visits your factory. The assessment takes 1-2 days and covers all 20 ZED parameters. Based on the score, you receive Bronze (basic compliance), Silver (good practices), or Gold (excellence). The assessor also provides an improvement roadmap with specific recommendations.',
+    estimatedTime: '4-8 weeks (scheduling + assessment)',
+    estimatedCost: 'Included in certification fee (subsidized)',
+    documentsNeeded: JSON.stringify(['Factory access for assessor', 'All supporting documents', 'Process documentation']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Focus on quick wins before the assessment: proper documentation, energy monitoring, waste segregation, and safety signage. These can boost your score significantly.',
+    source: 'MoMSME ZED',
+    sourceUrl: null,
+  });
+
+  addStep('S007', 4, {
+    title: 'Claim Linked Benefits',
+    description: 'With ZED certification, you unlock multiple benefits: (1) ISO/BIS/CE certification reimbursement up to ₹50K, (2) energy/environment certification reimbursement up to ₹1L, (3) priority access to CLCS-TUS subsidy, (4) procurement preference from government departments, (5) testing/calibration charges reimbursement up to ₹2L.',
+    estimatedTime: 'Ongoing',
+    estimatedCost: '₹0 (these are reimbursements)',
+    documentsNeeded: JSON.stringify(['ZED certificate', 'Invoices for ISO/BIS certification', 'Testing/calibration receipts']),
+    actionUrl: 'https://zed.msme.gov.in',
+    actionLabel: 'Check ZED Benefits',
+    tips: 'Use ZED certification as a stepping stone: get certified → claim testing/ISO reimbursement → apply for CLCS-TUS with priority → get energy audit via ADEETIE. Each step funds the next.',
+    source: 'MoMSME ZED',
+    sourceUrl: null,
+  });
+
+  // ── S008 SATAT / National Bioenergy Programme: 5 steps ──
+  addStep('S008', 1, {
+    title: 'Assess Biomass/CBG Feasibility',
+    description: 'Evaluate if switching to biomass briquettes or Compressed Biogas (CBG) makes sense for your factory. CBG is a direct replacement for natural gas (PNG/CNG) with similar calorific value. Biomass briquettes replace coal/pet coke in furnaces. Check local biomass availability and whether a CBG supply plant exists nearby. SATAT targets 5,000 CBG plants by 2030.',
+    estimatedTime: '1-2 weeks',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Current fuel consumption data', 'Furnace/boiler specifications']),
+    actionUrl: 'https://satat.co.in',
+    actionLabel: 'Visit SATAT Portal',
+    tips: 'CBG is priced at 85% of average CNG retail price (revised May 2025). If you\'re currently paying high PNG/CNG rates, CBG can save 15-20% on fuel costs. Check satat.co.in for CBG plants in your area.',
+    source: 'MNRE / SATAT Scheme',
+    sourceUrl: 'https://satat.co.in/',
+  });
+
+  addStep('S008', 2, {
+    title: 'Find a Biomass/CBG Supplier',
+    description: 'For biomass briquettes: Contact local briquette manufacturers (available in most agricultural states). For CBG: Check SATAT portal for commissioned plants near you (108 plants operational, 1,094 active Letters of Intent). CBG plants are concentrated in Maharashtra, Punjab, Haryana, UP, and Karnataka. You can also contact oil marketing companies (IOC, BPCL, HPCL) who purchase CBG under SATAT.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹0 (supplier identification)',
+    documentsNeeded: JSON.stringify(['Fuel requirement estimate', 'Location details for logistics']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'For briquettes, establish supply contracts with 2-3 suppliers to ensure continuity. Briquette quality varies — test samples before committing to bulk orders.',
+    source: 'SATAT Scheme',
+    sourceUrl: null,
+  });
+
+  addStep('S008', 3, {
+    title: 'Equipment Modification (If Needed)',
+    description: 'Switching from coal/FO to biomass may require minor furnace modifications (grate changes, feeding system). Switching to CBG from PNG requires minimal or no modifications (same pipeline + burner). Cost: ₹2-10L for furnace modifications, ₹0-2L for CBG burner adaptation. These modifications may be eligible for CLCS-TUS (S006) or ADEETIE (S001) financing.',
+    estimatedTime: '2-6 weeks',
+    estimatedCost: '₹2-10L for biomass furnace mods; ₹0-2L for CBG adaptation',
+    documentsNeeded: JSON.stringify(['Equipment modification plan', 'Supplier quotation', 'Existing furnace/boiler specifications']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'If you need furnace modifications, apply for CLCS-TUS subsidy (15-25% of project cost). For CBG, the switch is usually plug-and-play if you already use PNG.',
+    source: 'SATAT / MNRE',
+    sourceUrl: null,
+  });
+
+  addStep('S008', 4, {
+    title: 'Apply for VGF (If Setting Up CBG Plant)',
+    description: 'If you\'re setting up a CBG plant (not just consuming): Apply for Viability Gap Funding under SATAT. VGF: ₹4 Cr for new plants (4,800 kg/day capacity), ₹3 Cr for upgrades, max ₹10 Cr per project. Submit Expression of Interest to MNRE/MoPNG. You also get guaranteed offtake from oil marketing companies at the SATAT price.',
+    estimatedTime: '2-4 months (application + approval)',
+    estimatedCost: '₹0 (application)',
+    documentsNeeded: JSON.stringify(['Detailed Project Report', 'Biomass supply assessment', 'Land availability proof', 'Environmental clearance', 'EOI for SATAT']),
+    actionUrl: 'https://satat.co.in',
+    actionLabel: 'Submit SATAT EOI',
+    tips: 'Most MSMEs will be CONSUMERS of CBG/biomass, not producers. Steps 1-3 are for consumers. This step is only if you want to set up a CBG production plant.',
+    source: 'SATAT Scheme',
+    sourceUrl: 'https://satat.co.in/',
+  });
+
+  addStep('S008', 5, {
+    title: 'Start Using & Track Savings',
+    description: 'Begin using biomass/CBG as fuel. Track fuel costs, energy output, and emission reductions. Biomass is carbon-neutral (biogenic CO2 reported separately, not added to Scope 1). CBG reduces Scope 1 emissions by ~30-40% vs coal and qualifies for carbon credit potential. Mandatory CBG blending starts 1% in FY2025-26, rising to 5% from FY2028-29.',
+    estimatedTime: 'Ongoing',
+    estimatedCost: 'CBG at ~85% of CNG price; Briquettes at ₹5,000-8,000/tonne',
+    documentsNeeded: null,
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Keep records of biomass/CBG consumption — you may be able to claim carbon credits for the fuel switch. GHG inventory tool tracks biogenic CO2 separately, which demonstrates your net emission reduction.',
+    source: 'SATAT / MNRE',
+    sourceUrl: null,
+  });
+
+  // ── S009 State-level EE Subsidies: 4 steps ──
+  addStep('S009', 1, {
+    title: 'Identify Your State Designated Agency (SDA)',
+    description: 'Each state has an SDA that implements BEE and MNRE schemes locally. Key SDAs: MEDA (Maharashtra), GEDA (Gujarat), TEDA (Tamil Nadu), KREDL (Karnataka), HAREDA (Haryana), RRECL (Rajasthan), UPNEDA (UP), PEDA (Punjab). Contact your SDA to learn about current state-specific subsidies for EE, rooftop solar, and biomass.',
+    estimatedTime: '1 day',
+    estimatedCost: '₹0',
+    documentsNeeded: null,
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'State subsidies change frequently and have limited budgets — apply early. Some states offer additional 10-30% subsidy on top of central schemes for rooftop solar.',
+    source: 'Respective State SDAs',
+    sourceUrl: null,
+  });
+
+  addStep('S009', 2, {
+    title: 'Check State-Specific Schemes',
+    description: 'Common state EE subsidies: Maharashtra (MEDA) ~30% on rooftop solar; Gujarat (GEDA) ₹10K-20K additional solar subsidy + industrial EE scheme; Tamil Nadu (TEDA) 15% commercial solar subsidy; Karnataka (KREDL) net metering incentive; Rajasthan (RRECL) solar park access for MSMEs. Some states also offer interest subvention on EE loans through state finance corporations.',
+    estimatedTime: '1-2 weeks (research + inquiry)',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'Facility location proof']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Ask your SDA about "stacking" state subsidy with central schemes. In many cases, you can get ADEETIE interest subvention + state capital subsidy on the same project.',
+    source: 'Respective State SDAs',
+    sourceUrl: null,
+  });
+
+  addStep('S009', 3, {
+    title: 'Apply Through SDA',
+    description: 'Submit the state-specific application form to your SDA (online portal or physical office). Most state schemes require: Udyam certificate, project details/DPR, supplier quotation, and bank loan sanction (if subsidy is linked to financing). Processing time varies by state: 2-8 weeks for approval.',
+    estimatedTime: '2-8 weeks',
+    estimatedCost: '₹0 (application is free)',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'DPR or project details', 'Supplier quotation', 'Bank loan sanction letter', 'State application form']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'If your DPR was prepared under ADEETIE or BEE-GEF-UNIDO (free), use it directly for the state subsidy application. No need to prepare a separate one.',
+    source: 'Respective State SDAs',
+    sourceUrl: null,
+  });
+
+  addStep('S009', 4, {
+    title: 'Implement & Claim Subsidy',
+    description: 'After approval, implement the project and submit utilization certificates, invoices, and commissioning reports to the SDA. The subsidy is disbursed after verification — typically within 1-3 months of submission. Some states disburse in 2 tranches (50% after approval, 50% after commissioning).',
+    estimatedTime: '1-3 months (after project completion)',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Installation certificate', 'Supplier invoices', 'Commissioning report', 'Utilization certificate', 'Photos of installed equipment']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Take before/after photos and energy meter readings. Many SDAs require photographic evidence. Track energy savings for at least 3 months post-installation to demonstrate impact.',
+    source: 'Respective State SDAs',
+    sourceUrl: null,
+  });
+
   for (const step of actionPlanSteps) {
     await prisma.actionPlanStep.upsert({
       where: {

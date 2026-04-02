@@ -12,6 +12,7 @@ import { InfoTip } from '@/components/ui/info-tip';
 import { JargonProvider } from '@/components/funding/jargon-provider';
 import { ActionPlan } from '@/components/funding/action-plan';
 import { ServiceProviderSearch } from '@/components/funding/service-provider-search';
+import { CostWaterfall } from '@/components/funding/cost-waterfall';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -252,7 +253,7 @@ export default function FundingDirectoryPage() {
   const eligibleCount = hasContext ? schemes.filter((s) => s.eligible).length : null;
 
   // Scheme options for action plan selector — filter by eligibility when context exists
-  const schemesWithPlans = ['S001', 'S004', 'S005', 'S010'];
+  const schemesWithPlans = ['S001', 'S002', 'S003', 'S004', 'S005', 'S006', 'S007', 'S008', 'S009', 'S010'];
   const eligibleSchemesWithPlans = hasContext
     ? schemesWithPlans.filter((sid) => {
         const s = schemes.find((sc) => sc.schemeId === sid);
@@ -387,6 +388,22 @@ export default function FundingDirectoryPage() {
 
           {/* Action plan component */}
           <ActionPlan schemeId={actionPlanScheme} />
+
+          {/* Net cost waterfall chart */}
+          {allTechs.length > 0 && schemes.length > 0 && (
+            <CostWaterfall
+              technologies={
+                (hasContext ? relevantTechs : allTechs).map((t) => ({
+                  techId: t.techId,
+                  name: t.name,
+                }))
+              }
+              schemes={schemes.map((s) => ({
+                schemeId: s.schemeId,
+                name: s.name,
+              }))}
+            />
+          )}
 
           {/* Info note */}
           <Card>
