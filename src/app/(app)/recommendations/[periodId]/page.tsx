@@ -221,7 +221,8 @@ export default function RecommendationsPage() {
       {(() => {
         const enabledTechs = recommendations.filter((r) => enabledTechIds.has(r.techId));
         const techsWithFunding = enabledTechs.filter((r) => r.fundingMatches.length > 0);
-        const totalSchemes = techsWithFunding.reduce((sum, t) => sum + t.fundingMatches.length, 0);
+        const uniqueSchemeIds = new Set(techsWithFunding.flatMap((t) => t.fundingMatches.map((m) => m.schemeId)));
+        const totalSchemes = uniqueSchemeIds.size;
 
         return (
           <Card className="border-primary/20 bg-primary/[0.03] dark:bg-primary/[0.05]">
