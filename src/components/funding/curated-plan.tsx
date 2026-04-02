@@ -226,26 +226,8 @@ function buildCuratedPlan(
       const phaseCategory = classifyStep(step, sid);
       const dedupKey = getDedupKey(step);
 
-      // Check if this step is a duplicate of one already covered
-      if (dedupKey && coveredDedupKeys.has(dedupKey)) {
-        // Add a reference instead of the full step
-        phaseItems.get(phaseCategory)!.push({
-          title: step.title,
-          description: '',
-          estimatedTime: null,
-          estimatedCost: null,
-          documentsNeeded: [],
-          actionUrl: null,
-          actionLabel: null,
-          tips: null,
-          techNames,
-          schemeName: group.scheme.name,
-          schemeId: sid,
-          isReference: true,
-          referenceText: `Already covered above — reuse the same ${dedupKey === 'energy_audit' ? 'audit report' : dedupKey === 'dpr_prep' ? 'DPR' : dedupKey === 'bank_loan' ? 'loan application' : 'documents'} for ${group.scheme.name}`,
-        });
-        continue;
-      }
+      // Skip duplicate steps — already covered by an earlier scheme
+      if (dedupKey && coveredDedupKeys.has(dedupKey)) continue;
 
       // Mark this step pattern as covered
       if (dedupKey) coveredDedupKeys.add(dedupKey);
@@ -290,22 +272,6 @@ function buildCuratedPlan(
 
 function PhaseItemCard({ item, isLast }: { item: PhaseItem; isLast: boolean }) {
   const [expanded, setExpanded] = useState(false);
-
-  if (item.isReference) {
-    return (
-      <div className={cn('relative flex gap-3', !isLast && 'pb-4')}>
-        <div className="flex flex-col items-center">
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-dashed border-muted-foreground/30 bg-muted/30">
-            <ArrowRight className="h-3 w-3 text-muted-foreground/50" />
-          </div>
-          {!isLast && <div className="w-px flex-1 bg-border/50" />}
-        </div>
-        <div className="flex-1 pb-1">
-          <p className="text-xs text-muted-foreground italic">{item.referenceText}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={cn('relative flex gap-3', !isLast && 'pb-4')}>
@@ -655,8 +621,7 @@ export function CuratedPlan({ className }: { className?: string }) {
                     Phase {phaseIndex + 1}: {phase.title}
                   </CardTitle>
                   <CardDescription className="text-[11px]">
-                    {phase.items.filter((i) => !i.isReference).length} {phase.items.filter((i) => !i.isReference).length === 1 ? 'step' : 'steps'}
-                    {phase.items.some((i) => i.isReference) && ` (${phase.items.filter((i) => i.isReference).length} already covered)`}
+                    {phase.items.length} {phase.items.length === 1 ? 'step' : 'steps'}
                   </CardDescription>
                 </div>
               </div>
