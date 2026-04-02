@@ -374,17 +374,23 @@ export function CuratedPlan({ className }: { className?: string }) {
     return Array.from(docs);
   }, [sections]);
 
-  // Tech → scheme mapping for summary header
-  const techSchemeMap = useMemo(() => {
-    const map: { tech: TechWithFunding; scheme: FundingMatch }[] = [];
+  // Group techs by scheme for summary display
+  const schemeGroups = useMemo(() => {
+    const groups = new Map<string, { scheme: FundingMatch; techs: TechWithFunding[] }>();
     for (const tech of enabledTechs) {
       const scheme = pickBestScheme(tech);
-      if (scheme) map.push({ tech, scheme });
+      if (!scheme) continue;
+      const existing = groups.get(scheme.schemeId);
+      if (existing) {
+        existing.techs.push(tech);
+      } else {
+        groups.set(scheme.schemeId, { scheme, techs: [tech] });
+      }
     }
-    return map;
+    return Array.from(groups.values());
   }, [enabledTechs]);
 
-  const uniqueSchemeCount = new Set(techSchemeMap.map((m) => m.scheme.schemeId)).size;
+  const uniqueSchemeCount = schemeGroups.length;
 
   /* ---------------------------------------------------------------- */
   /*  No recommendations data — CTA                                    */
@@ -486,27 +492,36 @@ export function CuratedPlan({ className }: { className?: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Tech → Scheme mapping */}
-          <div className="space-y-2">
-            {techSchemeMap.map(({ tech, scheme }) => (
+          {/* Scheme groups — each scheme with its matched technologies */}
+          <div className="space-y-3">
+            {schemeGroups.map(({ scheme, techs }) => (
               <div
-                key={tech.techId}
-                className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-xs"
+                key={scheme.schemeId}
+                className="rounded-lg border border-border p-3 space-y-2"
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-mono text-muted-foreground shrink-0">{tech.techId}</span>
-                  <span className="font-medium truncate">{tech.name}</span>
-                </div>
-                <div className="flex items-center gap-2 shrink-0 ml-3">
-                  <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                  <Badge className="text-[10px] py-0 bg-primary/10 text-primary border-primary/20">
-                    {scheme.name.length > 25 ? scheme.name.slice(0, 22) + '...' : scheme.name}
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h4 className="text-xs font-semibold text-foreground">{scheme.name}</h4>
+                    <p className="text-[11px] text-muted-foreground">{scheme.supportType}</p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      'shrink-0 text-[10px]',
+                      scheme.status === 'Active'
+                        ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                        : 'border-amber-500 text-amber-600 dark:text-amber-400',
+                    )}
+                  >
+                    {scheme.status}
                   </Badge>
-                  {scheme.subsidyPct != null && (
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                      {scheme.subsidyPct}% off
-                    </span>
-                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {techs.map((tech) => (
+                    <Badge key={tech.techId} variant="outline" className="text-[10px] py-0.5 px-2 font-normal">
+                      {tech.name}
+                    </Badge>
+                  ))}
                 </div>
               </div>
             ))}
