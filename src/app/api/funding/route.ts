@@ -82,20 +82,30 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Determine which schemes are eligible based on turnover + state
+    // Determine which schemes are eligible based on sector + turnover + state
     const eligibleSchemeIds = new Set<string>();
     if (orgContext) {
       for (const s of filtered) {
+        // Check sector coverage
+        const sectors = parseJson(s.sectorsCovered);
+        if (sectors && sectors.length > 0 && !sectors.includes(orgContext.sector)) continue;
+
+        // Check turnover bracket
         const brackets = parseJson(s.turnoverBrackets);
         if (brackets && brackets.length > 0 && orgContext.turnoverBracket) {
           if (!brackets.includes(orgContext.turnoverBracket)) continue;
         }
 
+        // Check state (only for state-specific schemes)
         const states = parseJson(s.applicableStates);
         if (states && states.length > 0) {
           const allStates = [orgContext.state, ...facilityStates];
           if (!states.some((st) => allStates.includes(st))) continue;
         }
+
+        // Check if at least one linked technology is relevant to the user
+        const hasRelevantTech = s.techLinks.some((tl) => relevantTechIds.has(tl.technology.techId));
+        if (s.techLinks.length > 0 && !hasRelevantTech) continue;
 
         eligibleSchemeIds.add(s.schemeId);
       }
