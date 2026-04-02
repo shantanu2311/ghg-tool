@@ -326,6 +326,7 @@ model FundingScheme {
   sourceUrl           String?
   // ── Relations ──
   techLinks           TechFundingLink[]
+  actionPlanSteps     ActionPlanStep[]
 }
 
 // ── Technology ↔ Funding Link (many-to-many) ───────────────────────────────
@@ -341,6 +342,61 @@ model TechFundingLink {
   notes           String?             // special conditions
 
   @@unique([techId, fundingId])
+}
+
+// ── Financing Journey: Jargon Dictionary ──────────────────────────────────
+
+model JargonEntry {
+  id              String  @id @default(cuid())
+  term            String  @unique          // "DEA", "DPR", "IGEA"
+  fullForm        String                   // "Detailed Energy Audit"
+  explanation     String                   // Plain English, 2-3 sentences
+  whoDoesIt       String?                  // "BEE-certified Energy Auditor"
+  typicalCostInr  String?                  // "₹50,000–₹2,00,000"
+  isReimbursed    String?                  // "Yes, under ADEETIE up to ₹1L"
+  relatedTerms    String?                  // JSON: ["CEA", "AEA", "IGEA"]
+  source          String?
+  sourceUrl       String?
+}
+
+// ── Financing Journey: Action Plan Steps ──────────────────────────────────
+
+model ActionPlanStep {
+  id              String        @id @default(cuid())
+  schemeId        String
+  scheme          FundingScheme @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+  stepNumber      Int
+  title           String                   // "Submit Expression of Interest"
+  description     String                   // Detailed how-to
+  estimatedTime   String?                  // "30 minutes" | "2-4 weeks"
+  estimatedCost   String?                  // "₹0" | "₹50,000–₹2,00,000 (reimbursable)"
+  documentsNeeded String?                  // JSON: ["Udyam certificate", "12 months electricity bills"]
+  actionUrl       String?                  // Direct link to form/portal
+  actionLabel     String?                  // "Download EOI Format"
+  tips            String?                  // Practical advice
+  source          String?
+  sourceUrl       String?
+
+  @@unique([schemeId, stepNumber])
+}
+
+// ── Financing Journey: Service Providers ──────────────────────────────────
+
+model ServiceProvider {
+  id              String   @id @default(cuid())
+  name            String                   // "National Productivity Council"
+  type            String                   // "energy_auditor" | "esco" | "bank" | "sda" | "consultant"
+  services        String?                  // JSON: ["DEA", "IGEA", "DPR"]
+  states          String?                  // JSON: ["Maharashtra", "Gujarat"]
+  sectors         String?                  // JSON: ["foundry", "forging"]
+  accreditation   String?                  // "BEE AEA" | "ADEETIE Empaneled"
+  contactEmail    String?
+  contactPhone    String?
+  website         String?
+  address         String?
+  source          String
+  sourceUrl       String?
+  active          Boolean  @default(true)
 }
 
 // ── Custom Emission Sources (user-defined) ────────────────────────────────

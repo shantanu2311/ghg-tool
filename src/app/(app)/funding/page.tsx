@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff } from 'lucide-react';
+import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, ClipboardList, Building2, Users } from 'lucide-react';
 import { InfoTip } from '@/components/ui/info-tip';
+import { JargonProvider } from '@/components/funding/jargon-provider';
+import { ActionPlan } from '@/components/funding/action-plan';
+import { ServiceProviderSearch } from '@/components/funding/service-provider-search';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -117,6 +120,8 @@ export default function FundingDirectoryPage() {
   const [selectedTechId, setSelectedTechId] = useState<string | null>(null);
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
   const [showAllTechs, setShowAllTechs] = useState(false);
+  const [activeTab, setActiveTab] = useState<'action-plan' | 'all-schemes' | 'find-help'>('action-plan');
+  const [actionPlanScheme, setActionPlanScheme] = useState('S001'); // Default to ADEETIE
 
   useEffect(() => {
     fetch('/api/funding')
@@ -285,14 +290,19 @@ export default function FundingDirectoryPage() {
   const displayTechCount = hasContext && !showAllTechs ? relevantTechs.length : allTechs.length;
   const otherTechCount = allTechs.length - relevantTechs.length;
 
+  // Scheme options for action plan selector
+  const schemesWithPlans = ['S001', 'S004', 'S005', 'S010'];
+  const schemeOptions = schemes.filter((s) => schemesWithPlans.includes(s.schemeId));
+
   return (
+    <JargonProvider>
     <div className="space-y-4">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
           <Landmark className="h-6 w-6 text-muted-foreground" />
           Funding Directory
-          <InfoTip text="Government schemes and subsidies for MSME energy efficiency and emission reduction projects. Click a technology or scheme to see connections." />
+          <InfoTip text="Government schemes and subsidies for MSME energy efficiency and emission reduction projects. Explore action plans, browse schemes, or find service providers." />
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           {hasContext ? (
@@ -308,6 +318,76 @@ export default function FundingDirectoryPage() {
           )}
         </p>
       </div>
+
+      {/* Tab bar */}
+      <div className="flex items-center gap-1 border-b border-border">
+        {[
+          { id: 'action-plan' as const, label: 'Action Plan', icon: ClipboardList },
+          { id: 'all-schemes' as const, label: 'All Schemes', icon: Building2 },
+          { id: 'find-help' as const, label: 'Find Help', icon: Users },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px',
+              activeTab === tab.id
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border',
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ═══ TAB 1: Action Plan ═══ */}
+      {activeTab === 'action-plan' && (
+        <div className="space-y-4">
+          {/* Scheme selector */}
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-muted-foreground shrink-0">Show action plan for:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {schemesWithPlans.map((sid) => {
+                const s = schemes.find((sc) => sc.schemeId === sid);
+                return (
+                  <button
+                    key={sid}
+                    onClick={() => setActionPlanScheme(sid)}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-xs font-medium transition-colors border',
+                      actionPlanScheme === sid
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:border-border/80 hover:text-foreground',
+                    )}
+                  >
+                    {s?.name ?? sid}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Action plan component */}
+          <ActionPlan schemeId={actionPlanScheme} />
+
+          {/* Info note */}
+          <Card>
+            <CardContent className="py-4">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <span className="font-medium text-foreground">Not sure where to start?</span>{' '}
+                ADEETIE is the most widely applicable scheme for Indian MSMEs. It covers 14 sectors across 60 clusters
+                with interest subvention, free energy audits, and DPR support. Submit an Expression of Interest (EOI)
+                as your first step — it takes 30 minutes and costs nothing.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ═══ TAB 2: All Schemes (existing two-panel layout) ═══ */}
+      {activeTab === 'all-schemes' && <>
 
       {/* Selection summary bar */}
       {hasSelection && (
@@ -612,6 +692,26 @@ export default function FundingDirectoryPage() {
           </ScrollArea>
         </div>
       </div>
+      </>}
+
+      {/* ═══ TAB 3: Find Help ═══ */}
+      {activeTab === 'find-help' && (
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="py-4">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <span className="font-medium text-foreground">Find energy auditors, ESCOs, financing institutions, and state agencies</span>{' '}
+                that can help you access funding schemes and implement energy efficiency projects.
+                {hasContext && orgContext?.sector && (
+                  <> Filtered for your state where possible.</>
+                )}
+              </p>
+            </CardContent>
+          </Card>
+          <ServiceProviderSearch />
+        </div>
+      )}
     </div>
+    </JargonProvider>
   );
 }

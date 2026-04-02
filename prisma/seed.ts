@@ -2158,6 +2158,707 @@ async function main() {
   }
   console.log(`  ✓ ${techFundingLinks.length} technology-funding links seeded\n`);
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // 9. Jargon Dictionary (Financing Journey)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  console.log('  Seeding jargon dictionary...');
+
+  const jargonEntries = [
+    {
+      term: 'DEA',
+      fullForm: 'Detailed Energy Audit',
+      explanation: 'A trained auditor visits your factory for 2-3 days, measures energy use in every machine, furnace, motor, compressor, and lighting system, and writes a report showing where energy is wasted and what can be saved. Think of it as a health check-up for your factory\'s energy use.',
+      whoDoesIt: 'BEE-certified Energy Auditor (CEA) or Accredited Energy Auditor (AEA) firm',
+      typicalCostInr: '₹50,000–₹2,00,000 (depends on factory size and complexity)',
+      isReimbursed: 'Yes, under ADEETIE: up to ₹1L (medium) / ₹75K (micro/small). Under BEE-GEF-UNIDO: completely free in programme clusters.',
+      relatedTerms: JSON.stringify(['IGEA', 'CEA', 'AEA']),
+      source: 'BEE ADEETIE Guidelines',
+      sourceUrl: 'https://adeetie.beeindia.gov.in',
+    },
+    {
+      term: 'IGEA',
+      fullForm: 'Investment Grade Energy Audit',
+      explanation: 'A more detailed version of DEA that includes financial analysis — not just "you can save 20% electricity" but "if you spend ₹15L on VFDs, you\'ll save ₹4L/year, payback in 3.75 years, IRR 22%." This level of detail is needed for a bank to approve a loan.',
+      whoDoesIt: 'Same as DEA — BEE-empaneled auditor firms',
+      typicalCostInr: '₹75,000–₹2,50,000',
+      isReimbursed: 'Yes, fully reimbursed under ADEETIE',
+      relatedTerms: JSON.stringify(['DEA', 'DPR']),
+      source: 'BEE ADEETIE Guidelines',
+      sourceUrl: 'https://adeetie.beeindia.gov.in',
+    },
+    {
+      term: 'DPR',
+      fullForm: 'Detailed Project Report',
+      explanation: 'A formal document that says: this is the technology we want to install, this is what it costs, this is the vendor quote, this is the expected energy saving, this is the payback period, and this is why a bank should lend us money for it. Banks won\'t approve a loan without a DPR.',
+      whoDoesIt: 'Usually the same auditor who did the DEA, or a consultant recommended by SIDBI',
+      typicalCostInr: '₹30,000–₹75,000 (often bundled with DEA)',
+      isReimbursed: 'Yes, reimbursed under ADEETIE within the ₹1L/₹75K cap. Under SIDBI 4E, SIDBI\'s Energy Efficiency Cell vets the DPR at no cost.',
+      relatedTerms: JSON.stringify(['IGEA', 'DEA']),
+      source: 'BEE / SIDBI',
+      sourceUrl: null,
+    },
+    {
+      term: 'CEA',
+      fullForm: 'Certified Energy Auditor',
+      explanation: 'An individual who has passed BEE\'s national certification exam (4 papers) and has 3+ years of engineering experience. They can conduct energy audits independently.',
+      whoDoesIt: 'Individual professional certified by BEE',
+      typicalCostInr: 'N/A — it\'s a certification, not a service you buy',
+      isReimbursed: null,
+      relatedTerms: JSON.stringify(['AEA', 'DEA']),
+      source: 'BEE',
+      sourceUrl: 'https://beeindia.gov.in/content/certified-energy-auditors',
+    },
+    {
+      term: 'AEA',
+      fullForm: 'Accredited Energy Auditor',
+      explanation: 'A firm (not individual) that has been accredited by BEE to conduct energy audits. Has a team of CEAs on staff. More common for industrial audits than individual CEAs.',
+      whoDoesIt: 'Firms like NPC, TERI, Shakti Foundation — accredited by BEE',
+      typicalCostInr: 'Hired by the MSME; fee varies by factory size',
+      isReimbursed: null,
+      relatedTerms: JSON.stringify(['CEA', 'DEA']),
+      source: 'BEE',
+      sourceUrl: 'https://beeindia.gov.in/content/accredited-energy-auditors',
+    },
+    {
+      term: 'ESCO',
+      fullForm: 'Energy Service Company',
+      explanation: 'A company that installs energy-efficient equipment in your factory at ZERO upfront cost. They finance the installation themselves and get paid from your actual energy savings over 3-5 years. If you don\'t save, you don\'t pay.',
+      whoDoesIt: 'Companies like EESL (government), or private ESCOs',
+      typicalCostInr: 'Zero upfront cost to MSME — ESCO bears the capex',
+      isReimbursed: 'N/A — the whole point is you don\'t pay upfront',
+      relatedTerms: JSON.stringify(['EESL', 'EPC']),
+      source: 'BEE / EESL',
+      sourceUrl: 'https://eeslindia.org',
+    },
+    {
+      term: 'M&V',
+      fullForm: 'Monitoring & Verification',
+      explanation: 'After the technology is installed, someone comes to verify that the energy savings actually happened as claimed. This is needed to release the subsidy or interest subvention. Typically done 3-6 months after installation.',
+      whoDoesIt: 'The auditor firm or a third-party verifier empaneled by BEE',
+      typicalCostInr: '₹10,000–₹30,000',
+      isReimbursed: 'Typically included in the scheme support',
+      relatedTerms: JSON.stringify(['DEA', 'IGEA']),
+      source: 'BEE',
+      sourceUrl: null,
+    },
+    {
+      term: 'CGTMSE',
+      fullForm: 'Credit Guarantee Fund Trust for Micro and Small Enterprises',
+      explanation: 'If you don\'t have collateral (property/assets) to pledge for a bank loan, CGTMSE guarantees the loan so the bank takes less risk. Your bank applies for CGTMSE cover — you don\'t apply directly.',
+      whoDoesIt: 'Bank applies on your behalf to CGTMSE',
+      typicalCostInr: 'Small guarantee fee (0.5-1% of loan amount, one-time)',
+      isReimbursed: 'Often waived for loans under ₹5L',
+      relatedTerms: JSON.stringify(['PRSF', 'SIDBI']),
+      source: 'CGTMSE Trust',
+      sourceUrl: 'https://www.cgtmse.in',
+    },
+    {
+      term: 'PRSF',
+      fullForm: 'Partial Risk Sharing Facility',
+      explanation: 'SIDBI + World Bank facility that covers part of the default risk for banks lending to energy efficiency projects. This means banks are more willing to lend and may offer lower interest rates. 77 EE projects supported as of Dec 2023.',
+      whoDoesIt: 'SIDBI manages it; your bank accesses it',
+      typicalCostInr: 'No direct cost to MSME',
+      isReimbursed: 'N/A — it\'s a risk-sharing mechanism between banks',
+      relatedTerms: JSON.stringify(['SIDBI', 'CGTMSE']),
+      source: 'SIDBI',
+      sourceUrl: 'https://www.sidbi.in',
+    },
+    {
+      term: 'SDA',
+      fullForm: 'State Designated Agency',
+      explanation: 'Each state has a government body responsible for energy efficiency and renewable energy (e.g., MEDA in Maharashtra, TEDA in Tamil Nadu, HAREDA in Haryana). They often offer additional state-level subsidies on top of central schemes.',
+      whoDoesIt: 'State government agency',
+      typicalCostInr: 'No cost — they provide subsidies',
+      isReimbursed: 'They ARE the subsidiser',
+      relatedTerms: JSON.stringify(['MEDA', 'GEDA', 'TEDA']),
+      source: 'BEE',
+      sourceUrl: 'https://beeindia.gov.in/content/sdas',
+    },
+    {
+      term: 'EOI',
+      fullForm: 'Expression of Interest',
+      explanation: 'A simple 1-2 page form that says "I\'m interested in this scheme." It includes basic info about your factory (name, location, sector, energy bills). This is always step ONE — before anything else.',
+      whoDoesIt: 'The MSME fills this out themselves',
+      typicalCostInr: '₹0',
+      isReimbursed: 'N/A',
+      relatedTerms: JSON.stringify(['DPR']),
+      source: 'BEE ADEETIE',
+      sourceUrl: 'https://adeetie.beeindia.gov.in',
+    },
+    {
+      term: 'EPC',
+      fullForm: 'Energy Performance Contract',
+      explanation: 'A contract between an MSME and an ESCO where payment is linked to actual energy savings achieved. If the ESCO doesn\'t deliver the promised savings, the MSME pays less or nothing. Typical duration is 3-5 years.',
+      whoDoesIt: 'ESCO (e.g., EESL) drafts and signs with the MSME',
+      typicalCostInr: 'Zero upfront — payments come from verified savings',
+      isReimbursed: 'N/A',
+      relatedTerms: JSON.stringify(['ESCO', 'M&V']),
+      source: 'BEE',
+      sourceUrl: null,
+    },
+    {
+      term: 'PPA',
+      fullForm: 'Power Purchase Agreement',
+      explanation: 'A contract to buy electricity from a solar developer at a fixed rate (typically ₹3-4/kWh) for 15-25 years. The developer installs solar panels on YOUR roof at THEIR cost. You save 50-70% on the solar-covered portion of your electricity bill from day one.',
+      whoDoesIt: 'Solar RESCO / developer signs with the MSME',
+      typicalCostInr: 'Zero upfront — you pay per unit of solar electricity consumed',
+      isReimbursed: 'N/A',
+      relatedTerms: JSON.stringify(['RESCO']),
+      source: 'MNRE',
+      sourceUrl: null,
+    },
+    {
+      term: 'RESCO',
+      fullForm: 'Renewable Energy Service Company',
+      explanation: 'A company that installs solar panels on your roof at their own cost. You sign a PPA to buy the generated electricity at a rate lower than grid. After the contract (15-25 years), you own the panels. Zero upfront investment.',
+      whoDoesIt: 'Solar developers (Tata Power Solar, Fourth Partner Energy, etc.)',
+      typicalCostInr: 'Zero upfront — solar developer bears all capex',
+      isReimbursed: 'N/A — savings come from lower per-unit electricity cost',
+      relatedTerms: JSON.stringify(['PPA', 'ESCO']),
+      source: 'MNRE',
+      sourceUrl: null,
+    },
+    {
+      term: 'NCV',
+      fullForm: 'Net Calorific Value',
+      explanation: 'The amount of heat energy released when a fuel is burned, minus the energy lost to water evaporation. Measured in TJ/Gg (terajoules per gigagram). Used to convert fuel quantity to energy content for emission calculations. Higher NCV = more energy per kg of fuel.',
+      whoDoesIt: 'Laboratory testing or standard reference values (IPCC)',
+      typicalCostInr: 'N/A — standard values from IPCC are used',
+      isReimbursed: null,
+      relatedTerms: null,
+      source: 'IPCC 2019 Refinement',
+      sourceUrl: 'https://www.ipcc-nggip.iges.or.jp',
+    },
+  ];
+
+  for (const entry of jargonEntries) {
+    await prisma.jargonEntry.upsert({
+      where: { term: entry.term },
+      update: entry,
+      create: entry,
+    });
+  }
+  console.log(`  ✓ ${jargonEntries.length} jargon entries seeded\n`);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // 10. Action Plan Steps (Financing Journey)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  console.log('  Seeding action plan steps...');
+
+  // Look up internal FundingScheme IDs (same pattern as techFundingLinks)
+  const schemeIdMap = new Map<string, string>();
+  for (const s of fundingSchemes) {
+    const rec = await prisma.fundingScheme.findUnique({ where: { schemeId: s.schemeId } });
+    if (rec) schemeIdMap.set(s.schemeId, rec.id);
+  }
+
+  interface ActionPlanStepData {
+    schemeId: string;
+    stepNumber: number;
+    title: string;
+    description: string;
+    estimatedTime: string | null;
+    estimatedCost: string | null;
+    documentsNeeded: string | null;
+    actionUrl: string | null;
+    actionLabel: string | null;
+    tips: string | null;
+    source: string | null;
+    sourceUrl: string | null;
+  }
+
+  const actionPlanSteps: ActionPlanStepData[] = [];
+
+  function addStep(schemeCode: string, stepNumber: number, data: Omit<ActionPlanStepData, 'schemeId' | 'stepNumber'>) {
+    const internalId = schemeIdMap.get(schemeCode);
+    if (internalId) {
+      actionPlanSteps.push({ schemeId: internalId, stepNumber, ...data });
+    }
+  }
+
+  // ── S001 ADEETIE: 7 steps ──
+  addStep('S001', 1, {
+    title: 'Check Eligibility',
+    description: 'Verify you have Udyam registration, your factory is in one of the 60 ADEETIE clusters, your sector is among the 14 covered (Iron & Steel, Textiles, Foundry, Forging, Ceramics, Dairy, Brick Kilns, Brass, Chemicals, Glass, Leather, Paper, Pharma, Food Processing), and you\'re willing to achieve minimum 10% energy saving.',
+    estimatedTime: '5 minutes',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Udyam registration certificate']),
+    actionUrl: 'https://adeetie.beeindia.gov.in',
+    actionLabel: 'Check ADEETIE Portal',
+    tips: 'If you don\'t have Udyam registration, get it free at udyamregistration.gov.in (takes 15 minutes with Aadhaar and PAN).',
+    source: 'BEE ADEETIE Scheme Guidelines',
+    sourceUrl: 'https://adeetie.beeindia.gov.in',
+  });
+
+  addStep('S001', 2, {
+    title: 'Submit Expression of Interest (EOI)',
+    description: 'Download the EOI format from the ADEETIE portal and fill in your company name, Udyam number, sector, annual energy consumption, and contact details. Email it to the BEE facilitation centre. This is your formal request to participate in the scheme.',
+    estimatedTime: '30 minutes',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['Udyam certificate', '12 months electricity bills', 'Basic company details']),
+    actionUrl: 'https://adeetie.beeindia.gov.in',
+    actionLabel: 'Download EOI Format',
+    tips: 'Keep your last 12 months DISCOM bills ready before starting. You\'ll need total kWh consumed and bill amounts.',
+    source: 'BEE ADEETIE',
+    sourceUrl: 'https://adeetie.beeindia.gov.in',
+  });
+
+  addStep('S001', 3, {
+    title: 'Energy Audit (IGEA)',
+    description: 'BEE assigns an empaneled auditor from the ADEETIE list, or you choose one yourself. The auditor visits your factory for 2-3 days, measures energy use in every machine, furnace, motor, and compressor, and writes an Investment Grade Energy Audit report with specific technology recommendations and savings estimates.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹50,000–₹2,00,000 (reimbursable: up to ₹1L for medium, ₹75K for micro/small)',
+    documentsNeeded: JSON.stringify(['12 months electricity bills', '12 months fuel purchase records', 'Production data (tonnes/month)', 'Equipment list with rated capacities']),
+    actionUrl: 'https://adeetie.beeindia.gov.in/accredited-energy-audit-agencies',
+    actionLabel: 'Find Empaneled Auditors',
+    tips: 'You pay the auditor upfront, but the cost is reimbursed after M&V approval (Step 7). Ask the auditor for references from similar factories.',
+    source: 'BEE ADEETIE',
+    sourceUrl: 'https://adeetie.beeindia.gov.in/list-of-auditing-firms-empaneled-with-bee-for-scheme',
+  });
+
+  addStep('S001', 4, {
+    title: 'Detailed Project Report (DPR)',
+    description: 'The auditor (or a separate consultant) prepares the DPR. It includes: technology specification, vendor quotes (usually 3), cost breakdown, expected energy savings (kWh or fuel tonnes), payback period, IRR, NPV. Submit the DPR to BEE through the ADEETIE portal for approval.',
+    estimatedTime: '1-2 weeks after audit',
+    estimatedCost: '₹30,000–₹75,000 (usually bundled with audit; included in ₹1L/₹75K reimbursement cap)',
+    documentsNeeded: JSON.stringify(['IGEA report', 'Minimum 3 vendor quotations', 'Technology specification sheets']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Get at least 3 vendor quotes — banks require this. Ask the auditor to prepare the DPR simultaneously with the IGEA to save time.',
+    source: 'BEE ADEETIE',
+    sourceUrl: null,
+  });
+
+  addStep('S001', 5, {
+    title: 'Bank Loan Application',
+    description: 'Take the approved DPR to your existing bank OR apply to SIDBI directly (they have a dedicated EE lending cell). The loan amount is as specified in the DPR (typically ₹10L–₹150L). Interest rate is market rate MINUS 5% for micro/small or 3% for medium enterprises. Repayment is 36 months (up to ₹100L) or 60 months (above ₹100L) with up to 6 months moratorium.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: 'Bank processing fee: 0.5-1% of loan amount (₹5,000–₹15,000 on a ₹10L loan)',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'GST registration and returns (last 2 years)', 'Income tax returns (last 2 years)', 'Bank statements (last 12 months)', 'IGEA report', 'DPR', 'Technology vendor quotations (minimum 3)']),
+    actionUrl: 'https://www.sidbi.in/en/pages/incentive-schemes-for-green-loans',
+    actionLabel: 'Apply via SIDBI',
+    tips: 'The equipment itself serves as primary security. If you don\'t have collateral, ask the bank to apply for CGTMSE cover (collateral-free guarantee).',
+    source: 'BEE ADEETIE / SIDBI',
+    sourceUrl: null,
+  });
+
+  addStep('S001', 6, {
+    title: 'Technology Installation',
+    description: 'Place order with the approved vendor from the DPR. The vendor installs the equipment, does commissioning and testing. Start saving energy. Keep all installation records, invoices, and commissioning certificates — you\'ll need them for M&V.',
+    estimatedTime: '4-12 weeks',
+    estimatedCost: 'Paid from loan disbursement (no additional out-of-pocket cost)',
+    documentsNeeded: JSON.stringify(['Vendor purchase order', 'Installation completion certificate', 'Commissioning report', 'Payment receipts']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Take "before" readings of energy consumption before installation starts. You\'ll need these for the M&V comparison.',
+    source: 'BEE ADEETIE',
+    sourceUrl: null,
+  });
+
+  addStep('S001', 7, {
+    title: 'Monitoring & Verification (M&V)',
+    description: 'BEE-empaneled verifier checks actual energy savings against DPR projections, typically 3-6 months after installation. If savings are 10% or more, the interest subsidy continues for the loan tenure and your audit cost reimbursement is released. You keep saving energy and the loan EMI is typically less than your monthly savings.',
+    estimatedTime: '3-6 months after installation',
+    estimatedCost: '₹10,000–₹30,000 (usually covered under scheme)',
+    documentsNeeded: JSON.stringify(['Energy bills post-installation (3-6 months)', 'Production data post-installation', 'Installation completion certificate']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Keep detailed energy consumption records from the moment the new equipment is operational. The bigger the documented savings, the easier the M&V approval.',
+    source: 'BEE ADEETIE',
+    sourceUrl: null,
+  });
+
+  // ── S010 EESL ESCO: 5 steps ──
+  addStep('S010', 1, {
+    title: 'Contact EESL',
+    description: 'Contact EESL (Energy Efficiency Services Limited) through their MSME portal or nearest regional office. Provide your basic factory details: location, type of industry, monthly electricity bill amount, and the equipment you use (motors, compressors, lighting, HVAC).',
+    estimatedTime: '30 minutes',
+    estimatedCost: '₹0',
+    documentsNeeded: JSON.stringify(['12 months electricity bills', 'Factory address and contact details']),
+    actionUrl: 'https://msme.eeslindia.org',
+    actionLabel: 'Visit EESL MSME Portal',
+    tips: 'EESL typically looks for factories with monthly electricity bills above ₹50,000. If your bill is lower, a private ESCO may be more suitable.',
+    source: 'EESL',
+    sourceUrl: 'https://eeslindia.org',
+  });
+
+  addStep('S010', 2, {
+    title: 'Free Feasibility Assessment',
+    description: 'EESL sends a team to your factory for a free feasibility assessment (1-2 days). They check which equipment can be upgraded (motors, lighting, compressors, HVAC), estimate the energy savings potential, and determine if the project is viable for the ESCO model. Minimum viable savings: approximately ₹1,00,000/year.',
+    estimatedTime: '1-2 weeks',
+    estimatedCost: '₹0 (completely free)',
+    documentsNeeded: JSON.stringify(['Factory access for EESL team', 'Equipment inventory list', 'Operating hours data']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Be transparent about your actual operating hours and production patterns. Over-reporting will make the savings projections unrealistic and the project may fail M&V later.',
+    source: 'EESL',
+    sourceUrl: null,
+  });
+
+  addStep('S010', 3, {
+    title: 'Review & Sign Agreement',
+    description: 'EESL proposes the project with specific technologies, expected monthly savings, your 20% co-payment amount, and the contract duration (typically 3 years with quarterly repayment). Review the Shared Savings Agreement carefully — the key clause is that if they don\'t deliver savings, you pay less.',
+    estimatedTime: '1-2 weeks',
+    estimatedCost: '20% of project cost upfront (e.g., ₹2L on a ₹10L project)',
+    documentsNeeded: JSON.stringify(['Company authorization letter', 'Signatory authority documents']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Negotiate the savings split. Typical is 50-70% to EESL. Also confirm what happens at contract end — equipment should transfer to you at no additional cost.',
+    source: 'EESL',
+    sourceUrl: null,
+  });
+
+  addStep('S010', 4, {
+    title: 'Equipment Installation',
+    description: 'EESL arranges everything: procurement, delivery, installation, and commissioning. You provide factory access and a contact person. Typical equipment: IE3/IE4 motors, LED lighting, VFDs, efficient compressors. Installation usually takes 2-4 weeks depending on factory size.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹0 additional (covered by EESL)',
+    documentsNeeded: JSON.stringify(['Factory access during installation hours', 'Designated contact person']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Plan installation during a scheduled maintenance shutdown if possible. This avoids production disruption.',
+    source: 'EESL',
+    sourceUrl: null,
+  });
+
+  addStep('S010', 5, {
+    title: 'Savings & Repayment',
+    description: 'Every month your energy bill is lower. The 80% financed portion is repaid quarterly from your actual savings over 3 years. After the contract ends, the equipment is yours and you keep 100% of savings. EESL conducts periodic M&V to verify savings are on track.',
+    estimatedTime: '3 years (repayment period)',
+    estimatedCost: 'Quarterly repayments from energy savings (structured so savings > repayment)',
+    documentsNeeded: JSON.stringify(['Monthly energy bills for comparison', 'Production data for normalization']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Track your savings independently. Compare pre-installation and post-installation energy bills month by month. This data is useful for claiming the benefit in your BRSR disclosure.',
+    source: 'EESL',
+    sourceUrl: null,
+  });
+
+  // ── S004 SIDBI 4E: 5 steps ──
+  addStep('S004', 1, {
+    title: 'Get an Energy Audit Done',
+    description: 'Before approaching SIDBI, get a Detailed Energy Audit from a BEE-certified auditor. This identifies specific technologies (VFDs, efficient motors, solar, etc.) with their costs and savings. Under SIDBI 4E, the walk-through audit, detailed energy audit, and DPR preparation can be supported by SIDBI\'s Energy Efficiency Cell (EEC).',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: '₹50,000–₹2,00,000 (may be supported by SIDBI EEC)',
+    documentsNeeded: JSON.stringify(['12 months electricity and fuel bills', 'Production data', 'Equipment list']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'If you\'re also eligible for ADEETIE, apply there first — the audit cost gets reimbursed. Then use the IGEA report for your SIDBI 4E loan application.',
+    source: 'SIDBI',
+    sourceUrl: 'https://www.sidbi.in/en/pages/incentive-schemes-for-green-loans',
+  });
+
+  addStep('S004', 2, {
+    title: 'Prepare & Submit DPR',
+    description: 'Prepare a Detailed Project Report based on the energy audit findings. Include technology specifications, 3 vendor quotes, cost-benefit analysis, payback period, and projected energy savings. Submit to SIDBI branch office or through your existing bank if they have a SIDBI refinancing arrangement.',
+    estimatedTime: '1-2 weeks',
+    estimatedCost: '₹30,000–₹75,000 (may be covered by SIDBI EEC)',
+    documentsNeeded: JSON.stringify(['Energy audit report', '3 vendor quotations', 'DPR with financial projections']),
+    actionUrl: 'https://www.sidbi.in/en/pages/incentive-schemes-for-green-loans',
+    actionLabel: 'Find SIDBI Branch',
+    tips: 'SIDBI\'s EEC can vet your DPR at no cost. Contact the nearest SIDBI branch to check if EEC support is available in your area.',
+    source: 'SIDBI',
+    sourceUrl: null,
+  });
+
+  addStep('S004', 3, {
+    title: 'Loan Sanction',
+    description: 'SIDBI evaluates your application: credit history, project viability, energy savings potential. Loan amount ranges from ₹10L to ₹150L per borrower at 2-3.85% below SIDBI\'s normal lending rate (based on your credit rating). Loan can cover up to 90% of project cost.',
+    estimatedTime: '2-4 weeks',
+    estimatedCost: 'Processing fee: 0.5-1% of loan amount',
+    documentsNeeded: JSON.stringify(['Udyam certificate', 'GST returns (2 years)', 'ITR (2 years)', 'Bank statements (12 months)', 'Balance sheet and P&L (2 years)', 'DPR']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'If you\'ve been in business for 3+ years with cash profits in the last 2 years, approval is typically straightforward. SIDBI also offers CGTMSE cover for collateral-free lending.',
+    source: 'SIDBI',
+    sourceUrl: null,
+  });
+
+  addStep('S004', 4, {
+    title: 'Install Technology',
+    description: 'Use the loan disbursement to purchase and install the approved technology. Work with the vendor quoted in your DPR. Ensure proper commissioning and document everything — energy meter readings before and after, installation certificates, payment receipts.',
+    estimatedTime: '4-12 weeks',
+    estimatedCost: 'From loan disbursement + your 10% equity contribution',
+    documentsNeeded: JSON.stringify(['Purchase order to vendor', 'Installation certificate', 'Commissioning report', 'Payment receipts', '"Before" energy readings']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Document baseline energy consumption carefully before installation. Install sub-meters if possible — they make M&V much easier.',
+    source: 'SIDBI',
+    sourceUrl: null,
+  });
+
+  addStep('S004', 5, {
+    title: 'Repayment & Savings',
+    description: 'Repay the loan over 36 months (for loans up to ₹100L) or 60 months (above ₹100L). With 2-3.85% interest concession, effective rates are 4-7%. Monthly EMI is typically lower than monthly energy savings, making you cash-positive from month one. Up to 6 months moratorium available.',
+    estimatedTime: '36-60 months',
+    estimatedCost: 'Monthly EMI from savings (cash positive from month 1 in most cases)',
+    documentsNeeded: null,
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Keep tracking energy savings versus EMI payments. If you\'re saving more than the EMI, consider prepaying the loan to save on interest.',
+    source: 'SIDBI',
+    sourceUrl: null,
+  });
+
+  // ── S005 Solar (RESCO/CAPEX): 4 steps ──
+  addStep('S005', 1, {
+    title: 'Assess Roof Suitability',
+    description: 'Check your factory roof: Is there shadow-free area? (Need ~100 sqft per kWp.) Is the roof structurally strong? (Solar panels add 15-20 kg/sqm.) Most solar companies offer free site surveys — they\'ll visit, assess, and tell you how much capacity your roof can support.',
+    estimatedTime: '1 week',
+    estimatedCost: '₹0 (free site survey by solar companies)',
+    documentsNeeded: JSON.stringify(['Electricity bills (12 months)', 'Roof area estimate', 'Building structure details']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'South-facing roofs get the most sunlight. Even partial shading from a water tank or chimney can reduce output by 20-30%. Share your electricity bills so the installer can size the system correctly.',
+    source: 'MNRE',
+    sourceUrl: null,
+  });
+
+  addStep('S005', 2, {
+    title: 'Choose RESCO (Zero Cost) or CAPEX (Own the Panels)',
+    description: 'RESCO/OPEX model: Developer installs at their cost, you sign a 15-25 year PPA at ₹3-4/kWh (vs grid ₹8-12/kWh). Zero upfront investment. CAPEX model: You buy the panels (₹40-60/Watt), own them immediately, get state subsidies (10-30%), and free electricity after 3-5 year payback. Use SIDBI 4E or ADEETIE loan for CAPEX.',
+    estimatedTime: '1-2 weeks to decide and finalize agreement',
+    estimatedCost: 'RESCO: ₹0 upfront. CAPEX: ₹40-60L for 100 kWp (before subsidies)',
+    documentsNeeded: JSON.stringify(['Roof lease agreement (if rented)', 'Net metering application', 'Electricity connection details']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'If your electricity bill is above ₹1L/month and you plan to operate for 10+ years, CAPEX gives better lifetime returns. If cash flow is tight, RESCO gives instant savings with zero investment.',
+    source: 'MNRE',
+    sourceUrl: null,
+  });
+
+  addStep('S005', 3, {
+    title: 'Installation & Commissioning',
+    description: 'Selected vendor installs solar panels, inverters, and wiring. Process takes 4-8 weeks. Apply for net metering with your DISCOM (they allow you to export excess solar to the grid and get credits on your bill). DISCOM installs a bi-directional meter.',
+    estimatedTime: '4-8 weeks (installation) + 2-4 weeks (net metering approval)',
+    estimatedCost: 'DISCOM meter fee: ₹2,000-5,000',
+    documentsNeeded: JSON.stringify(['DISCOM net metering application', 'Solar system specifications', 'Vendor installation certificate', 'Electrical safety certificate']),
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Apply for net metering BEFORE installation starts — DISCOM approval can take 2-4 weeks. This way both complete around the same time.',
+    source: 'State DISCOM / MNRE',
+    sourceUrl: null,
+  });
+
+  addStep('S005', 4, {
+    title: 'Start Saving',
+    description: 'Solar panels generate electricity during daylight hours (6-8 hours peak). Your grid bill drops by 30-80% depending on system size. Track generation via the inverter app. Under net metering, excess units are credited to your bill. System requires minimal maintenance (panel cleaning every 2-4 weeks).',
+    estimatedTime: 'Ongoing — system life 25 years',
+    estimatedCost: 'Maintenance: ₹1,000-2,000/month (cleaning + monitoring)',
+    documentsNeeded: null,
+    actionUrl: null,
+    actionLabel: null,
+    tips: 'Clean panels regularly — dust reduces output by 10-25% in Indian conditions. Monitor daily generation through the inverter app to catch any issues early.',
+    source: 'MNRE',
+    sourceUrl: null,
+  });
+
+  for (const step of actionPlanSteps) {
+    await prisma.actionPlanStep.upsert({
+      where: {
+        schemeId_stepNumber: { schemeId: step.schemeId, stepNumber: step.stepNumber },
+      },
+      update: step,
+      create: step,
+    });
+  }
+  console.log(`  ✓ ${actionPlanSteps.length} action plan steps seeded\n`);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // 11. Service Providers (Financing Journey)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  console.log('  Seeding service providers...');
+
+  const serviceProviders = [
+    // SDAs
+    {
+      name: 'MEDA (Maharashtra Energy Development Agency)',
+      type: 'sda',
+      services: JSON.stringify(['Solar subsidies', 'EE technology subsidies', 'Energy audit support']),
+      states: JSON.stringify(['Maharashtra']),
+      sectors: null,
+      accreditation: 'State Designated Agency under BEE',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://mahaurja.com',
+      address: 'Mumbai, Maharashtra',
+      source: 'BEE SDA List',
+      sourceUrl: 'https://beeindia.gov.in/content/sdas',
+    },
+    {
+      name: 'GEDA (Gujarat Energy Development Agency)',
+      type: 'sda',
+      services: JSON.stringify(['Net metering for solar', 'EE loans', 'Industrial policy incentives']),
+      states: JSON.stringify(['Gujarat']),
+      sectors: null,
+      accreditation: 'State Designated Agency under BEE',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://geda.gujarat.gov.in',
+      address: 'Gandhinagar, Gujarat',
+      source: 'BEE SDA List',
+      sourceUrl: 'https://beeindia.gov.in/content/sdas',
+    },
+    {
+      name: 'TEDA (Tamil Nadu Energy Development Agency)',
+      type: 'sda',
+      services: JSON.stringify(['Solar subsidies', 'EE technology demonstrations']),
+      states: JSON.stringify(['Tamil Nadu']),
+      sectors: null,
+      accreditation: 'State Designated Agency under BEE',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://teda.in',
+      address: 'Chennai, Tamil Nadu',
+      source: 'BEE SDA List',
+      sourceUrl: 'https://beeindia.gov.in/content/sdas',
+    },
+    {
+      name: 'HAREDA (Haryana Renewable Energy Development Agency)',
+      type: 'sda',
+      services: JSON.stringify(['Solar subsidies', 'PEACE scheme (50% audit cost, 25% implementation cost)']),
+      states: JSON.stringify(['Haryana']),
+      sectors: null,
+      accreditation: 'State Designated Agency under BEE',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://hareda.gov.in',
+      address: 'Chandigarh, Haryana',
+      source: 'BEE SDA List',
+      sourceUrl: 'https://beeindia.gov.in/content/sdas',
+    },
+    {
+      name: 'KREDL (Karnataka Renewable Energy Development Ltd)',
+      type: 'sda',
+      services: JSON.stringify(['Solar subsidies', 'Green energy open access facilitation']),
+      states: JSON.stringify(['Karnataka']),
+      sectors: null,
+      accreditation: 'State Designated Agency under BEE',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://kredl.karnataka.gov.in',
+      address: 'Bengaluru, Karnataka',
+      source: 'BEE SDA List',
+      sourceUrl: 'https://beeindia.gov.in/content/sdas',
+    },
+    // Auditor bodies
+    {
+      name: 'National Productivity Council (NPC)',
+      type: 'energy_auditor',
+      services: JSON.stringify(['DEA', 'IGEA', 'DPR', 'M&V']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: JSON.stringify(['foundry', 'forging', 'steel_re_rolling', 'ceramics']),
+      accreditation: 'BEE AEA; 20+ certified auditors',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://npcindia.gov.in',
+      address: 'New Delhi (HQ) + 14 regional offices',
+      source: 'NPC Website',
+      sourceUrl: 'https://npcindia.gov.in',
+    },
+    {
+      name: 'TERI (The Energy and Resources Institute)',
+      type: 'energy_auditor',
+      services: JSON.stringify(['DEA', 'IGEA', 'DPR', 'Technology assessment', 'Training']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: JSON.stringify(['iron_steel', 'textiles', 'ceramics', 'chemicals']),
+      accreditation: 'BEE AEA; ADEETIE empaneled',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://www.teriin.org',
+      address: 'New Delhi (HQ) + regional offices',
+      source: 'TERI Website',
+      sourceUrl: 'https://www.teriin.org',
+    },
+    {
+      name: 'BEE Empaneled Auditors (ADEETIE)',
+      type: 'energy_auditor',
+      services: JSON.stringify(['DEA', 'IGEA', 'DPR under ADEETIE scheme']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: null,
+      accreditation: 'ADEETIE Empaneled by BEE',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://adeetie.beeindia.gov.in/accredited-energy-audit-agencies',
+      address: 'Various — see official list',
+      source: 'BEE ADEETIE Portal',
+      sourceUrl: 'https://adeetie.beeindia.gov.in/list-of-auditing-firms-empaneled-with-bee-for-scheme',
+    },
+    // Financing institutions
+    {
+      name: 'SIDBI (Small Industries Development Bank of India)',
+      type: 'bank',
+      services: JSON.stringify(['4E green loans', 'PRSF credit guarantee', 'MSME refinancing']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: null,
+      accreditation: 'Development Financial Institution',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://www.sidbi.in',
+      address: 'Lucknow (HQ) + 100+ branch offices',
+      source: 'SIDBI Website',
+      sourceUrl: 'https://www.sidbi.in/en/pages/incentive-schemes-for-green-loans',
+    },
+    {
+      name: 'EESL (Energy Efficiency Services Limited)',
+      type: 'esco',
+      services: JSON.stringify(['ESCO installation', 'LED upgrades', 'Motor replacement', 'HVAC efficiency']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: null,
+      accreditation: 'Government of India PSU (Joint venture of NTPC, PFC, REC, POWERGRID)',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://eeslindia.org',
+      address: 'New Delhi (HQ) + regional offices',
+      source: 'EESL Website',
+      sourceUrl: 'https://msme.eeslindia.org',
+    },
+    {
+      name: 'CGTMSE (Credit Guarantee Fund Trust for MSEs)',
+      type: 'bank',
+      services: JSON.stringify(['Collateral-free loan guarantee up to ₹5 Cr']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: null,
+      accreditation: 'Government of India Trust (SIDBI + Ministry of MSME)',
+      contactEmail: null,
+      contactPhone: null,
+      website: 'https://www.cgtmse.in',
+      address: 'Mumbai (HQ)',
+      source: 'CGTMSE Website',
+      sourceUrl: 'https://www.cgtmse.in',
+    },
+    // Portals
+    {
+      name: 'ADEETIE Portal (BEE)',
+      type: 'consultant',
+      services: JSON.stringify(['EOI submission', 'Scheme information', 'Auditor directory', 'Application tracking']),
+      states: JSON.stringify(['Pan-India']),
+      sectors: null,
+      accreditation: 'Official BEE scheme portal',
+      contactEmail: 'facilitation-centre@beeindia.gov.in',
+      contactPhone: null,
+      website: 'https://adeetie.beeindia.gov.in',
+      address: null,
+      source: 'BEE',
+      sourceUrl: 'https://adeetie.beeindia.gov.in',
+    },
+  ];
+
+  for (const sp of serviceProviders) {
+    const existing = await prisma.serviceProvider.findFirst({
+      where: { name: sp.name, type: sp.type },
+    });
+    if (existing) {
+      await prisma.serviceProvider.update({ where: { id: existing.id }, data: sp });
+    } else {
+      await prisma.serviceProvider.create({ data: sp });
+    }
+  }
+  console.log(`  ✓ ${serviceProviders.length} service providers seeded\n`);
+
   console.log('Seed complete. All data points auditable to source.\n');
   console.log('Run: npx tsx data/generate-audit.ts to generate source-audit.xlsx');
 }
