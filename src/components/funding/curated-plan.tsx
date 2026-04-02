@@ -16,7 +16,6 @@ import {
   IndianRupee,
   ExternalLink,
   ChevronRight,
-  Zap,
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -53,15 +52,20 @@ interface SchemeSteps {
   steps: ActionStepData[];
 }
 
-/** A phase groups related steps across schemes */
-interface Phase {
-  id: string;
-  title: string;
-  icon: 'preparation' | 'assessment' | 'planning' | 'financing' | 'implementation' | 'verification';
-  items: PhaseItem[];
+/** A scheme section in the curated plan */
+interface SchemeSection {
+  schemeId: string;
+  schemeName: string;
+  schemeAgency: string;
+  supportType: string;
+  status: string;
+  applicationUrl: string | null;
+  techNames: string[];        // Technologies funded by this scheme
+  steps: StepItem[];           // Steps in order, with dedup applied
 }
 
-interface PhaseItem {
+interface StepItem {
+  stepNumber: number;
   title: string;
   description: string;
   estimatedTime: string | null;
@@ -70,18 +74,12 @@ interface PhaseItem {
   actionUrl: string | null;
   actionLabel: string | null;
   tips: string | null;
-  techNames: string[];      // Which technologies this step covers
-  schemeName: string;       // Which scheme this step comes from
-  schemeId: string;
-  isReference: boolean;     // If true, this step references a step already covered
-  referenceText: string | null; // e.g. "Already covered in Preparation phase"
 }
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-// Jargon terms to auto-link
 const JARGON_TERMS = ['DEA', 'IGEA', 'DPR', 'ESCO', 'M&V', 'CGTMSE', 'PRSF', 'EOI', 'PPA', 'RESCO', 'CEA', 'AEA', 'NCV', 'SDA', 'EPC'];
 
 function renderWithJargon(text: string) {
@@ -110,7 +108,6 @@ function pickBestScheme(tech: TechWithFunding): FundingMatch | null {
   const active = tech.fundingMatches.filter((m) => m.status === 'Active');
   if (active.length === 0) return tech.fundingMatches[0] ?? null;
 
-  // Prefer: lowest net CAPEX, then highest subsidy %
   return active.reduce((best, m) => {
     if (m.netCapexMinLakhs != null && (best.netCapexMinLakhs == null || m.netCapexMinLakhs < best.netCapexMinLakhs)) {
       return m;
@@ -122,52 +119,17 @@ function pickBestScheme(tech: TechWithFunding): FundingMatch | null {
   });
 }
 
-/** Classify a step into a phase category based on its content */
-function classifyStep(step: ActionStepData, schemeId: string): Phase['icon'] {
-  const t = (step.title + ' ' + step.description).toLowerCase();
-
-  if (t.includes('eligib') || t.includes('register') || t.includes('udyam') || t.includes('verify')) return 'preparation';
-  if (t.includes('audit') || t.includes('assessment') || t.includes('survey') || t.includes('feasib')) return 'assessment';
-  if (t.includes('dpr') || t.includes('project report') || t.includes('choose') || t.includes('proposal') || t.includes('contract') || t.includes('agreement')) return 'planning';
-  if (t.includes('loan') || t.includes('subsid') || t.includes('financ') || t.includes('sanction') || t.includes('apply') || t.includes('guarantee') || t.includes('reimburse')) return 'financing';
-  if (t.includes('install') || t.includes('procure') || t.includes('implement') || t.includes('commission') || t.includes('equipment')) return 'implementation';
-  if (t.includes('verif') || t.includes('m&v') || t.includes('monitor') || t.includes('saving') || t.includes('track') || t.includes('repay') || t.includes('meter')) return 'verification';
-
-  return 'implementation'; // default
-}
-
-const PHASE_ORDER: Phase['icon'][] = ['preparation', 'assessment', 'planning', 'financing', 'implementation', 'verification'];
-
-const PHASE_TITLES: Record<Phase['icon'], string> = {
-  preparation: 'Preparation & Eligibility',
-  assessment: 'Energy Assessment & Surveys',
-  planning: 'Project Planning & DPR',
-  financing: 'Financing & Subsidies',
-  implementation: 'Procurement & Installation',
-  verification: 'Verification & Savings',
-};
-
-const PHASE_ICONS: Record<Phase['icon'], typeof CheckCircle2> = {
-  preparation: FileText,
-  assessment: Zap,
-  planning: FileText,
-  financing: IndianRupee,
-  implementation: Zap,
-  verification: CheckCircle2,
-};
-
 /* ------------------------------------------------------------------ */
-/*  Step deduplication                                                  */
+/*  Deduplication                                                      */
 /* ------------------------------------------------------------------ */
 
-/** Key patterns that indicate duplicate steps across schemes */
+/** Patterns that identify equivalent steps across schemes */
 const DEDUP_PATTERNS: { key: string; patterns: RegExp[] }[] = [
-  { key: 'udyam_check', patterns: [/udyam/i, /eligib.*check/i] },
-  { key: 'energy_audit', patterns: [/energy audit/i, /dea/i, /detailed energy audit/i] },
-  { key: 'dpr_prep', patterns: [/dpr|detailed project report/i] },
-  { key: 'bank_loan', patterns: [/bank loan|loan.*sanction|loan.*appli/i] },
-  { key: 'cgtmse', patterns: [/cgtmse|collateral.free/i] },
-  { key: 'eoi_submit', patterns: [/expression of interest|submit.*eoi/i] },
+  { key: 'eligibility_check', patterns: [/check.*eligib/i, /verify.*udyam/i, /eligib.*check/i] },
+  { key: 'energy_audit', patterns: [/energy audit/i, /\bDEA\b/, /\bIGEA\b/] },
+  { key: 'dpr', patterns: [/\bDPR\b/, /detailed project report/i] },
+  { key: 'bank_loan', patterns: [/bank loan/i, /loan.*sanction/i, /loan.*appli/i] },
+  { key: 'eoi', patterns: [/submit.*eoi/i, /expression of interest/i] },
 ];
 
 function getDedupKey(step: ActionStepData): string | null {
@@ -179,13 +141,13 @@ function getDedupKey(step: ActionStepData): string | null {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Build curated plan                                                 */
+/*  Build curated plan — scheme-grouped, step-ordered, deduplicated    */
 /* ------------------------------------------------------------------ */
 
 function buildCuratedPlan(
   enabledTechs: TechWithFunding[],
   schemeStepsMap: Map<string, SchemeSteps>,
-): Phase[] {
+): SchemeSection[] {
   // 1. Group techs by best scheme
   const techsByScheme = new Map<string, { techs: TechWithFunding[]; scheme: FundingMatch }>();
 
@@ -201,13 +163,7 @@ function buildCuratedPlan(
     }
   }
 
-  // 2. Build phase items from action plan steps, grouped by phase category
-  const phaseItems = new Map<Phase['icon'], PhaseItem[]>();
-  for (const phase of PHASE_ORDER) phaseItems.set(phase, []);
-
-  const coveredDedupKeys = new Set<string>();
-
-  // Process schemes in a priority order: ADEETIE first (most comprehensive), then others
+  // 2. Process schemes in priority order (most comprehensive first)
   const schemeOrder = ['S001', 'S004', 'S002', 'S003', 'S006', 'S007', 'S010', 'S005', 'S008', 'S009'];
   const sortedSchemeIds = Array.from(techsByScheme.keys()).sort((a, b) => {
     const ia = schemeOrder.indexOf(a);
@@ -215,24 +171,29 @@ function buildCuratedPlan(
     return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
   });
 
+  // 3. Build sections, keeping scheme step order, deduplicating across schemes
+  const coveredDedupKeys = new Set<string>();
+  const sections: SchemeSection[] = [];
+
   for (const sid of sortedSchemeIds) {
     const group = techsByScheme.get(sid)!;
     const stepsData = schemeStepsMap.get(sid);
     if (!stepsData) continue;
 
-    const techNames = group.techs.map((t) => t.name);
+    const steps: StepItem[] = [];
+    let stepCounter = 1;
 
     for (const step of stepsData.steps) {
-      const phaseCategory = classifyStep(step, sid);
       const dedupKey = getDedupKey(step);
 
-      // Skip duplicate steps — already covered by an earlier scheme
+      // Skip if this step type was already covered by an earlier scheme
       if (dedupKey && coveredDedupKeys.has(dedupKey)) continue;
 
-      // Mark this step pattern as covered
+      // Mark as covered for subsequent schemes
       if (dedupKey) coveredDedupKeys.add(dedupKey);
 
-      phaseItems.get(phaseCategory)!.push({
+      steps.push({
+        stepNumber: stepCounter++,
         title: step.title,
         description: step.description,
         estimatedTime: step.estimatedTime,
@@ -241,82 +202,66 @@ function buildCuratedPlan(
         actionUrl: step.actionUrl,
         actionLabel: step.actionLabel,
         tips: step.tips,
-        techNames,
-        schemeName: group.scheme.name,
-        schemeId: sid,
-        isReference: false,
-        referenceText: null,
       });
     }
-  }
 
-  // 3. Build phases (skip empty ones)
-  const phases: Phase[] = [];
-  for (const phaseKey of PHASE_ORDER) {
-    const items = phaseItems.get(phaseKey) ?? [];
-    if (items.length === 0) continue;
-    phases.push({
-      id: phaseKey,
-      title: PHASE_TITLES[phaseKey],
-      icon: phaseKey,
-      items,
+    if (steps.length === 0) continue;
+
+    sections.push({
+      schemeId: sid,
+      schemeName: stepsData.scheme.name,
+      schemeAgency: stepsData.scheme.implementingAgency,
+      supportType: stepsData.scheme.supportType,
+      status: stepsData.scheme.status,
+      applicationUrl: stepsData.scheme.applicationUrl,
+      techNames: group.techs.map((t) => t.name),
+      steps,
     });
   }
 
-  return phases;
+  return sections;
 }
 
 /* ------------------------------------------------------------------ */
-/*  Components                                                         */
+/*  Step card component                                                */
 /* ------------------------------------------------------------------ */
 
-function PhaseItemCard({ item, isLast }: { item: PhaseItem; isLast: boolean }) {
+function StepCard({ step, stepIndex, totalSteps }: { step: StepItem; stepIndex: number; totalSteps: number }) {
   const [expanded, setExpanded] = useState(false);
+  const isLast = stepIndex === totalSteps - 1;
 
   return (
     <div className={cn('relative flex gap-3', !isLast && 'pb-4')}>
       {/* Timeline connector */}
       <div className="flex flex-col items-center">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10">
-          <CheckCircle2 className="h-3 w-3 text-primary" />
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-[10px] font-bold text-primary">
+          {step.stepNumber}
         </div>
         {!isLast && <div className="w-px flex-1 bg-border" />}
       </div>
 
       {/* Content */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
           className="flex w-full items-start justify-between text-left group"
         >
-          <div className="space-y-1">
+          <div className="space-y-0.5 min-w-0">
             <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
-              {item.title}
+              {step.title}
             </h4>
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Tech badges */}
-              {item.techNames.map((name) => (
-                <Badge key={name} variant="outline" className="text-[10px] py-0 px-1.5 font-normal">
-                  {name.length > 25 ? name.slice(0, 22) + '...' : name}
-                </Badge>
-              ))}
-              {/* Scheme badge */}
-              <Badge className="text-[10px] py-0 px-1.5 font-normal bg-primary/10 text-primary border-primary/20">
-                via {item.schemeName.length > 30 ? item.schemeName.slice(0, 27) + '...' : item.schemeName}
-              </Badge>
-            </div>
             <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-              {item.estimatedTime && (
+              {step.estimatedTime && (
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {item.estimatedTime}
+                  {step.estimatedTime}
                 </span>
               )}
-              {item.estimatedCost && (
+              {step.estimatedCost && (
                 <span className="flex items-center gap-1">
                   <IndianRupee className="h-3 w-3" />
-                  {item.estimatedCost}
+                  {step.estimatedCost}
                 </span>
               )}
             </div>
@@ -329,26 +274,26 @@ function PhaseItemCard({ item, isLast }: { item: PhaseItem; isLast: boolean }) {
         {expanded && (
           <div className="mt-3 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
             <p className="text-xs text-foreground leading-relaxed">
-              {renderWithJargon(item.description)}
+              {renderWithJargon(step.description)}
             </p>
 
-            {item.tips && (
+            {step.tips && (
               <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2">
                 <p className="text-[11px] text-amber-800 dark:text-amber-200">
-                  <span className="font-semibold">Tip:</span> {item.tips}
+                  <span className="font-semibold">Tip:</span> {step.tips}
                 </p>
               </div>
             )}
 
-            {item.documentsNeeded.length > 0 && (
-              <DocumentChecklist documents={item.documentsNeeded} />
+            {step.documentsNeeded.length > 0 && (
+              <DocumentChecklist documents={step.documentsNeeded} />
             )}
 
-            {item.actionUrl && (
-              <a href={item.actionUrl} target="_blank" rel="noopener noreferrer">
+            {step.actionUrl && (
+              <a href={step.actionUrl} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm" className="gap-1.5 text-xs">
                   <ExternalLink className="h-3 w-3" />
-                  {item.actionLabel ?? 'Open Link'}
+                  {step.actionLabel ?? 'Open Link'}
                 </Button>
               </a>
             )}
@@ -372,13 +317,11 @@ export function CuratedPlan({ className }: { className?: string }) {
   const [schemeStepsMap, setSchemeStepsMap] = useState<Map<string, SchemeSteps>>(new Map());
   const [loading, setLoading] = useState(false);
 
-  // Get enabled techs with their data
   const enabledTechs = useMemo(
     () => recommendations.filter((r) => enabledTechIds.has(r.techId)),
     [recommendations, enabledTechIds],
   );
 
-  // Determine which schemes we need action plans for
   const neededSchemeIds = useMemo(() => {
     const ids = new Set<string>();
     for (const tech of enabledTechs) {
@@ -391,8 +334,6 @@ export function CuratedPlan({ className }: { className?: string }) {
   // Fetch action plan steps for all needed schemes
   useEffect(() => {
     if (neededSchemeIds.size === 0) return;
-
-    // Only fetch schemes we don't have yet
     const toFetch = Array.from(neededSchemeIds).filter((id) => !schemeStepsMap.has(id));
     if (toFetch.length === 0) return;
 
@@ -416,26 +357,24 @@ export function CuratedPlan({ className }: { className?: string }) {
       .finally(() => setLoading(false));
   }, [neededSchemeIds, schemeStepsMap]);
 
-  // Build the curated plan
-  const phases = useMemo(
+  // Build the curated plan — scheme-grouped sections
+  const sections = useMemo(
     () => buildCuratedPlan(enabledTechs, schemeStepsMap),
     [enabledTechs, schemeStepsMap],
   );
 
-  // Consolidated document list
+  // Consolidated document list across all sections
   const allDocuments = useMemo(() => {
     const docs = new Set<string>();
-    for (const phase of phases) {
-      for (const item of phase.items) {
-        if (!item.isReference) {
-          for (const doc of item.documentsNeeded) docs.add(doc);
-        }
+    for (const section of sections) {
+      for (const step of section.steps) {
+        for (const doc of step.documentsNeeded) docs.add(doc);
       }
     }
     return Array.from(docs);
-  }, [phases]);
+  }, [sections]);
 
-  // Tech-to-scheme mapping for summary
+  // Tech → scheme mapping for summary header
   const techSchemeMap = useMemo(() => {
     const map: { tech: TechWithFunding; scheme: FundingMatch }[] = [];
     for (const tech of enabledTechs) {
@@ -445,8 +384,10 @@ export function CuratedPlan({ className }: { className?: string }) {
     return map;
   }, [enabledTechs]);
 
+  const uniqueSchemeCount = new Set(techSchemeMap.map((m) => m.scheme.schemeId)).size;
+
   /* ---------------------------------------------------------------- */
-  /*  No recommendations data — show CTA                               */
+  /*  No recommendations data — CTA                                    */
   /* ---------------------------------------------------------------- */
 
   if (recommendations.length === 0) {
@@ -502,7 +443,7 @@ export function CuratedPlan({ className }: { className?: string }) {
   /*  Loading                                                          */
   /* ---------------------------------------------------------------- */
 
-  if (loading && phases.length === 0) {
+  if (loading && sections.length === 0) {
     return (
       <Card className={className}>
         <CardContent className="space-y-4 py-8">
@@ -525,7 +466,7 @@ export function CuratedPlan({ className }: { className?: string }) {
   }
 
   /* ---------------------------------------------------------------- */
-  /*  Render curated plan                                              */
+  /*  Render                                                           */
   /* ---------------------------------------------------------------- */
 
   return (
@@ -540,8 +481,8 @@ export function CuratedPlan({ className }: { className?: string }) {
             </CardTitle>
           </div>
           <CardDescription className="text-[11px]">
-            Personalised for your {enabledTechs.length} selected {enabledTechs.length === 1 ? 'technology' : 'technologies'},
-            matched with {techSchemeMap.length > 0 ? new Set(techSchemeMap.map((m) => m.scheme.schemeId)).size : 0} funding {new Set(techSchemeMap.map((m) => m.scheme.schemeId)).size === 1 ? 'scheme' : 'schemes'}
+            {enabledTechs.length} {enabledTechs.length === 1 ? 'technology' : 'technologies'} matched
+            with {uniqueSchemeCount} funding {uniqueSchemeCount === 1 ? 'scheme' : 'schemes'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -606,40 +547,68 @@ export function CuratedPlan({ className }: { className?: string }) {
         </CardContent>
       </Card>
 
-      {/* Phased action plan */}
-      {phases.map((phase, phaseIndex) => {
-        const PhaseIcon = PHASE_ICONS[phase.icon];
-        return (
-          <Card key={phase.id}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
-                  <PhaseIcon className="h-3.5 w-3.5 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-sm font-semibold">
-                    Phase {phaseIndex + 1}: {phase.title}
-                  </CardTitle>
-                  <CardDescription className="text-[11px]">
-                    {phase.items.length} {phase.items.length === 1 ? 'step' : 'steps'}
-                  </CardDescription>
-                </div>
+      {/* Scheme sections — each section shows the full step sequence for a scheme */}
+      {sections.map((section, sectionIndex) => (
+        <Card key={section.schemeId}>
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                    {sectionIndex + 1}
+                  </span>
+                  {section.schemeName}
+                </CardTitle>
+                <CardDescription className="text-[11px] mt-1">
+                  {section.supportType} — {section.schemeAgency}
+                </CardDescription>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-0">
-                {phase.items.map((item, i) => (
-                  <PhaseItemCard
-                    key={`${item.schemeId}-${item.title}-${i}`}
-                    item={item}
-                    isLast={i === phase.items.length - 1}
-                  />
-                ))}
+              <Badge
+                variant="outline"
+                className={cn(
+                  'shrink-0 text-[10px]',
+                  section.status === 'Active'
+                    ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                    : 'border-amber-500 text-amber-600 dark:text-amber-400',
+                )}
+              >
+                {section.status}
+              </Badge>
+            </div>
+            {/* Technologies covered by this scheme */}
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              <span className="text-[11px] text-muted-foreground mr-1">Covers:</span>
+              {section.techNames.map((name) => (
+                <Badge key={name} variant="outline" className="text-[10px] py-0 px-1.5 font-normal">
+                  {name}
+                </Badge>
+              ))}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-0">
+              {section.steps.map((step, i) => (
+                <StepCard
+                  key={`${section.schemeId}-${step.stepNumber}`}
+                  step={step}
+                  stepIndex={i}
+                  totalSteps={section.steps.length}
+                />
+              ))}
+            </div>
+            {section.applicationUrl && (
+              <div className="mt-4 pt-3 border-t border-border">
+                <a href={section.applicationUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                    <ExternalLink className="h-3 w-3" />
+                    Go to {section.schemeName} Portal
+                  </Button>
+                </a>
               </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+            )}
+          </CardContent>
+        </Card>
+      ))}
 
       {/* Consolidated document checklist */}
       {allDocuments.length > 0 && (
