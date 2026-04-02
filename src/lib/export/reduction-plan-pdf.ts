@@ -45,8 +45,15 @@ export function generateReductionPlanPdf(data: RecommendationResult) {
   doc.setTextColor(100, 116, 139); // zinc-500
   doc.text(`${recommendations.length} technologies matched · Generated ${new Date().toLocaleDateString('en-IN')}`, MARGIN, 38);
 
-  // ── Impact Summary ─────────────────────────────────────────────────────
-  let y = 50;
+  // ── Disclaimer ─────────────────────────────────────────────────────────
+  let y = 46;
+  doc.setFillColor(255, 251, 235); // amber-50
+  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 14, 2, 2, 'F');
+  doc.setFontSize(7);
+  doc.setTextColor(146, 64, 14); // amber-800
+  const disclaimerText = 'Disclaimer: These recommendations are indicative estimates based on reported emissions data and sector benchmarks. Actual reduction potential, costs, and payback periods will depend on a detailed energy audit of your facilities.';
+  doc.text(disclaimerText, MARGIN + 3, y + 5, { maxWidth: CONTENT_WIDTH - 6 });
+  y += 20;
   doc.setFontSize(12);
   doc.setTextColor(15, 23, 42);
   doc.text('Impact Summary', MARGIN, y);

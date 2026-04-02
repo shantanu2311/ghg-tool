@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Building2, Mail, Phone, MapPin, Users, Landmark } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
+import { InfoTip } from '@/components/ui/info-tip';
 
 export default function StepOrganisation() {
   const org = useWizardStore((s) => s.organisation);
@@ -36,6 +37,7 @@ export default function StepOrganisation() {
           <div className="space-y-1.5">
             <Label htmlFor="org-name">
               Company Name <span className="text-destructive">*</span>
+              <InfoTip text="Legal entity name as registered. This will appear on your GHG inventory report." />
             </Label>
             <div className="relative">
               <Building2 className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -51,7 +53,7 @@ export default function StepOrganisation() {
 
           {/* UDYAM Number */}
           <div className="space-y-1.5">
-            <Label htmlFor="org-udyam">UDYAM Number</Label>
+            <Label htmlFor="org-udyam">UDYAM Number <InfoTip text="MSME registration number (format: UDYAM-XX-00-0000000). Optional, but helps with government scheme eligibility." /></Label>
             <Input
               id="org-udyam"
               placeholder="UDYAM-XX-00-0000000"
@@ -62,7 +64,7 @@ export default function StepOrganisation() {
 
           {/* Sector (read-only) */}
           <div className="space-y-1.5">
-            <Label>Sector</Label>
+            <Label>Sector <InfoTip text="Currently limited to Iron & Steel. More sectors coming soon." /></Label>
             <Input
               value="Iron & Steel"
               readOnly
@@ -74,6 +76,7 @@ export default function StepOrganisation() {
           <div className="space-y-1.5">
             <Label>
               Sub-sector <span className="text-destructive">*</span>
+              <InfoTip text="Your primary manufacturing process. Determines which emission sources and benchmarks are relevant." />
             </Label>
             <Select
               value={org.subSector}
@@ -97,6 +100,7 @@ export default function StepOrganisation() {
             <Label>
               <MapPin className="h-3.5 w-3.5" />
               State <span className="text-destructive">*</span>
+              <InfoTip text="Head office state. Each facility's state determines its electricity grid region for Scope 2 calculations." />
             </Label>
             <Select
               value={org.state}
@@ -117,7 +121,7 @@ export default function StepOrganisation() {
 
           {/* District */}
           <div className="space-y-1.5">
-            <Label htmlFor="org-district">District</Label>
+            <Label htmlFor="org-district">District <InfoTip text="Optional. Helps identify your location for cluster-specific recommendations." /></Label>
             <Input
               id="org-district"
               placeholder="e.g. Ahmedabad"
@@ -131,6 +135,7 @@ export default function StepOrganisation() {
             <Label htmlFor="org-employees">
               <Users className="h-3.5 w-3.5" />
               Employee Count
+              <InfoTip text="Optional. Used for per-employee intensity metrics if provided." />
             </Label>
             <Input
               id="org-employees"
@@ -151,6 +156,7 @@ export default function StepOrganisation() {
             <Label>
               <Landmark className="h-3.5 w-3.5" />
               Turnover Bracket
+              <InfoTip text="MSME classification as per MSMED Act. Determines eligibility for government funding schemes." />
             </Label>
             <Select
               value={org.turnoverBracket}
@@ -174,6 +180,7 @@ export default function StepOrganisation() {
             <Label htmlFor="org-email">
               <Mail className="h-3.5 w-3.5" />
               Contact Email
+              <InfoTip text="Optional. Appears on your GHG inventory report for verification purposes." />
             </Label>
             <Input
               id="org-email"
@@ -189,6 +196,7 @@ export default function StepOrganisation() {
             <Label htmlFor="org-phone">
               <Phone className="h-3.5 w-3.5" />
               Contact Phone
+              <InfoTip text="Optional. Appears on your GHG inventory report." />
             </Label>
             <Input
               id="org-phone"

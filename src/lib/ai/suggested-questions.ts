@@ -88,11 +88,16 @@ export const SUGGESTED_QUESTIONS: Record<string, string[]> = {
 
   // Recommendations
   recommendations: [
-    'How are emission reduction recommendations generated?',
-    'What does payback period mean for a technology?',
-    'Can I combine multiple technologies?',
-    'How is the CO2 reduction calculated?',
-    'What funding schemes are available for my technology?',
+    'What is my total emission reduction from the enabled technologies?',
+    'Which technology gives me the best payback?',
+    'What does the already-implemented percentage mean?',
+    'How much CAPEX do I need for all the enabled technologies?',
+    'Are there funding schemes for the technologies I selected?',
+    'What is the difference between CAPEX and RESCO solar models?',
+    'How are the CO2 reduction numbers calculated?',
+    'What should I prioritise first for maximum reduction?',
+    'What happens if I combine multiple technologies — do savings stack?',
+    'Is green open access better than rooftop solar for my factory?',
   ],
 
   // Funding Directory

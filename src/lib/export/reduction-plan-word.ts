@@ -74,6 +74,35 @@ export async function generateReductionPlanWord(data: RecommendationResult) {
     }),
   );
 
+  // Disclaimer
+  sectionChildren.push(
+    new Paragraph({
+      spacing: { after: 300 },
+      shading: { fill: 'FFFBEB', type: ShadingType.CLEAR, color: 'auto' },
+      border: {
+        top: { style: BorderStyle.SINGLE, size: 1, color: 'FCD34D' },
+        bottom: { style: BorderStyle.SINGLE, size: 1, color: 'FCD34D' },
+        left: { style: BorderStyle.SINGLE, size: 1, color: 'FCD34D' },
+        right: { style: BorderStyle.SINGLE, size: 1, color: 'FCD34D' },
+      },
+      children: [
+        new TextRun({
+          text: 'Disclaimer: ',
+          bold: true,
+          size: 16,
+          color: '92400E',
+          font: 'Arial',
+        }),
+        new TextRun({
+          text: 'These recommendations are indicative estimates based on reported emissions data and sector benchmarks. Actual reduction potential, costs, and payback periods will depend on a detailed energy audit of your facilities.',
+          size: 16,
+          color: '92400E',
+          font: 'Arial',
+        }),
+      ],
+    }),
+  );
+
   // Impact Summary
   sectionChildren.push(
     new Paragraph({

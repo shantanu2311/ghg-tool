@@ -43,14 +43,14 @@ function StepIndicator({
       onClick={onClick}
       disabled={!isClickable}
       className={cn(
-        'flex items-center gap-2 transition-all',
+        'flex items-center gap-2 transition-colors duration-200',
         isClickable ? 'cursor-pointer' : 'cursor-default opacity-40',
       )}
     >
       <span className="relative">
         <span
           className={cn(
-            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-all',
+            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200',
             isActive && 'bg-primary text-primary-foreground shadow-sm',
             isCompleted && 'bg-primary/15 text-primary',
             !isActive && !isCompleted && 'bg-muted text-muted-foreground',
@@ -157,7 +157,7 @@ export default function WizardPage() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
             <StepComponent />
           </motion.div>

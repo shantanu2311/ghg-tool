@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Info } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
+import { InfoTip } from '@/components/ui/info-tip';
 
 const PRESETS = [
   { label: 'FY 2023-24', start: '2023-04-01', end: '2024-03-31' },
@@ -75,6 +76,7 @@ export default function StepPeriod() {
           <div className="space-y-1.5">
             <Label htmlFor="period-start">
               Start Date <span className="text-destructive">*</span>
+              <InfoTip text="First day of your reporting period. Indian FY starts April 1." />
             </Label>
             <Input
               id="period-start"
@@ -87,6 +89,7 @@ export default function StepPeriod() {
           <div className="space-y-1.5">
             <Label htmlFor="period-end">
               End Date <span className="text-destructive">*</span>
+              <InfoTip text="Last day of your reporting period. Indian FY ends March 31." />
             </Label>
             <Input
               id="period-end"
@@ -106,6 +109,7 @@ export default function StepPeriod() {
           <div>
             <Label className="cursor-pointer text-sm font-medium">
               Mark as Base Year
+              <InfoTip text="The base year is your reference point for measuring emission reductions over time." />
             </Label>
             <p className="text-xs text-muted-foreground mt-0.5">
               The base year is used as the reference point for tracking emission reductions over time.

@@ -33,7 +33,10 @@ RULES — follow these strictly:
 4. If the user writes in Hindi, reply in Hindi (Devanagari script). Otherwise reply in English.
 5. When referencing where to find data in a factory, give PRACTICAL advice (e.g. "Check your monthly electricity bill from the DISCOM" not "Refer to your utility records").
 6. Do not give legal or compliance advice. Say "Consult your BRSR consultant" for regulatory questions.
-7. You are embedded inside a GHG tool — do not suggest other tools or software.`;
+7. You are embedded inside a GHG tool — do not suggest other tools or software.
+8. When answering questions about the user's data, ONLY state facts from the USER'S ANALYSIS DATA section. Quote their actual numbers (e.g. "Your Scope 1 is 0.0232 tCO2e"). Do NOT speculate about missing data, data quality issues, or whether their numbers seem too high or too low. The user's data is their data — do not question it.
+9. NEVER suggest the user's data is incomplete or wrong. If they ask for interpretation, explain what the numbers mean — do not judge accuracy.
+10. Clearly separate facts (from their data) from general guidance (from your knowledge). Do not mix the two.`;
 
 const WIZARD_STEPS = `
 WIZARD STEPS — the user progresses through these:
@@ -242,6 +245,110 @@ A: The tool handles conversions automatically. Common ones: 1 unit of electricit
 Q: What is an emission factor?
 A: A number that converts an activity (like burning 1 kg of coal) into CO2 equivalent emissions. Example: coal EF ≈ 96.1 kgCO2/GJ. The tool has built-in emission factors from IPCC 2019 Refinement, CEA v21.0 (FY2024-25), and DEFRA 2024 — you don't need to look them up.`;
 
+const BENCHMARK_METHODOLOGY = `
+SECTOR BENCHMARK METHODOLOGY — Indian Iron & Steel MSME Emission Intensity Benchmarks:
+
+All benchmarks are gate-to-gate (Scope 1 + Scope 2) in tCO2e per tonne of product, derived from India-specific studies.
+
+CONVERSION APPROACH:
+- Grid electricity → tCO2e: SEC (kWh/t) × 0.000710 (CEA v21.0 national weighted avg)
+- Furnace oil → tCO2e: 3.15 tCO2/t FO (IPCC 2019 Refinement, 77,400 kgCO2/TJ, NCV 40.4 TJ/Gg, density 0.96 kg/L)
+- Coal (Indian sub-bituminous) → tCO2e: ~2.6 tCO2/t (IPCC 2019 Refinement, 96,100 kgCO2/TJ, NCV ~19.6 TJ/Gg)
+- Coke → tCO2e: ~3.0 tCO2/t (IPCC 2019 Refinement, 107,000 kgCO2/TJ, NCV 28.2 TJ/Gg)
+
+SUB-SECTOR BENCHMARKS (Best Practice / Average / Worst Quartile):
+
+EAF Mini Mill: 0.32 / 0.40 / 0.52 tCO2e/t (SEC: 400-650 kWh/t)
+- Scope 2: SEC × 0.000710. Scope 1 add-on: 0.03-0.05 (electrodes ~3 kg/t, lime flux ~25 kg/t, oxy-fuel burner)
+- Sources: SAMEEEKSHA EAF Compendium (TERI/UNDP), Ministry of Steel UNDP-GEF project (321 mills audited)
+
+Induction Furnace: 0.42 / 0.56 / 0.72 tCO2e/t (SEC: 520-870 kWh/t)
+- Scope 2: SEC × 0.000710. Scope 1 add-on: 0.03-0.08 (ladle preheating FO, DG backup, lime)
+- Sources: BEE/SAMEEEKSHA IF cluster profiles (Howrah, Mandi Gobindgarh, Raipur), Shakti Foundation/CSTEP study
+
+Re-Rolling Mill: 0.27 / 0.44 / 0.70 tCO2e/t
+- Fuel-intensive (reheating furnace). Fuel SEC: 80-220 kgoe/t. Electricity: 30-80 kWh/t
+- Scope 1: fuel × ~2.9 tCO2/toe (weighted avg). Scope 2: electricity × 0.000710
+- Wide variance: modern walking beam furnaces (best) vs old pusher-type coal-fired (worst)
+- Sources: IspatGuru (benchmark SEC 270,000 kCal/t, coal 226-269 kg/t), Ministry of Steel UNDP-GEF (34 model mills), SAMEEEKSHA re-rolling profiles
+
+Forging: 0.46 / 0.55 / 0.65 tCO2e/t
+- Scope 1: FO 0.14-0.18 L/kg × 0.96 density × 3.15 EF. Scope 2: 40-80 kWh/t × 0.000710
+- Assumes furnace oil heating (dominant in Indian forging MSMEs)
+- Sources: UNIDO Eastern Zone Forging Cluster Technology Compendium, SAMEEEKSHA Pune Forging Cluster (200+ units), BEE SIDHIEE portal
+
+Casting/Foundry (IF-based): 0.58 / 0.77 / 1.04 tCO2e/t
+- 83% of Indian foundries use IF. Key factor: yield loss (55-70%)
+- Effective SEC = liquid metal SEC / yield: 786-1545 kWh/t finished product
+- Sources: BEE Foundry Sector Energy Mapping (PwC national report), SAMEEEKSHA Rajkot Investment Castings, BEE Belgaum Foundry best practices
+
+IMPORTANT CAVEATS:
+1. No single authoritative India MSME steel benchmark document exists — values synthesised from multiple 2016-2023 studies
+2. Regional grid variation: Southern (0.617) vs Northern (0.898) = 45% Scope 2 variance. Benchmarks use national average
+3. DRI-IF route excluded — coal DRI totals 2.3-3.1 tCO2/tcs including upstream
+4. "Best Practice" = top decile Indian plant; "Average" = median MSME; "Worst Quartile" = bottom 25th percentile
+5. Many MSMEs switching from furnace oil to PNG — would reduce intensity ~25-30%
+6. A detailed methodology PDF with full derivations is downloadable from the benchmark section of the dashboard`;
+
+const RECOMMENDATIONS_KNOWLEDGE = `
+EMISSION REDUCTION RECOMMENDATIONS — how the simulator works:
+
+The tool recommends technologies based on the user's actual emission profile. Each technology is matched to specific fuel types and scopes in the user's inventory.
+
+HOW REDUCTION IS CALCULATED:
+- Each technology has a CO2 reduction range (e.g. 20-40%) applied to the MATCHED emissions only, not the entire inventory
+- When multiple technologies are enabled, reductions are applied SEQUENTIALLY to the residual (not additive). Example: 3 technologies each reducing 20% → 1 - (0.8 × 0.8 × 0.8) = 48.8% total, NOT 60%
+- Technologies are applied in order of payback period (fastest payback first)
+
+"ALREADY IMPLEMENTED" SLIDER:
+- Each technology has an "already implemented" slider (0-100%)
+- This represents what fraction of the opportunity has already been captured
+- For example: "70% of furnaces upgraded to IGBT" means 70% of the emission reduction from that technology has already been realised. Only 30% of the reduction potential remains.
+- At 100%, the technology is fully implemented and no further reduction is possible from it
+- The specific meaning varies per technology:
+  T001: % of motors fitted with VFDs
+  T002: % of motors upgraded to IE3/IE4
+  T003: % of boiler capacity upgraded
+  T004: % of waste heat being recovered
+  T005: % of compressed air system optimised
+  T006: % of lighting converted to LED
+  T007: % of thermal insulation upgraded
+  T008: % of EnMS implementation complete
+  T009: % of cupolas converted to divided blast
+  T010: % of kilns converted to zig-zag
+  T011: % of steam load from cogeneration
+  T012: % of furnaces upgraded to IGBT
+  T013: % of dye lines with heat recovery
+  T014: % of sand being reclaimed/recycled
+  T015: % of electricity from rooftop solar (CAPEX)
+  T016: % of electricity from rooftop solar (RESCO)
+  T017: % of electricity from green open access
+  T018: % of load covered by battery + solar
+  T019: % of thermal load switched to natural gas
+  T020: % of coal replaced with biomass briquettes
+  T021: % of fuel switched to compressed biogas
+  T022: % of process heat from solar thermal
+  T023: % of thermal processes electrified
+
+TECHNOLOGY CATEGORIES:
+- Energy Efficiency (Cross Sector): VFDs, motors, boilers, WHRS, compressed air, LED, insulation, EnMS — apply to most factories
+- Sector Specific: DBC (foundry), zig-zag kiln (brick), cogeneration, IGBT furnace, dye liquor heat recovery, sand reclamation
+- Green Electricity: Rooftop solar (CAPEX or RESCO), green open access, battery storage — reduces Scope 2
+- Alternative Fuels: PNG switch, biomass briquettes, CBG, solar thermal, electrification — reduces Scope 1
+
+FUNDING SCHEMES:
+- Technologies may be linked to government funding schemes (ADEETIE, BEE-GEF-UNIDO, SIDBI, PM Surya Ghar, TEQUP, ZED, SATAT, EESL ESCO)
+- Schemes provide subsidies, interest subvention, or zero-upfront-cost models
+- Eligibility depends on Udyam registration, sector, state, and turnover bracket
+
+ANSWERING RECOMMENDATION QUESTIONS:
+When the user's recommendation data is available in the ANALYSIS DATA section:
+- Use their ACTUAL enabled technologies and numbers. Quote the specific reduction, payback, and CAPEX from their data.
+- If they ask "what does X% implemented mean" — explain using the specific technology context (e.g. "70% implemented for IGBT furnace means 70% of your induction furnaces have been upgraded to IGBT technology, so only 30% of the potential 10-20% energy saving remains")
+- Calculate real numbers: if a tech shows 50 tCO2e reduction at 0% implemented, then at 70% implemented only 30% × 50 = 15 tCO2e reduction remains
+- When comparing options, use their actual matched emissions, not generic estimates
+- Mention relevant funding schemes if the technology has matches`;
+
 // ---------------------------------------------------------------------------
 // Build prompt
 // ---------------------------------------------------------------------------
@@ -262,6 +369,8 @@ export function buildSystemPrompt(context: AssistantContext): string {
   sections.push(SUB_SECTORS);
   sections.push(STATE_GRID_MAPPING);
   sections.push(DATA_QUALITY);
+  sections.push(BENCHMARK_METHODOLOGY);
+  sections.push(RECOMMENDATIONS_KNOWLEDGE);
   sections.push(COMMON_QUESTIONS);
 
   // Context-specific guidance
@@ -300,7 +409,7 @@ export function buildSystemPrompt(context: AssistantContext): string {
   // about the user's specific emissions, top sources, intensity, etc.
   if (context.analysisSummary) {
     sections.push(
-      `USER'S ANALYSIS DATA (from their current session):\n${context.analysisSummary}\n\nUse this data to answer questions about their specific emissions, top sources, intensity, and recommendations. Reference their actual numbers when relevant.`
+      `USER'S ANALYSIS DATA (from their current session):\n${context.analysisSummary}\n\nUse this data to answer questions about their specific emissions, top sources, intensity, and recommendations. Always quote their actual numbers. Do NOT suggest their data is incomplete, missing, or wrong. Do NOT compare their numbers to benchmarks unless they specifically ask. Their data is correct as entered.\n\nIf the data includes a "Recommendation Simulator State" section, use it to answer questions about their selected technologies, implementation status, combined impact, CAPEX, savings, and payback. Calculate remaining reduction potential when they ask about partially implemented technologies. Reference specific technology names and numbers from their data.`
     );
   }
 

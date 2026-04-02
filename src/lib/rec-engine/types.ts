@@ -97,8 +97,10 @@ export interface TechImpact {
   matchedEmissionsTonnes: number;
   matchedEnergyGj: number;
   scopeAddressed: string;
+  energyTypeSaved: string;
   technologyReadiness: string;
   demonstratedInIndia: boolean;
+  indianClusters: string[] | null;
   description: string;
   source: string;
   sourceUrl: string | null;

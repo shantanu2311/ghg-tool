@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectTrigger,
@@ -166,7 +167,7 @@ export function CustomSourceDialog({ orgId, open, onOpenChange, onCreated }: Pro
           {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              className={`h-1.5 rounded-full transition-all ${
+              className={`h-1.5 rounded-full transition-[width,background-color] duration-200 ${
                 s === step ? 'w-6 bg-primary' : s < step ? 'w-3 bg-primary/40' : 'w-3 bg-muted'
               }`}
             />
@@ -188,8 +189,8 @@ export function CustomSourceDialog({ orgId, open, onOpenChange, onCreated }: Pro
 
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">Description</Label>
-                <textarea
-                  className="flex h-16 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none resize-none dark:bg-input/30"
+                <Textarea
+                  className="h-16 resize-none"
                   placeholder="Optional: what this source is and how it's used"
                   value={form.description}
                   onChange={(e) => update('description', e.target.value)}

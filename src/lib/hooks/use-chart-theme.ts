@@ -21,4 +21,45 @@ export const chartTheme = {
   /** Common tick props */
   xAxisTick: { fontSize: 11, fill: 'var(--color-foreground)' },
   yAxisTick: { fontSize: 11, fill: 'var(--color-muted-foreground)' },
+
+  /** Scope colors — recommendations before/after chart */
+  scope: {
+    scope1: 'var(--chart-scope1)',
+    scope2: 'var(--chart-scope2)',
+    scope3: 'var(--chart-scope3)',
+  },
+
+  /** Scope colors — dashboard charts (different palette) */
+  scopeDashboard: {
+    scope1: 'var(--chart-scope1-dashboard)',
+    scope2: 'var(--chart-scope2-dashboard)',
+    scope3: 'var(--chart-scope3-dashboard)',
+  },
+
+  /** Priority tier colors */
+  tier: {
+    quickWin: 'var(--chart-tier-quickwin)',
+    strategic: 'var(--chart-tier-strategic)',
+    easyWin: 'var(--chart-tier-easywin)',
+    lowPriority: 'var(--chart-tier-lowpriority)',
+  },
+
+  /** Before/after & waterfall accent colors */
+  beforeAfter: {
+    baseline: 'var(--chart-baseline)',
+    after: 'var(--chart-after)',
+    trend: 'var(--chart-trend)',
+  },
+
+  /** Accent colors for various chart elements */
+  accent: {
+    facility: 'var(--chart-facility)',
+    savingsArea: 'var(--chart-savings-area)',
+    savingsLine: 'var(--chart-savings-line)',
+    capexLine: 'var(--chart-capex-line)',
+    paybackLine: 'var(--chart-payback-line)',
+  },
+
+  /** Monospace font for numeric axis ticks */
+  fontMono: 'var(--font-mono)',
 } as const;

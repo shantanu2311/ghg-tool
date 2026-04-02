@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Landmark, ExternalLink, FileText, HandCoins } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
 
 interface Props {
   tech: TechWithFunding | null;
@@ -24,6 +25,7 @@ export function FundingPanel({ tech }: Props) {
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
             <Landmark className="h-4 w-4 text-muted-foreground" />
             Funding Opportunities
+            <InfoTip text="Government subsidies and schemes that can offset the CAPEX for the selected technology." />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -41,9 +43,10 @@ export function FundingPanel({ tech }: Props) {
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           <Landmark className="h-4 w-4 text-muted-foreground" />
           Funding for {tech.name}
+          <InfoTip text="Government subsidies and schemes that can offset the CAPEX for the selected technology." />
         </CardTitle>
         <CardDescription className="text-[11px]">
-          Estimated CAPEX: {tech.capexMinLakhs !== null ? `Rs.${tech.capexMinLakhs}--${tech.capexMaxLakhs} Lakhs` : 'N/A'}
+          Estimated CAPEX: {tech.capexMinLakhs !== null ? `Rs.${tech.capexMinLakhs}-${tech.capexMaxLakhs} Lakhs` : 'N/A'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -71,7 +74,7 @@ export function FundingPanel({ tech }: Props) {
                     <HandCoins className="inline h-3 w-3 mr-0.5" />
                     Subsidy: {fm.subsidyPct}%
                     {fm.netCapexMinLakhs !== null && (
-                      <> -- Net cost: Rs.{fm.netCapexMinLakhs.toFixed(1)}--{fm.netCapexMaxLakhs?.toFixed(1)} Lakhs</>
+                      <> — Net cost: Rs.{fm.netCapexMinLakhs.toFixed(1)}-{fm.netCapexMaxLakhs?.toFixed(1)} Lakhs</>
                     )}
                   </p>
                 )}
@@ -116,7 +119,7 @@ export function FundingPanel({ tech }: Props) {
         {tech.bestNetCapexMinLakhs !== null && tech.bestNetCapexMaxLakhs !== null && (
           <div className="mt-3 rounded-lg bg-primary/10 p-3">
             <p className="text-[11px] font-medium text-primary">
-              Best net cost after subsidy: Rs.{tech.bestNetCapexMinLakhs.toFixed(1)}--{tech.bestNetCapexMaxLakhs.toFixed(1)} Lakhs
+              Best net cost after subsidy: Rs.{tech.bestNetCapexMinLakhs.toFixed(1)}-{tech.bestNetCapexMaxLakhs.toFixed(1)} Lakhs
             </p>
           </div>
         )}

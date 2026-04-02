@@ -64,8 +64,8 @@ export function Sidebar() {
   return (
     <motion.aside
       animate={{ width: collapsed ? 64 : 240 }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
-      className="hidden lg:flex flex-col border-r border-border bg-sidebar h-screen sticky top-0 overflow-hidden"
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      className="hidden lg:flex flex-col border-r border-border bg-sidebar h-[100dvh] sticky top-0 overflow-hidden"
     >
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border flex-shrink-0">

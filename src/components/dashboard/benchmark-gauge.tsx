@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { FileText, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
 
 interface BenchmarkData {
   bestPractice: number;
@@ -118,7 +119,7 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Sector Benchmark</CardTitle>
+          <CardTitle className="text-sm font-semibold">Sector Benchmark <InfoTip text="Compares your emission intensity against Indian Iron & Steel MSME benchmarks derived from BEE, SAMEEEKSHA, and UNIDO studies." /></CardTitle>
         </CardHeader>
         <CardContent>
           {!benchmark ? (
@@ -155,9 +156,9 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
   const classification = getClassification(intensity);
 
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Sector Benchmark</CardTitle>
+        <CardTitle className="text-sm font-semibold">Sector Benchmark <InfoTip text="Compares your emission intensity against Indian Iron & Steel MSME benchmarks derived from BEE, SAMEEEKSHA, and UNIDO studies." /></CardTitle>
         <CardDescription className="text-[11px]">Emission intensity vs Iron &amp; Steel sector</CardDescription>
       </CardHeader>
       <CardContent>

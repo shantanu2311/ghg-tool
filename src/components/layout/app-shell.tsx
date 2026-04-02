@@ -8,7 +8,7 @@ import { HelpFab } from '@/components/ai/help-fab';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen">
+    <div className="flex min-h-[100dvh]">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <MobileNav />

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
 
 interface FundingScheme {
   id: string;
@@ -94,6 +95,7 @@ export default function FundingDirectoryPage() {
         <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
           <Landmark className="h-6 w-6 text-muted-foreground" />
           Funding Directory
+          <InfoTip text="Government schemes and subsidies for MSME energy efficiency and emission reduction projects." />
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Government schemes and subsidies for MSME emission reduction -- {schemes.length} schemes

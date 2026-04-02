@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Plus, Trash2, Building2, Inbox } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
+import { InfoTip } from '@/components/ui/info-tip';
 
 function FacilityCard({
   facility,
@@ -64,7 +65,7 @@ function FacilityCard({
           {/* Name */}
           <div className="space-y-1.5">
             <Label htmlFor={`fac-name-${facility.id}`}>
-              Facility Name <span className="text-destructive">*</span>
+              Facility Name <span className="text-destructive">*</span> <InfoTip text="A physical location where your company operates — factory, plant, or office." />
             </Label>
             <Input
               id={`fac-name-${facility.id}`}
@@ -76,7 +77,7 @@ function FacilityCard({
 
           {/* Address */}
           <div className="space-y-1.5">
-            <Label htmlFor={`fac-addr-${facility.id}`}>Address</Label>
+            <Label htmlFor={`fac-addr-${facility.id}`}>Address <InfoTip text="Optional. Street address for record-keeping and audit trail." /></Label>
             <Input
               id={`fac-addr-${facility.id}`}
               placeholder="Street address"
@@ -88,7 +89,7 @@ function FacilityCard({
           {/* State */}
           <div className="space-y-1.5">
             <Label>
-              State <span className="text-destructive">*</span>
+              State <span className="text-destructive">*</span> <InfoTip text="Determines the electricity grid region, which affects your Scope 2 emission factor." />
             </Label>
             <Select
               value={facility.state }
@@ -109,7 +110,7 @@ function FacilityCard({
 
           {/* District */}
           <div className="space-y-1.5">
-            <Label htmlFor={`fac-dist-${facility.id}`}>District</Label>
+            <Label htmlFor={`fac-dist-${facility.id}`}>District <InfoTip text="Optional. Helps with cluster-specific benchmarking." /></Label>
             <Input
               id={`fac-dist-${facility.id}`}
               placeholder="e.g. Ahmedabad"
@@ -120,7 +121,7 @@ function FacilityCard({
 
           {/* Grid Region (auto-filled, read-only) */}
           <div className="space-y-1.5">
-            <Label>Grid Region</Label>
+            <Label>Grid Region <InfoTip text="Auto-assigned based on state. India has 5 grid regions with different emission factors (CEA v21.0)." /></Label>
             <Input
               value={facility.gridRegion || '(auto-filled from state)'}
               readOnly
@@ -130,7 +131,7 @@ function FacilityCard({
 
           {/* Activity Type */}
           <div className="space-y-1.5">
-            <Label>Activity Type</Label>
+            <Label>Activity Type <InfoTip text="Optional. Primary manufacturing activity at this facility. Used for sub-sector benchmarking." /></Label>
             <Select
               value={facility.activityType }
               onValueChange={(val) => updateFacility(facility.id, { activityType: val ?? '' })}

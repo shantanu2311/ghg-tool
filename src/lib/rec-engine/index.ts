@@ -12,6 +12,7 @@ import type {
 import { matchTechnologies } from './matcher';
 import { calculateTechImpact } from './impact-calculator';
 import { matchFunding, bestNetCapex } from './funding-matcher';
+import { TECH_TO_LEVER } from './lever-groups';
 
 export { matchTechnologies } from './matcher';
 export { calculateTechImpact } from './impact-calculator';
@@ -119,6 +120,7 @@ export function calculateCombinedImpact(
   baselineScope1: number,
   baselineScope2: number,
   baselineScope3: number,
+  implementedPcts?: Record<string, number>,
 ): CombinedImpact {
   if (enabledTechs.length === 0 || baselineTotal <= 0) {
     return {
@@ -141,6 +143,16 @@ export function calculateCombinedImpact(
   // Sort by payback ascending for sequential application
   const sorted = [...enabledTechs].sort((a, b) => a.paybackMinYears - b.paybackMinYears);
 
+  // Enforce lever group exclusivity: only keep the first (best payback) tech per lever group
+  const seenLevers = new Set<string>();
+  const deduped = sorted.filter((tech) => {
+    const lever = TECH_TO_LEVER[tech.techId];
+    if (!lever) return true; // Independent tech — always include
+    if (seenLevers.has(lever)) return false; // Already have one from this lever group
+    seenLevers.add(lever);
+    return true;
+  });
+
   let residual = baselineTotal;
   const sequence: CombinedImpact['technologySequence'] = [];
   let totalCapexMin = 0;
@@ -148,14 +160,18 @@ export function calculateCombinedImpact(
   let totalSavingMin = 0;
   let totalSavingMax = 0;
 
-  for (const tech of sorted) {
+  for (const tech of deduped) {
     // Apply this tech's mid reduction % to the residual
     const midPct = (tech.reductionMidTonnes / tech.matchedEmissionsTonnes) * 100;
     // But the reduction applies only to the fraction of residual that this tech addresses
     // Scale: what fraction of the ORIGINAL matched emissions is still in the residual?
     const residualFraction = residual / baselineTotal;
     const effectiveMatchedEmissions = tech.matchedEmissionsTonnes * residualFraction;
-    const actualReduction = effectiveMatchedEmissions * (midPct / 100);
+
+    // Scale by remaining potential: if 40% already implemented, only 60% of reduction remains
+    const alreadyPct = implementedPcts?.[tech.techId] ?? 0;
+    const remainingFactor = (100 - alreadyPct) / 100;
+    const actualReduction = effectiveMatchedEmissions * (midPct / 100) * remainingFactor;
 
     residual -= actualReduction;
     if (residual < 0) residual = 0;

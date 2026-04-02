@@ -5,6 +5,7 @@ import { BRSR_FIELDS } from '@/lib/calc-engine/constants';
 import type { InventoryResult, BrsrOutput } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { InfoTip } from '@/components/ui/info-tip';
 
 interface BrsrTableProps {
   result: InventoryResult;
@@ -34,7 +35,7 @@ export default function BrsrTable({ result }: BrsrTableProps) {
     <div className="space-y-6">
       <Card className="overflow-hidden">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">BRSR Principle 6 Disclosure</CardTitle>
+          <CardTitle className="text-sm font-semibold">BRSR Principle 6 Disclosure <InfoTip text="Maps your calculated emissions to SEBI BRSR Core reporting fields. Ready to copy into your BRSR submission." /></CardTitle>
           <CardDescription className="text-[11px]">SEBI BRSR Core fields mapped from calculated inventory</CardDescription>
         </CardHeader>
         <CardContent className="p-0">

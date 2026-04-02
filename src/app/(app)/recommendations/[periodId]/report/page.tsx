@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { AlertCircle, ArrowLeft, FileText, FileType, Loader2, Landmark, HandCoins } from 'lucide-react';
+import { AlertCircle, ArrowLeft, FileText, FileType, Loader2, Landmark, HandCoins, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ReductionReportPage() {
@@ -87,6 +87,14 @@ export default function ReductionReportPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Disclaimer */}
+      <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20 px-4 py-3">
+        <Info className="h-4 w-4 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+        <p className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
+          These recommendations are <span className="font-semibold">indicative estimates</span> based on reported emissions data and sector benchmarks. Actual reduction potential, costs, and payback periods will depend on a <span className="font-semibold">detailed energy audit</span> of your facilities.
+        </p>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -144,7 +152,7 @@ export default function ReductionReportPage() {
               <p className="text-[11px] text-muted-foreground">Total CAPEX</p>
               <p className="text-lg font-semibold">
                 {combinedImpact.totalCapexMinLakhs > 0
-                  ? `Rs.${combinedImpact.totalCapexMinLakhs.toFixed(0)}--${combinedImpact.totalCapexMaxLakhs.toFixed(0)}L`
+                  ? `Rs.${combinedImpact.totalCapexMinLakhs.toFixed(0)}-${combinedImpact.totalCapexMaxLakhs.toFixed(0)}L`
                   : 'N/A'}
               </p>
               <p className="text-[10px] text-muted-foreground">Lakhs</p>
@@ -188,14 +196,14 @@ export default function ReductionReportPage() {
                       {tech.category.replace(' - Cross Sector', '').replace('Sector Specific - ', '')}
                     </td>
                     <td className="px-3 py-2.5 text-right">
-                      {tech.reductionMinTonnes.toFixed(1)}--{tech.reductionMaxTonnes.toFixed(1)}
+                      {tech.reductionMinTonnes.toFixed(1)}-{tech.reductionMaxTonnes.toFixed(1)}
                     </td>
                     <td className="px-3 py-2.5 text-right">{tech.pctOfTotal.toFixed(1)}%</td>
                     <td className="px-3 py-2.5 text-right">
-                      {tech.capexMinLakhs != null ? `${tech.capexMinLakhs}--${tech.capexMaxLakhs}` : 'N/A'}
+                      {tech.capexMinLakhs != null ? `${tech.capexMinLakhs}-${tech.capexMaxLakhs}` : 'N/A'}
                     </td>
                     <td className="px-3 py-2.5 text-right">
-                      {tech.paybackMinYears}--{tech.paybackMaxYears}
+                      {tech.paybackMinYears}-{tech.paybackMaxYears}
                     </td>
                     <td className="px-5 py-2.5 text-right text-primary">
                       {tech.fundingMatches.length > 0 ? `${tech.fundingMatches.length} scheme${tech.fundingMatches.length > 1 ? 's' : ''}` : '--'}

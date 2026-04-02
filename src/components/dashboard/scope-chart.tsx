@@ -4,12 +4,14 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 import type { InventoryResult } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PieChart as PieChartIcon } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
+import { chartTheme } from '@/lib/hooks/use-chart-theme';
 
 interface ScopeChartProps {
   result: InventoryResult;
 }
 
-const COLORS = ['#0f766e', '#f59e0b', '#64748b']; // teal-700, amber-500, slate-500
+const COLORS = [chartTheme.scopeDashboard.scope1, chartTheme.scopeDashboard.scope2, chartTheme.scopeDashboard.scope3];
 const LABELS = ['Scope 1', 'Scope 2', 'Scope 3'];
 
 const RADIAN = Math.PI / 180;
@@ -36,14 +38,6 @@ function renderCustomLabel(props: any) {
   );
 }
 
-const tooltipStyle = {
-  borderRadius: '10px',
-  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-  padding: '10px 14px',
-  backgroundColor: 'var(--color-card, white)',
-  border: '1px solid var(--color-border)',
-};
-
 export default function ScopeChart({ result }: ScopeChartProps) {
   const data = [
     { name: 'Scope 1', value: result.scope1.total },
@@ -65,9 +59,9 @@ export default function ScopeChart({ result }: ScopeChartProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Scope Breakdown</CardTitle>
+        <CardTitle className="text-sm font-semibold">Scope Breakdown <InfoTip text="Percentage distribution of emissions across Scope 1 (direct), Scope 2 (electricity), and Scope 3 (value chain)." /></CardTitle>
         <CardDescription className="text-[11px]">Distribution by scope category</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -98,7 +92,7 @@ export default function ScopeChart({ result }: ScopeChartProps) {
               </Pie>
               <Tooltip
                 formatter={(value) => [`${Number(value).toFixed(2)} tCO2e`, '']}
-                contentStyle={tooltipStyle}
+                contentStyle={chartTheme.tooltipStyle}
               />
               <Legend
                 verticalAlign="bottom"

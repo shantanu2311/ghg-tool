@@ -4,6 +4,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { InventoryResult } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Inbox } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
+import { chartTheme } from '@/lib/hooks/use-chart-theme';
 
 interface MonthlyTrendProps {
   result: InventoryResult;
@@ -11,20 +13,12 @@ interface MonthlyTrendProps {
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const tooltipStyle = {
-  borderRadius: '10px',
-  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-  padding: '10px 14px',
-  backgroundColor: 'var(--color-card, white)',
-  border: '1px solid var(--color-border)',
-};
-
 export default function MonthlyTrend({ result }: MonthlyTrendProps) {
   if (!result.monthlyTrend || result.monthlyTrend.length === 0) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Monthly Trend</CardTitle>
+          <CardTitle className="text-sm font-semibold">Monthly Trend <InfoTip text="Monthly emission pattern based on entries with month data. Useful for identifying seasonal peaks." /></CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Inbox className="h-8 w-8 text-muted-foreground/30 mb-2" />
@@ -40,9 +34,9 @@ export default function MonthlyTrend({ result }: MonthlyTrendProps) {
   }));
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Monthly Trend</CardTitle>
+        <CardTitle className="text-sm font-semibold">Monthly Trend <InfoTip text="Monthly emission pattern based on entries with month data. Useful for identifying seasonal peaks." /></CardTitle>
         <CardDescription className="text-[11px]">Emissions over the reporting period</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -54,14 +48,14 @@ export default function MonthlyTrend({ result }: MonthlyTrendProps) {
               <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }} />
               <Tooltip
                 formatter={(value) => [`${Number(value).toFixed(2)} tCO2e`, 'Emissions']}
-                contentStyle={tooltipStyle}
+                contentStyle={chartTheme.tooltipStyle}
               />
               <Line
                 type="monotone"
                 dataKey="total"
-                stroke="#0f766e"
+                stroke={chartTheme.scopeDashboard.scope1}
                 strokeWidth={2}
-                dot={{ fill: '#0f766e', r: 3 }}
+                dot={{ fill: chartTheme.scopeDashboard.scope1, r: 3 }}
                 activeDot={{ r: 5 }}
                 name="CO2e"
               />

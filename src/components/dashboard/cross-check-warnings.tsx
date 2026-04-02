@@ -5,6 +5,7 @@ import type { CrossCheckWarning } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, AlertCircle, Info, CircleCheck } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
 
 interface CrossCheckWarningsProps {
   warnings: CrossCheckWarning[];
@@ -42,7 +43,7 @@ export default function CrossCheckWarnings({ warnings }: CrossCheckWarningsProps
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Cross-Check Warnings</CardTitle>
+          <CardTitle className="text-sm font-semibold">Cross-Check Warnings <InfoTip text="Automated sanity checks comparing your data against expected ranges for your sub-sector. Helps identify data entry errors." /></CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-6 gap-2">
           <CircleCheck className="h-4 w-4 text-emerald-500" />
@@ -57,7 +58,7 @@ export default function CrossCheckWarnings({ warnings }: CrossCheckWarningsProps
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Cross-Check Warnings</CardTitle>
+        <CardTitle className="text-sm font-semibold">Cross-Check Warnings <InfoTip text="Automated sanity checks comparing your data against expected ranges for your sub-sector. Helps identify data entry errors." /></CardTitle>
         <CardDescription className="text-[11px]">
           {warnings.length} issue{warnings.length !== 1 ? 's' : ''} detected
         </CardDescription>

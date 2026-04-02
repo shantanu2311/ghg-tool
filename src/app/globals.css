@@ -73,6 +73,27 @@
   --chart-4: oklch(0.6 0.15 250);
   --chart-5: oklch(0.65 0.2 25);
   --radius: 0.625rem;
+
+  /* Chart semantic colors */
+  --chart-scope1: #1D3557;
+  --chart-scope2: #2D6A4F;
+  --chart-scope3: #F4A261;
+  --chart-scope1-dashboard: #0f766e;
+  --chart-scope2-dashboard: #f59e0b;
+  --chart-scope3-dashboard: #64748b;
+  --chart-tier-quickwin: #10b981;
+  --chart-tier-strategic: #f59e0b;
+  --chart-tier-easywin: #6366f1;
+  --chart-tier-lowpriority: #94a3b8;
+  --chart-baseline: #8B8B8B;
+  --chart-after: #2D6A4F;
+  --chart-trend: #ef4444;
+  --chart-facility: #8b5cf6;
+  --chart-savings-area: #d1fae5;
+  --chart-savings-line: #059669;
+  --chart-capex-line: #ef4444;
+  --chart-payback-line: #0f766e;
+
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.5 0.155 163);
@@ -107,6 +128,26 @@
   --chart-3: oklch(0.65 0 0);
   --chart-4: oklch(0.65 0.15 250);
   --chart-5: oklch(0.7 0.2 25);
+  /* Chart semantic colors (dark mode adjustments) */
+  --chart-scope1: #a8c8e8;
+  --chart-scope2: #6fcf97;
+  --chart-scope3: #F4A261;
+  --chart-scope1-dashboard: #2dd4bf;
+  --chart-scope2-dashboard: #fbbf24;
+  --chart-scope3-dashboard: #94a3b8;
+  --chart-tier-quickwin: #34d399;
+  --chart-tier-strategic: #fbbf24;
+  --chart-tier-easywin: #818cf8;
+  --chart-tier-lowpriority: #94a3b8;
+  --chart-baseline: #9ca3af;
+  --chart-after: #6fcf97;
+  --chart-trend: #f87171;
+  --chart-facility: #a78bfa;
+  --chart-savings-area: rgba(16, 185, 129, 0.15);
+  --chart-savings-line: #34d399;
+  --chart-capex-line: #f87171;
+  --chart-payback-line: #2dd4bf;
+
   --sidebar: oklch(0.175 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.65 0.155 163);

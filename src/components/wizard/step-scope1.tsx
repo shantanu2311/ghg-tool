@@ -23,12 +23,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Inbox, AlertTriangle } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
-
-const DATA_QUALITY_OPTIONS = [
-  { value: 'PRIMARY', label: 'Primary (metered/invoiced)', color: 'text-emerald-600 border-emerald-200 bg-emerald-50' },
-  { value: 'SECONDARY', label: 'Secondary (industry avg)', color: 'text-amber-600 border-amber-200 bg-amber-50' },
-  { value: 'ESTIMATED', label: 'Estimated', color: 'text-red-600 border-red-200 bg-red-50' },
-] as const;
+import { InfoTip } from '@/components/ui/info-tip';
+import { DataQualityToggle } from './data-quality-toggle';
 
 // ── Entry Row Component ──────────────────────────────────────────────────────
 
@@ -58,7 +54,7 @@ function EntryRow({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {/* Facility */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Facility</Label>
+          <Label className="text-xs text-muted-foreground">Facility <InfoTip text="Which factory/plant this activity belongs to." /></Label>
           <Select
             value={entry.facilityId }
             onValueChange={(val) => onUpdate(entry.id, { facilityId: val ?? '' })}
@@ -81,7 +77,7 @@ function EntryRow({
 
         {/* Fuel Type */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Source / Fuel Type</Label>
+          <Label className="text-xs text-muted-foreground">Source / Fuel Type <InfoTip text="The specific fuel or activity. Emission factors are automatically applied based on your selection." /></Label>
           <Select
             value={entry.fuelType }
             onValueChange={(val) => handleFuelChange(val ?? '')}
@@ -104,7 +100,7 @@ function EntryRow({
 
         {/* Input Mode Toggle */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Input Mode</Label>
+          <Label className="text-xs text-muted-foreground">Input Mode <InfoTip text="Quantity mode uses direct measurement (preferred). Spend mode converts INR to quantity via fuel prices — flagged as Estimated quality." /></Label>
           <Tabs
             value={entry.inputMode}
             onValueChange={(val) => {
@@ -124,7 +120,7 @@ function EntryRow({
         {entry.inputMode === 'quantity' ? (
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">
-              Quantity ({defaultUnit || 'unit'})
+              Quantity ({defaultUnit || 'unit'}) <InfoTip text="Amount consumed. Check purchase invoices, weigh-bridge slips, or meter readings." />
             </Label>
             <Input
               type="number"
@@ -140,7 +136,7 @@ function EntryRow({
           </div>
         ) : (
           <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Spend (INR)</Label>
+            <Label className="text-xs text-muted-foreground">Spend (INR) <InfoTip text="Total expenditure in INR. Will be converted to quantity using average fuel prices." /></Label>
             <Input
               type="number"
               placeholder="0"
@@ -156,31 +152,16 @@ function EntryRow({
 
         {/* Data Quality */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Data Quality</Label>
-          <div className="flex gap-1.5">
-            {DATA_QUALITY_OPTIONS.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() =>
-                  onUpdate(entry.id, { dataQualityFlag: o.value as 'PRIMARY' | 'SECONDARY' | 'ESTIMATED' })
-                }
-                className={cn(
-                  'flex-1 rounded-md border px-2 py-1.5 text-[10px] font-medium transition-colors',
-                  entry.dataQualityFlag === o.value
-                    ? o.color
-                    : 'border-border text-muted-foreground hover:bg-accent',
-                )}
-              >
-                {o.value === 'PRIMARY' ? 'Primary' : o.value === 'SECONDARY' ? 'Secondary' : 'Estimated'}
-              </button>
-            ))}
-          </div>
+          <Label className="text-xs text-muted-foreground">Data Quality <InfoTip text="Primary = metered/weighed. Secondary = from invoices/supplier data. Estimated = calculated from spend or averages." /></Label>
+          <DataQualityToggle
+            value={entry.dataQualityFlag as 'PRIMARY' | 'SECONDARY' | 'ESTIMATED'}
+            onChange={(v) => onUpdate(entry.id, { dataQualityFlag: v })}
+          />
         </div>
 
         {/* Description */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Description (optional)</Label>
+          <Label className="text-xs text-muted-foreground">Description (optional) <InfoTip text="Optional. E.g. equipment name, DG set ID, vehicle number." /></Label>
           <Input
             placeholder="e.g. DG set, Boiler"
             value={entry.description}
@@ -199,7 +180,7 @@ function EntryRow({
               onUpdate(entry.id, { month: checked ? 1 : null })
             }
           />
-          Monthly breakdown
+          Monthly breakdown <InfoTip text="Enable to record consumption month by month for seasonal analysis." />
         </label>
         <Button
           variant="ghost"

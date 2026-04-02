@@ -24,12 +24,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Inbox, ChevronRight, Info } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
-
-const DATA_QUALITY_OPTIONS = [
-  { value: 'PRIMARY', label: 'Primary', color: 'text-emerald-600 border-emerald-200 bg-emerald-50' },
-  { value: 'SECONDARY', label: 'Secondary', color: 'text-amber-600 border-amber-200 bg-amber-50' },
-  { value: 'ESTIMATED', label: 'Estimated', color: 'text-red-600 border-red-200 bg-red-50' },
-] as const;
+import { InfoTip } from '@/components/ui/info-tip';
+import { DataQualityToggle } from './data-quality-toggle';
 
 // ── Entry Row ────────────────────────────────────────────────────────────────
 
@@ -59,7 +55,7 @@ function EntryRow({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {/* Facility */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Facility</Label>
+          <Label className="text-xs text-muted-foreground">Facility <InfoTip text="Which facility this value chain activity is linked to." /></Label>
           <Select
             value={entry.facilityId }
             onValueChange={(val) => onUpdate(entry.id, { facilityId: val ?? '' })}
@@ -82,7 +78,7 @@ function EntryRow({
 
         {/* Source Type */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Source Type</Label>
+          <Label className="text-xs text-muted-foreground">Source Type <InfoTip text="The type of upstream/downstream activity. Emission factors are automatically applied." /></Label>
           <Select
             value={entry.fuelType }
             onValueChange={(val) => handleSourceChange(val ?? '')}
@@ -105,7 +101,7 @@ function EntryRow({
 
         {/* Input Mode Toggle */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Input Mode</Label>
+          <Label className="text-xs text-muted-foreground">Input Mode <InfoTip text="Quantity is preferred but spend-based estimates are common and acceptable for Scope 3." /></Label>
           <Tabs
             value={entry.inputMode}
             onValueChange={(val) => {
@@ -125,7 +121,7 @@ function EntryRow({
         {entry.inputMode === 'quantity' ? (
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">
-              Quantity ({defaultUnit || 'unit'})
+              Quantity ({defaultUnit || 'unit'}) <InfoTip text="Amount in the relevant unit. Check purchase invoices or logistics records." />
             </Label>
             <Input
               type="number"
@@ -141,7 +137,7 @@ function EntryRow({
           </div>
         ) : (
           <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Spend (INR)</Label>
+            <Label className="text-xs text-muted-foreground">Spend (INR) <InfoTip text="Expenditure in INR. Converted using average commodity prices." /></Label>
             <Input
               type="number"
               placeholder="0"
@@ -157,31 +153,16 @@ function EntryRow({
 
         {/* Data Quality */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Data Quality</Label>
-          <div className="flex gap-1.5">
-            {DATA_QUALITY_OPTIONS.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() =>
-                  onUpdate(entry.id, { dataQualityFlag: o.value as 'PRIMARY' | 'SECONDARY' | 'ESTIMATED' })
-                }
-                className={cn(
-                  'flex-1 rounded-md border px-2 py-1.5 text-[10px] font-medium transition-colors',
-                  entry.dataQualityFlag === o.value
-                    ? o.color
-                    : 'border-border text-muted-foreground hover:bg-accent',
-                )}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
+          <Label className="text-xs text-muted-foreground">Data Quality <InfoTip text="Scope 3 data is typically Secondary or Estimated. Improve over time as you get better supplier data." /></Label>
+          <DataQualityToggle
+            value={entry.dataQualityFlag as 'PRIMARY' | 'SECONDARY' | 'ESTIMATED'}
+            onChange={(v) => onUpdate(entry.id, { dataQualityFlag: v })}
+          />
         </div>
 
         {/* Description */}
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Description (optional)</Label>
+          <Label className="text-xs text-muted-foreground">Description (optional) <InfoTip text="Optional. E.g. supplier name, transport route, waste type." /></Label>
           <Input
             placeholder="e.g. Supplier name, route details"
             value={entry.description}
@@ -275,7 +256,7 @@ function CategorySection({
                 onToggleNA();
               }}
             />
-            Not Applicable -- this category does not apply to our operations
+            Not Applicable <InfoTip text="Mark if this category does not apply to your operations. E.g. no business travel." /> -- this category does not apply to our operations
           </label>
 
           {!notApplicable && (

@@ -4,18 +4,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { InventoryResult } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Inbox } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
+import { chartTheme } from '@/lib/hooks/use-chart-theme';
 
 interface FacilityBreakdownProps {
   result: InventoryResult;
 }
-
-const tooltipStyle = {
-  borderRadius: '10px',
-  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-  padding: '10px 14px',
-  backgroundColor: 'var(--color-card, white)',
-  border: '1px solid var(--color-border)',
-};
 
 export default function FacilityBreakdown({ result }: FacilityBreakdownProps) {
   const data = result.facilityBreakdown.map((f) => ({
@@ -28,7 +22,7 @@ export default function FacilityBreakdown({ result }: FacilityBreakdownProps) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Emissions by Facility</CardTitle>
+          <CardTitle className="text-sm font-semibold">Emissions by Facility <InfoTip text="Emissions split by facility location. Helps identify which plants contribute most to your footprint." /></CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Inbox className="h-8 w-8 text-muted-foreground/30 mb-2" />
@@ -39,9 +33,9 @@ export default function FacilityBreakdown({ result }: FacilityBreakdownProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Emissions by Facility</CardTitle>
+        <CardTitle className="text-sm font-semibold">Emissions by Facility <InfoTip text="Emissions split by facility location. Helps identify which plants contribute most to your footprint." /></CardTitle>
         <CardDescription className="text-[11px]">Total CO2e per facility</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -53,9 +47,9 @@ export default function FacilityBreakdown({ result }: FacilityBreakdownProps) {
               <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }} />
               <Tooltip
                 formatter={(value) => [`${Number(value).toFixed(2)} tCO2e`, 'Total']}
-                contentStyle={tooltipStyle}
+                contentStyle={chartTheme.tooltipStyle}
               />
-              <Bar dataKey="total" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="CO2e" />
+              <Bar dataKey="total" fill={chartTheme.accent.facility} radius={[4, 4, 0, 0]} name="CO2e" />
             </BarChart>
           </ResponsiveContainer>
         </div>

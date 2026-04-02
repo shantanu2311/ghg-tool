@@ -5,6 +5,7 @@ import type { InventoryResult } from '@/lib/calc-engine/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Activity, Layers, ShieldCheck, TrendingDown } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
 
 interface KpiCardsProps {
   result: InventoryResult;
@@ -37,8 +38,9 @@ export default function KpiCards({ result }: KpiCardsProps) {
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
             <Activity className="h-4 w-4" />
             <p className="text-xs font-medium uppercase tracking-wide">Grand Total</p>
+            <InfoTip text="Total greenhouse gas emissions across all three scopes, measured in tonnes of CO2 equivalent (tCO2e)." />
           </div>
-          <p className="text-3xl font-semibold">{formatNumber(grandTotal)}</p>
+          <p className="text-3xl font-semibold font-mono tabular-nums">{formatNumber(grandTotal)}</p>
           <p className="mt-1 text-xs text-muted-foreground">tCO2e</p>
         </CardContent>
       </Card>
@@ -49,6 +51,7 @@ export default function KpiCards({ result }: KpiCardsProps) {
           <div className="flex items-center gap-2 text-muted-foreground mb-3">
             <Layers className="h-4 w-4" />
             <p className="text-xs font-medium uppercase tracking-wide">Scope Breakdown</p>
+            <InfoTip text="Scope 1 = direct emissions you own. Scope 2 = purchased electricity. Scope 3 = value chain (materials, transport, waste)." />
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -56,21 +59,21 @@ export default function KpiCards({ result }: KpiCardsProps) {
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-teal-700" />
                 Scope 1
               </span>
-              <span className="text-sm font-semibold">{formatNumber(scope1.total)}</span>
+              <span className="text-sm font-semibold font-mono tabular-nums">{formatNumber(scope1.total)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />
                 Scope 2
               </span>
-              <span className="text-sm font-semibold">{formatNumber(scope2Location.total)}</span>
+              <span className="text-sm font-semibold font-mono tabular-nums">{formatNumber(scope2Location.total)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-500" />
                 Scope 3
               </span>
-              <span className="text-sm font-semibold">{formatNumber(scope3.total)}</span>
+              <span className="text-sm font-semibold font-mono tabular-nums">{formatNumber(scope3.total)}</span>
             </div>
           </div>
         </CardContent>
@@ -82,12 +85,13 @@ export default function KpiCards({ result }: KpiCardsProps) {
           <div className="flex items-center gap-2 text-muted-foreground mb-3">
             <ShieldCheck className="h-4 w-4" />
             <p className="text-xs font-medium uppercase tracking-wide">Data Quality</p>
+            <InfoTip text="Based on the ratio of Primary (metered), Secondary (invoiced), and Estimated data. Higher primary % = more reliable results." />
           </div>
           <div className="flex items-center gap-3">
             <Badge className={cn('text-xs', gradeColor(dataQuality.grade))}>
               {dataQuality.grade}
             </Badge>
-            <span className="text-2xl font-semibold">{dataQuality.overall}</span>
+            <span className="text-2xl font-semibold font-mono tabular-nums">{dataQuality.overall}</span>
             <span className="text-xs text-muted-foreground">/100</span>
           </div>
           <div className="mt-2 flex gap-3 text-[11px] text-muted-foreground">
@@ -104,15 +108,16 @@ export default function KpiCards({ result }: KpiCardsProps) {
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
             <TrendingDown className="h-4 w-4" />
             <p className="text-xs font-medium uppercase tracking-wide">Emission Intensity</p>
+            <InfoTip text="Emissions per unit of output. Used for benchmarking against sector averages and BRSR reporting." />
           </div>
           {intensityMetrics.perProduct != null ? (
             <>
-              <p className="text-3xl font-semibold">{intensityMetrics.perProduct.toFixed(4)}</p>
+              <p className="text-3xl font-semibold font-mono tabular-nums">{intensityMetrics.perProduct.toFixed(4)}</p>
               <p className="mt-1 text-xs text-muted-foreground">tCO2e / tonne of product</p>
             </>
           ) : intensityMetrics.perTurnover != null ? (
             <>
-              <p className="text-3xl font-semibold">{intensityMetrics.perTurnover.toFixed(6)}</p>
+              <p className="text-3xl font-semibold font-mono tabular-nums">{intensityMetrics.perTurnover.toFixed(6)}</p>
               <p className="mt-1 text-xs text-muted-foreground">tCO2e / lakh INR turnover</p>
             </>
           ) : (

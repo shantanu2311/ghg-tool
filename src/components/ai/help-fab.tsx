@@ -1,10 +1,11 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
+import { MessageCircleQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHelpStore } from '@/lib/help-store';
 import { useWizardStore } from '@/lib/store';
+import { useWhatIfStore } from '@/lib/what-if-store';
 import { getSuggestedQuestions } from '@/lib/ai/suggested-questions';
 import type { ActivityEntry } from '@/lib/store';
 
@@ -128,6 +129,65 @@ function buildAnalysisSummary(): string {
     }
   }
 
+  // ── Recommendation / What-If State ──
+  const whatIf = useWhatIfStore.getState();
+  if (whatIf.recommendations.length > 0) {
+    lines.push('--- Recommendation Simulator State ---');
+    lines.push(`Baseline total: ${whatIf.baselineTotal.toFixed(4)} tCO2e`);
+
+    // Enabled technologies with their details
+    const enabledTechs = whatIf.recommendations.filter((r) => whatIf.enabledTechIds.has(r.techId));
+    const disabledTechs = whatIf.recommendations.filter((r) => !whatIf.enabledTechIds.has(r.techId));
+
+    if (enabledTechs.length > 0) {
+      lines.push(`Enabled technologies (${enabledTechs.length}):`);
+      for (const t of enabledTechs) {
+        const implPct = whatIf.implementedPcts[t.techId] || 0;
+        const remainingPct = implPct > 0 ? ` [${implPct}% already implemented → ${100 - implPct}% remaining]` : '';
+        lines.push(`  - ${t.name} (${t.techId}): CO2 reduction ${t.reductionMinTonnes.toFixed(2)}-${t.reductionMaxTonnes.toFixed(2)} tCO2e/yr, payback ${t.paybackMinYears}-${t.paybackMaxYears} yrs, CAPEX Rs ${t.capexMinLakhs ?? 0}-${t.capexMaxLakhs ?? 0}L${remainingPct}`);
+      }
+    }
+
+    if (disabledTechs.length > 0) {
+      lines.push(`Disabled technologies (${disabledTechs.length}): ${disabledTechs.map((t) => t.name).join(', ')}`);
+    }
+
+    // Technologies marked as already implemented
+    const implEntries = Object.entries(whatIf.implementedPcts).filter(([, pct]) => pct > 0);
+    if (implEntries.length > 0) {
+      lines.push('Already implemented:');
+      for (const [techId, pct] of implEntries) {
+        const tech = whatIf.recommendations.find((r) => r.techId === techId);
+        if (tech) lines.push(`  - ${tech.name}: ${pct}% implemented`);
+      }
+    }
+
+    // Combined impact
+    if (whatIf.combinedImpact) {
+      const ci = whatIf.combinedImpact;
+      lines.push(`Combined impact of enabled technologies:`);
+      lines.push(`  Total reduction: ${ci.totalReductionTonnes.toFixed(4)} tCO2e (${ci.totalReductionPct.toFixed(1)}% of baseline)`);
+      lines.push(`  Post-reduction total: ${ci.postReductionTotalTonnes.toFixed(4)} tCO2e`);
+      lines.push(`  Total CAPEX: Rs ${ci.totalCapexMinLakhs.toFixed(1)}-${ci.totalCapexMaxLakhs.toFixed(1)} Lakhs`);
+      lines.push(`  Annual savings: Rs ${Math.round(ci.totalAnnualSavingMinInr).toLocaleString('en-IN')}-${Math.round(ci.totalAnnualSavingMaxInr).toLocaleString('en-IN')}`);
+      if (ci.blendedPaybackYears != null) {
+        lines.push(`  Blended payback: ${ci.blendedPaybackYears.toFixed(1)} years`);
+      }
+    }
+
+    // Funding matches
+    const techsWithFunding = whatIf.recommendations.filter((r) => r.fundingMatches.length > 0);
+    if (techsWithFunding.length > 0) {
+      lines.push(`Technologies with funding: ${techsWithFunding.map((t) => `${t.name} (${t.fundingMatches.length} scheme${t.fundingMatches.length > 1 ? 's' : ''})`).join(', ')}`);
+    }
+
+    // Warnings
+    const allWarnings = whatIf.recommendations.flatMap((r) => r.warnings.map((w) => `${r.name}: ${w}`));
+    if (allWarnings.length > 0) {
+      lines.push(`Warnings: ${allWarnings.join('; ')}`);
+    }
+  }
+
   return lines.join('\n');
 }
 
@@ -154,11 +214,11 @@ export function HelpFab() {
 
   return (
     <Button
-      size="icon"
-      className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg z-30"
+      className="fixed bottom-6 right-6 h-auto rounded-full shadow-lg z-30 gap-2 pl-4 pr-5 py-3"
       onClick={handleClick}
     >
-      <Sparkles className="h-5 w-5" />
+      <MessageCircleQuestion className="h-4 w-4" />
+      <span className="text-sm font-medium">Ask AI</span>
     </Button>
   );
 }

@@ -70,7 +70,9 @@ export default function RecommendationsIndexPage() {
                 >
                   <div>
                     <p className="text-sm font-medium">{p.organisation.name}</p>
-                    <p className="text-xs text-muted-foreground">{p.startDate} to {p.endDate}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(p.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} to {new Date(p.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </Link>

@@ -4,18 +4,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { InventoryResult } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Inbox } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
+import { chartTheme } from '@/lib/hooks/use-chart-theme';
 
 interface TopSourcesProps {
   result: InventoryResult;
 }
-
-const tooltipStyle = {
-  borderRadius: '10px',
-  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-  padding: '10px 14px',
-  backgroundColor: 'var(--color-card, white)',
-  border: '1px solid var(--color-border)',
-};
 
 export default function TopSources({ result }: TopSourcesProps) {
   const data = result.topSources.slice(0, 5).map((s) => ({
@@ -29,7 +23,7 @@ export default function TopSources({ result }: TopSourcesProps) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Top Emission Sources</CardTitle>
+          <CardTitle className="text-sm font-semibold">Top Emission Sources <InfoTip text="Your largest emission sources ranked by contribution. Focus reduction efforts on the top sources for maximum impact." /></CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Inbox className="h-8 w-8 text-muted-foreground/30 mb-2" />
@@ -40,9 +34,9 @@ export default function TopSources({ result }: TopSourcesProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Top Emission Sources</CardTitle>
+        <CardTitle className="text-sm font-semibold">Top Emission Sources <InfoTip text="Your largest emission sources ranked by contribution. Focus reduction efforts on the top sources for maximum impact." /></CardTitle>
         <CardDescription className="text-[11px]">Top 5 contributors by CO2e</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -59,9 +53,9 @@ export default function TopSources({ result }: TopSourcesProps) {
               />
               <Tooltip
                 formatter={(value, name) => [`${Number(value).toFixed(2)} tCO2e`, String(name)]}
-                contentStyle={tooltipStyle}
+                contentStyle={chartTheme.tooltipStyle}
               />
-              <Bar dataKey="co2e" fill="#0f766e" radius={[0, 4, 4, 0]} name="CO2e" />
+              <Bar dataKey="co2e" fill={chartTheme.scopeDashboard.scope1} radius={[0, 4, 4, 0]} name="CO2e" />
             </BarChart>
           </ResponsiveContainer>
         </div>

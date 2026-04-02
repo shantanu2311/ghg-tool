@@ -1207,7 +1207,7 @@ async function main() {
       matchesSubSectors: JSON.stringify(['eaf_mini_mill', 'induction_furnace', 're_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
       source: 'BEE-GEF-UNIDO; SAMEEEKSHA DPRs',
-      sourceUrl: 'https://sameeeksha.org/',
+      sourceUrl: 'https://www.sameeeksha.org/index.php?option=com_content&view=article&id=107&Itemid=507',
     },
     {
       techId: 'T002',
@@ -1232,8 +1232,8 @@ async function main() {
       matchesCategories: JSON.stringify(['grid_electricity']),
       matchesSubSectors: JSON.stringify(['eaf_mini_mill', 'induction_furnace', 're_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'TERI-SSEF IE3 Motor Project',
-      sourceUrl: 'https://www.teriin.org/',
+      source: 'Shakti Foundation MSME EE Project',
+      sourceUrl: 'https://shaktifoundation.in/wp-content/uploads/2017/06/Final-Project-Report_Shakti-MSME.pdf',
     },
     {
       techId: 'T003',
@@ -1258,8 +1258,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['re_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'SAMEEEKSHA/Shakti Foundation',
-      sourceUrl: 'https://sameeeksha.org/',
+      source: 'SAMEEEKSHA DPRs (Boiler studies)',
+      sourceUrl: 'https://www.sameeeksha.org/pdf/dpr/surat_4TPH.pdf',
     },
     {
       techId: 'T004',
@@ -1284,8 +1284,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion', 'process']),
       matchesSubSectors: JSON.stringify(['re_rolling', 'forging', 'casting_foundry', 'eaf_mini_mill']),
       minEmissionThreshold: null,
-      source: 'SAMEEEKSHA; avg 26% saving',
-      sourceUrl: 'https://sameeeksha.org/',
+      source: 'SAMEEEKSHA DPRs; avg 26% saving',
+      sourceUrl: 'https://www.sameeeksha.org/pdf/dpr/East_and_West_Godavari_refractories_cluster/11_Waste_heat_recovery_system_200_tons_capacity_kiln_Godavari_Refr_cluster.pdf',
     },
     {
       techId: 'T005',
@@ -1311,7 +1311,7 @@ async function main() {
       matchesSubSectors: JSON.stringify(['eaf_mini_mill', 'induction_furnace', 're_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
       source: 'BEE EC Guidelines for MSMEs',
-      sourceUrl: 'https://beeindia.gov.in/',
+      sourceUrl: 'https://beeindia.gov.in/sites/default/files/Annexure%202.pdf',
     },
     {
       techId: 'T006',
@@ -1337,7 +1337,7 @@ async function main() {
       matchesSubSectors: JSON.stringify(['eaf_mini_mill', 'induction_furnace', 're_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
       source: 'BEE UJALA Programme',
-      sourceUrl: 'https://beeindia.gov.in/',
+      sourceUrl: 'https://eeslindia.org/en/ourujala/',
     },
     {
       techId: 'T007',
@@ -1363,7 +1363,7 @@ async function main() {
       matchesSubSectors: JSON.stringify(['re_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
       source: 'BEE EC Guidelines 2019',
-      sourceUrl: 'https://beeindia.gov.in/',
+      sourceUrl: 'https://beeindia.gov.in/sites/default/files/Annexure%202.pdf',
     },
     {
       techId: 'T008',
@@ -1389,7 +1389,7 @@ async function main() {
       matchesSubSectors: JSON.stringify(['eaf_mini_mill', 'induction_furnace', 're_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
       source: 'BEE-GEF-UNIDO; 45+ MSMEs certified',
-      sourceUrl: 'https://sidhiee.beeindia.gov.in/',
+      sourceUrl: 'https://www.bsigroup.com/en-IN/ISO-50001-Energy-Management/bee-wb-project-on-iso50001-implementation-for-msmes/',
     },
     // ── 3.2 Sector-Specific Technologies ──
     {
@@ -1415,8 +1415,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['casting_foundry']),
       minEmissionThreshold: null,
-      source: 'UNIDO-BEE Tech Compendium',
-      sourceUrl: 'https://www.unido.org/',
+      source: 'UNIDO-BEE Tech Compendium (Belgaum Foundry)',
+      sourceUrl: 'http://sidhiee.beeindia.gov.in/images/DigitalLibrary/637877056026116995.pdf',
     },
     {
       techId: 'T010',
@@ -1441,8 +1441,8 @@ async function main() {
       matchesCategories: null,
       matchesSubSectors: JSON.stringify(['brick_kilns']),
       minEmissionThreshold: null,
-      source: 'CPCB/NITI Aayog',
-      sourceUrl: 'https://cpcb.nic.in/',
+      source: 'CPCB Direction; CSE Zig-Zag Design Manual',
+      sourceUrl: 'http://cdn.cseindia.org/attachments/0.15498400_1520395734_zig-zag-kilns-design_manual.pdf',
     },
     {
       techId: 'T011',
@@ -1467,8 +1467,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['re_rolling']),
       minEmissionThreshold: null,
-      source: 'Power Line Magazine',
-      sourceUrl: null,
+      source: 'BEE Best Practice Manual — Cogeneration',
+      sourceUrl: 'https://nredcap.in/PDFs/BEE_manuals/BEST_PRACTICE_MANUAL_COGENERATION.pdf',
     },
     {
       techId: 'T012',
@@ -1493,8 +1493,8 @@ async function main() {
       matchesCategories: JSON.stringify(['grid_electricity']),
       matchesSubSectors: JSON.stringify(['induction_furnace', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'BEE-GEF-UNIDO',
-      sourceUrl: 'https://sidhiee.beeindia.gov.in/',
+      source: 'BEE-GEF-UNIDO DPR on IGBT Induction Furnace',
+      sourceUrl: 'https://sidhiee.beeindia.gov.in/images/DigitalLibrary/637876885490689821.pdf',
     },
     {
       techId: 'T013',
@@ -1519,8 +1519,8 @@ async function main() {
       matchesCategories: null,
       matchesSubSectors: null,
       minEmissionThreshold: null,
-      source: 'BEE-GEF-UNIDO DPRs',
-      sourceUrl: 'https://sidhiee.beeindia.gov.in/',
+      source: 'BEE-GEF-UNIDO DPRs (Pali Textile Cluster)',
+      sourceUrl: 'https://sameeeksha.org/pdf/dpr/Pali_Textile.pdf',
     },
     {
       techId: 'T014',
@@ -1545,8 +1545,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion', 'grid_electricity']),
       matchesSubSectors: JSON.stringify(['casting_foundry']),
       minEmissionThreshold: null,
-      source: 'UNIDO Tech Compendium Indore',
-      sourceUrl: 'https://www.unido.org/',
+      source: 'UNIDO Tech Compendium (Indore Foundry)',
+      sourceUrl: 'https://sidhiee.beeindia.gov.in/images/DigitalLibrary/637877086697410216.pdf',
     },
     // ── 3.3 Green Electricity Technologies ──
     {
@@ -1573,7 +1573,7 @@ async function main() {
       matchesSubSectors: null,
       minEmissionThreshold: null,
       source: 'NITI Aayog MSME Roadmap',
-      sourceUrl: 'https://www.niti.gov.in/',
+      sourceUrl: 'https://niti.gov.in/sites/default/files/2026-01/Roadmap_for_Green_Transition_of_MSMEs.pdf',
     },
     {
       techId: 'T016',
@@ -1598,8 +1598,8 @@ async function main() {
       matchesCategories: JSON.stringify(['grid_electricity']),
       matchesSubSectors: null,
       minEmissionThreshold: null,
-      source: 'NITI Aayog MSME Roadmap',
-      sourceUrl: 'https://www.niti.gov.in/',
+      source: 'NITI Aayog MSME Roadmap; MNRE RESCO Guidelines',
+      sourceUrl: 'https://niti.gov.in/sites/default/files/2026-01/Roadmap_for_Green_Transition_of_MSMEs.pdf',
     },
     {
       techId: 'T017',
@@ -1624,8 +1624,8 @@ async function main() {
       matchesCategories: JSON.stringify(['grid_electricity']),
       matchesSubSectors: null,
       minEmissionThreshold: null,
-      source: 'NITI Aayog; CERC/SERC',
-      sourceUrl: 'https://www.niti.gov.in/',
+      source: 'NITI Aayog MSME Green Transition Roadmap; CERC/SERC',
+      sourceUrl: 'https://niti.gov.in/sites/default/files/2026-01/Roadmap_for_Green_Transition_of_MSMEs.pdf',
     },
     {
       techId: 'T018',
@@ -1650,8 +1650,8 @@ async function main() {
       matchesCategories: JSON.stringify(['grid_electricity']),
       matchesSubSectors: null,
       minEmissionThreshold: null,
-      source: 'NITI Aayog (medium-term)',
-      sourceUrl: 'https://www.niti.gov.in/',
+      source: 'NITI Aayog Energy Storage Roadmap',
+      sourceUrl: 'https://www.niti.gov.in/sites/default/files/2019-10/ISGF-Report-on-Energy-Storage-System-(ESS)-Roadmap-for-India-2019-2032.pdf',
     },
     // ── 3.4 Alternative Fuel Technologies ──
     {
@@ -1677,8 +1677,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['re_rolling', 'forging', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'NITI Aayog; PNGRB',
-      sourceUrl: 'https://www.pngrb.gov.in/',
+      source: 'PNGRB CGD Authorisation; Deloitte Pathways Report',
+      sourceUrl: 'https://pngrb.gov.in/eng-web/cgd-auth.html',
     },
     {
       techId: 'T020',
@@ -1703,8 +1703,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['re_rolling', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'MNRE-GIZ Report',
-      sourceUrl: 'https://mnre.gov.in/',
+      source: 'MNRE-GIZ Biomass for MSMEs Report (2026)',
+      sourceUrl: 'https://www.pib.gov.in/PressReleasePage.aspx?PRID=2215271&reg=3&lang=1',
     },
     {
       techId: 'T021',
@@ -1729,8 +1729,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['re_rolling', 'forging']),
       minEmissionThreshold: null,
-      source: 'SATAT Scheme',
-      sourceUrl: 'https://satat.co.in/',
+      source: 'MoPNG SATAT Scheme',
+      sourceUrl: 'https://mopng.gov.in/en/refining/compressed-bio-gas',
     },
     {
       techId: 'T022',
@@ -1755,8 +1755,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['forging', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'MNRE; CSTEP',
-      sourceUrl: 'https://mnre.gov.in/',
+      source: 'CSTEP Solar Process Heat Study; MNRE',
+      sourceUrl: 'https://cstep.in/publication/solar-energy-for-process-heating-a-case-study-of-select-indian-industries/',
     },
     {
       techId: 'T023',
@@ -1781,8 +1781,8 @@ async function main() {
       matchesCategories: JSON.stringify(['stationary_combustion']),
       matchesSubSectors: JSON.stringify(['induction_furnace', 'casting_foundry']),
       minEmissionThreshold: null,
-      source: 'Ember India; NITI Aayog',
-      sourceUrl: 'https://ember-climate.org/',
+      source: 'Ember India Green Electrification Report (2024)',
+      sourceUrl: 'https://ember-energy.org/app/uploads/2024/09/Report-Green-electrification-of-Indian-industries-for-clean-energy-gains.pdf',
     },
   ];
 
@@ -1819,7 +1819,7 @@ async function main() {
       applicationUrl: 'https://adeetie.beeindia.gov.in',
       reportedImpact: null,
       source: 'BEE ADEETIE Scheme Guidelines',
-      sourceUrl: 'https://beeindia.gov.in/',
+      sourceUrl: 'https://adeetie.beeindia.gov.in/',
     },
     {
       schemeId: 'S002',
@@ -1840,7 +1840,7 @@ async function main() {
       applicationUrl: 'https://sidhiee.beeindia.gov.in',
       reportedImpact: '45+ MSMEs ISO 50001 certified; 200+ energy audits completed',
       source: 'BEE-GEF-UNIDO Programme',
-      sourceUrl: 'https://sidhiee.beeindia.gov.in/',
+      sourceUrl: 'https://sidhiee.beeindia.gov.in/ProjectComponent/GEF_UNIDO',
     },
     {
       schemeId: 'S003',
@@ -1861,7 +1861,7 @@ async function main() {
       applicationUrl: 'https://prsf.sidbi.in',
       reportedImpact: null,
       source: 'SIDBI PRSF',
-      sourceUrl: 'https://sidbi.in/',
+      sourceUrl: 'https://prsf.sidbi.in/',
     },
     {
       schemeId: 'S004',
@@ -1882,7 +1882,7 @@ async function main() {
       applicationUrl: 'https://sidbi.in',
       reportedImpact: null,
       source: 'SIDBI Green Finance',
-      sourceUrl: 'https://sidbi.in/',
+      sourceUrl: 'https://www.sidbi.in/en/green-finance',
     },
     {
       schemeId: 'S005',

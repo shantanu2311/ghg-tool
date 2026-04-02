@@ -1,28 +1,65 @@
 'use client';
 
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import type { TechWithFunding } from '@/lib/rec-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Inbox } from 'lucide-react';
+import { InfoTip } from '@/components/ui/info-tip';
+import { chartTheme } from '@/lib/hooks/use-chart-theme';
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Energy Efficiency - Cross Sector': '#0f766e',
-  'Sector Specific - Iron & Steel': '#2563eb',
-  'Green Electricity': '#059669',
-  'Alternative Fuels': '#d97706',
-};
+/** Priority tiers with distinct colors */
+const TIERS = {
+  quickWin: { label: 'Quick Win', color: chartTheme.tier.quickWin, bg: 'bg-emerald-500' },
+  strategic: { label: 'Strategic', color: chartTheme.tier.strategic, bg: 'bg-amber-500' },
+  easyWin: { label: 'Easy Win', color: chartTheme.tier.easyWin, bg: 'bg-indigo-500' },
+  lowPriority: { label: 'Low Priority', color: chartTheme.tier.lowPriority, bg: 'bg-slate-400' },
+} as const;
 
-const tooltipStyle = {
-  borderRadius: '10px',
-  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-  padding: '10px 14px',
-  backgroundColor: 'var(--color-card, white)',
-  border: '1px solid var(--color-border)',
-};
+type TierKey = keyof typeof TIERS;
+
+/**
+ * Classify tech into a priority tier.
+ * Quick Win: high impact (above median) + fast payback (below median)
+ * Strategic: high impact + slower payback
+ * Easy Win: lower impact + fast payback
+ * Low Priority: lower impact + slower payback
+ */
+function classifyTier(
+  pctOfTotal: number,
+  paybackMid: number,
+  medianPct: number,
+  medianPayback: number,
+): TierKey {
+  const highImpact = pctOfTotal >= medianPct;
+  const fastPayback = paybackMid <= medianPayback;
+  if (highImpact && fastPayback) return 'quickWin';
+  if (highImpact && !fastPayback) return 'strategic';
+  if (!highImpact && fastPayback) return 'easyWin';
+  return 'lowPriority';
+}
+
+function fmtCO2(v: number): string {
+  if (v === 0) return '0';
+  if (v >= 100) return v.toFixed(0);
+  if (v >= 1) return v.toFixed(1);
+  if (v >= 0.01) return v.toFixed(2);
+  return v.toFixed(4);
+}
 
 interface Props {
   technologies: TechWithFunding[];
   enabledTechIds: Set<string>;
+}
+
+interface BarData {
+  name: string;
+  fullName: string;
+  pctOfTotal: number;
+  paybackMid: number;
+  reductionMid: number;
+  capexMid: number;
+  tier: TierKey;
+  color: string;
 }
 
 export function PaybackScatter({ technologies, enabledTechIds }: Props) {
@@ -32,64 +69,120 @@ export function PaybackScatter({ technologies, enabledTechIds }: Props) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Payback vs Impact</CardTitle>
-          <CardDescription className="text-[11px]">Bubble size = CAPEX, position = payback x CO2 reduction</CardDescription>
+          <CardTitle className="text-sm font-semibold">
+            Priority Ranking
+            <InfoTip text="Technologies ranked by priority. Quick Wins (high impact, fast payback) should be implemented first." />
+          </CardTitle>
+          <CardDescription className="text-[11px]">Enable technologies to see priority ranking</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Inbox className="h-8 w-8 text-muted-foreground/30 mb-2" />
-          <p className="text-sm text-muted-foreground">Enable technologies to see the scatter plot</p>
+          <p className="text-sm text-muted-foreground">Enable technologies to see the priority ranking</p>
         </CardContent>
       </Card>
     );
   }
 
-  const data = enabled.map((t) => ({
-    x: (t.paybackMinYears + t.paybackMaxYears) / 2,
-    y: t.reductionMidTonnes,
-    z: ((t.capexMinLakhs ?? 0) + (t.capexMaxLakhs ?? 0)) / 2,
-    name: t.name,
-    category: t.category,
-    fill: CATEGORY_COLORS[t.category] ?? '#64748b',
-  }));
+  // Calculate medians for tier classification
+  const pcts = enabled.map((t) => t.pctOfTotal).sort((a, b) => a - b);
+  const paybacks = enabled.map((t) => (t.paybackMinYears + t.paybackMaxYears) / 2).sort((a, b) => a - b);
+  const medianPct = pcts[Math.floor(pcts.length / 2)];
+  const medianPayback = paybacks[Math.floor(paybacks.length / 2)];
+
+  // Build bar data
+  const data: BarData[] = enabled.map((t) => {
+    const paybackMid = (t.paybackMinYears + t.paybackMaxYears) / 2;
+    const tier = classifyTier(t.pctOfTotal, paybackMid, medianPct, medianPayback);
+    return {
+      name: t.name.length > 22 ? t.name.substring(0, 20) + '…' : t.name,
+      fullName: t.name,
+      pctOfTotal: t.pctOfTotal,
+      paybackMid,
+      reductionMid: t.reductionMidTonnes,
+      capexMid: ((t.capexMinLakhs ?? 0) + (t.capexMaxLakhs ?? 0)) / 2,
+      tier,
+      color: TIERS[tier].color,
+    };
+  });
+
+  // Sort: Quick Wins first, then Strategic, Easy Wins, Low Priority
+  // Within each tier, sort by pctOfTotal descending
+  const tierOrder: TierKey[] = ['quickWin', 'strategic', 'easyWin', 'lowPriority'];
+  data.sort((a, b) => {
+    const ta = tierOrder.indexOf(a.tier);
+    const tb = tierOrder.indexOf(b.tier);
+    if (ta !== tb) return ta - tb;
+    return b.pctOfTotal - a.pctOfTotal;
+  });
+
+  const chartHeight = Math.max(250, data.length * 34 + 40);
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">Payback vs Impact</CardTitle>
-        <CardDescription className="text-[11px]">X = payback years, Y = CO2 reduction (tCO2e), size = CAPEX</CardDescription>
+        <CardTitle className="text-sm font-semibold">
+          Priority Ranking
+          <InfoTip text="Technologies ranked by priority. Quick Wins (high impact, fast payback) should be implemented first." />
+        </CardTitle>
+        <CardDescription className="text-[11px]">
+          Sorted by priority — implement from top to bottom
+        </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="h-[300px]">
+        <div style={{ height: chartHeight }}>
           <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis type="number" dataKey="x" name="Payback" unit=" yrs" tick={{ fontSize: 11, fill: 'var(--color-foreground)' }} />
-              <YAxis type="number" dataKey="y" name="CO2 Reduction" unit=" t" tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }} />
-              <ZAxis type="number" dataKey="z" range={[80, 600]} name="CAPEX" unit=" L" />
-              <Tooltip
-                cursor={{ strokeDasharray: '3 3' }}
-                formatter={(value, name) => {
-                  const n = String(name);
-                  if (n === 'Payback') return [`${Number(value).toFixed(1)} years`, n];
-                  if (n === 'CO2 Reduction') return [`${Number(value).toFixed(1)} tCO2e`, n];
-                  if (n === 'CAPEX') return [`Rs.${Number(value).toFixed(0)} Lakhs`, n];
-                  return [String(value), n];
-                }}
-                contentStyle={tooltipStyle}
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{ top: 5, right: 50, left: 10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
+              <XAxis
+                type="number"
+                tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }}
+                tickFormatter={(v) => `${Number(v).toFixed(1)}%`}
+                label={{ value: '% of total emissions', position: 'insideBottomRight', offset: -5, fontSize: 10, fill: 'var(--color-muted-foreground)' }}
               />
-              <Scatter data={data} fill="#0f766e">
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={150}
+                tick={{ fontSize: 10, fill: 'var(--color-foreground)' }}
+              />
+              <Tooltip
+                formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Impact']}
+                labelFormatter={(label) => String(label)}
+                contentStyle={chartTheme.tooltipStyle}
+                content={({ active, payload }) => {
+                  if (!active || !payload || payload.length === 0) return null;
+                  const d = payload[0].payload as BarData;
+                  return (
+                    <div style={chartTheme.tooltipStyle}>
+                      <p className="text-xs font-semibold mb-1">{d.fullName}</p>
+                      <p className="text-[11px]" style={{ color: d.color }}>{TIERS[d.tier].label}</p>
+                      <p className="text-[11px] text-muted-foreground">Impact: {d.pctOfTotal.toFixed(1)}% of total</p>
+                      <p className="text-[11px] text-muted-foreground">Reduction: {fmtCO2(d.reductionMid)} tCO2e</p>
+                      <p className="text-[11px] text-muted-foreground">Payback: {d.paybackMid.toFixed(1)} years</p>
+                      {d.capexMid > 0 && <p className="text-[11px] text-muted-foreground">CAPEX: Rs.{d.capexMid.toFixed(0)}L</p>}
+                    </div>
+                  );
+                }}
+              />
+              <Bar dataKey="pctOfTotal" isAnimationActive={false} radius={[0, 4, 4, 0]} barSize={18}>
                 {data.map((entry, i) => (
-                  <circle key={i} fill={entry.fill} />
+                  <Cell key={i} fill={entry.color} fillOpacity={0.85} />
                 ))}
-              </Scatter>
-            </ScatterChart>
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex flex-wrap gap-3 border-t border-border pt-2">
-          {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
-            <div key={cat} className="flex items-center gap-1">
-              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-              <span className="text-[10px] text-muted-foreground">{cat.replace(' - Cross Sector', '').replace('Sector Specific - ', '')}</span>
+
+        {/* Tier legend */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 border-t border-border pt-2 mt-1">
+          {tierOrder.map((key) => (
+            <div key={key} className="flex items-center gap-1.5">
+              <div className="h-2.5 w-5 rounded-sm" style={{ backgroundColor: TIERS[key].color, opacity: 0.85 }} />
+              <span className="text-[10px] text-muted-foreground">{TIERS[key].label}</span>
             </div>
           ))}
         </div>

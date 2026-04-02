@@ -26,6 +26,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
+import { InfoTip } from '@/components/ui/info-tip';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -68,11 +69,13 @@ function ScopeSummaryCard({
   entries,
   scopeColor,
   facilityMap,
+  tooltip,
 }: {
   title: string;
   entries: ScopeEntry[];
   scopeColor: string;
   facilityMap: Map<string, string>;
+  tooltip?: string;
 }) {
   // Group by category, then list entries within each
   const grouped = useMemo(() => {
@@ -88,7 +91,7 @@ function ScopeSummaryCard({
   return (
     <Card className="overflow-hidden">
       <div className={cn('px-4 py-3', scopeColor)}>
-        <h3 className="text-sm font-semibold text-white">{title}</h3>
+        <h3 className="text-sm font-semibold text-white">{title}{tooltip && <> <InfoTip text={tooltip} className="text-white/70 hover:text-white" /></>}</h3>
         <p className="text-xs text-white/80">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</p>
       </div>
       <CardContent className="pt-4">
@@ -352,18 +355,21 @@ export default function StepReview() {
               entries={scope1Data}
               scopeColor="bg-rose-600"
               facilityMap={facilityMap}
+              tooltip="Emissions from sources your company owns or controls: furnaces, vehicles, refrigerants."
             />
             <ScopeSummaryCard
               title="Scope 2 -- Energy"
               entries={scope2Data}
               scopeColor="bg-amber-600"
               facilityMap={facilityMap}
+              tooltip="Emissions from purchased electricity and steam."
             />
             <ScopeSummaryCard
               title="Scope 3 -- Value Chain"
               entries={scope3Data}
               scopeColor="bg-blue-600"
               facilityMap={facilityMap}
+              tooltip="Indirect emissions from your supply chain: raw materials, transport, waste."
             />
           </div>
         );
@@ -372,7 +378,7 @@ export default function StepReview() {
       {/* Data Quality */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold">Data Quality</CardTitle>
+          <CardTitle className="text-sm font-semibold">Data Quality <InfoTip text="Shows the mix of data quality across your entries. Higher primary data percentage means more reliable results." /></CardTitle>
         </CardHeader>
         <CardContent>
           {qualityBreakdown.total > 0 ? (
@@ -381,19 +387,19 @@ export default function StepReview() {
                 <div className="flex h-3 rounded-full overflow-hidden bg-muted">
                   {qualityBreakdown.primary > 0 && (
                     <div
-                      className="bg-emerald-500 transition-all"
+                      className="bg-emerald-500 transition-[width] duration-300"
                       style={{ width: `${(qualityBreakdown.primary / qualityBreakdown.total) * 100}%` }}
                     />
                   )}
                   {qualityBreakdown.secondary > 0 && (
                     <div
-                      className="bg-amber-400 transition-all"
+                      className="bg-amber-400 transition-[width] duration-300"
                       style={{ width: `${(qualityBreakdown.secondary / qualityBreakdown.total) * 100}%` }}
                     />
                   )}
                   {qualityBreakdown.estimated > 0 && (
                     <div
-                      className="bg-red-400 transition-all"
+                      className="bg-red-400 transition-[width] duration-300"
                       style={{ width: `${(qualityBreakdown.estimated / qualityBreakdown.total) * 100}%` }}
                     />
                   )}
@@ -453,7 +459,7 @@ export default function StepReview() {
         <CardContent>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="prod-tonnes">Total Production (tonnes)</Label>
+              <Label htmlFor="prod-tonnes">Total Production (tonnes) <InfoTip text="Annual product output in tonnes. Required to calculate emission intensity (tCO2e per tonne of product) for BRSR reporting." /></Label>
               <Input
                 id="prod-tonnes"
                 type="number"
@@ -465,7 +471,7 @@ export default function StepReview() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="turnover">Annual Turnover (lakh INR)</Label>
+              <Label htmlFor="turnover">Annual Turnover (lakh INR) <InfoTip text="Annual revenue in lakh INR (1 lakh = Rs.1,00,000). Required for revenue-based emission intensity for BRSR." /></Label>
               <Input
                 id="turnover"
                 type="number"

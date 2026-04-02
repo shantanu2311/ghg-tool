@@ -4,14 +4,7 @@ import { ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, Respon
 import type { CombinedImpact } from '@/lib/rec-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Inbox } from 'lucide-react';
-
-const tooltipStyle = {
-  borderRadius: '10px',
-  boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)',
-  padding: '10px 14px',
-  backgroundColor: 'var(--color-card, white)',
-  border: '1px solid var(--color-border)',
-};
+import { chartTheme } from '@/lib/hooks/use-chart-theme';
 
 interface Props {
   impact: CombinedImpact;
@@ -50,12 +43,12 @@ export function SavingsLineChart({ impact }: Props) {
   const paybackYear = annualSavingMid > 0 ? totalCapexMid / annualSavingMid : null;
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-semibold">Cost Savings Over Time</CardTitle>
         <CardDescription className="text-[11px]">
           Cumulative savings vs CAPEX (Rs. Lakhs)
-          {paybackYear !== null && ` -- Payback at ${paybackYear.toFixed(1)} years`}
+          {paybackYear !== null && ` — Payback at ${paybackYear.toFixed(1)} years`}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -67,12 +60,12 @@ export function SavingsLineChart({ impact }: Props) {
               <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }} tickFormatter={(v) => `Rs.${v}L`} />
               <Tooltip
                 formatter={(value, name) => [`Rs.${Number(value).toFixed(0)} Lakhs`, String(name) === 'savings' ? 'Cumulative Savings' : String(name) === 'capex' ? 'Investment' : 'Net Position']}
-                contentStyle={tooltipStyle}
+                contentStyle={chartTheme.tooltipStyle}
               />
-              <ReferenceLine y={data[0].capex} stroke="#ef4444" strokeDasharray="5 5" label={{ value: 'CAPEX', position: 'right', fontSize: 10 }} />
-              <Area type="monotone" dataKey="savings" fill="#d1fae5" stroke="#059669" strokeWidth={2} />
+              <ReferenceLine y={data[0].capex} stroke={chartTheme.accent.capexLine} strokeDasharray="5 5" label={{ value: 'CAPEX', position: 'right', fontSize: 10 }} />
+              <Area type="monotone" dataKey="savings" fill={chartTheme.accent.savingsArea} stroke={chartTheme.accent.savingsLine} strokeWidth={2} />
               {paybackYear !== null && paybackYear <= 10 && (
-                <ReferenceLine x={Math.ceil(paybackYear)} stroke="#0f766e" strokeDasharray="3 3" label={{ value: 'Payback', position: 'top', fontSize: 10 }} />
+                <ReferenceLine x={Math.ceil(paybackYear)} stroke={chartTheme.accent.paybackLine} strokeDasharray="3 3" label={{ value: 'Payback', position: 'top', fontSize: 10 }} />
               )}
             </ComposedChart>
           </ResponsiveContainer>
