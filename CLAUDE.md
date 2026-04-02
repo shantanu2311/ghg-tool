@@ -139,6 +139,8 @@ For each activity data entry:
 - **Prisma v7 client import**: `import { PrismaClient } from '@/generated/prisma/client'`
 - **Prisma v7 PostgreSQL adapter**: Uses `@prisma/adapter-pg` with `pg.Pool` — `new PrismaClient({ adapter: new PrismaPg(pool) })`
 - **Database**: Neon PostgreSQL (free tier, serverless). Connection string in `.env`
+- **AUTH_URL**: Must match the actual dev server port (e.g., `AUTH_URL=http://localhost:3001` if port 3000 is occupied). Mismatch causes NextAuth redirect failures.
+- **Funding seed data**: All 10 schemes (S001-S010) audited against official sources. Key corrections: ADEETIE sectors 5→16, SIDBI PRSF turnover micro/small not small/medium, TEQUP renamed CLCS-TUS, PM Surya Ghar subsidy rates updated, SATAT CBG pricing corrected.
 - **Blueprint corrections**: NCV Diesel=43.0 (not 43.33), CEA national avg=0.710 (not 0.708; regional: N=0.898, W=0.672, S=0.617, E=0.826, NE=0.476), R22 GWP=1760 (not 1810, that was AR4), HFC-134a GWP=1300 (not 1430). See `data/source-audit.xlsx` "Blueprint Corrections" sheet.
 - **Financial Year**: Indian FY is April-March; BRSR reporting follows this
 - **Biogenic CO2**: From biomass combustion — reported separately, NOT added to Scope 1 total (GHG Protocol rule)
@@ -156,8 +158,14 @@ For each activity data entry:
 ### Module 3: Funding Directory
 
 - Standalone page at `/funding` — not tied to any inventory period
+- **Two-panel layout**: Technologies grouped by category on left (w-[340px]), funding schemes on right
+- **Interactive mapping**: Click a tech → connected schemes highlight; click a scheme → connected techs highlight
+- **Context-aware**: When authenticated, filters techs by user's sector/sub-sector, shows eligibility badges on schemes based on turnover bracket and state
+- `showAllTechs` toggle reveals non-relevant technologies (dimmed)
 - Searchable/filterable by status and text search
 - Funding matches also shown per-tech in the recommendations page's right panel
+- API response format: `{ schemes: [...with eligible/relevant flags], context: { sector, subSector, relevantTechIds } | null }`
+- Degrades gracefully when not authenticated (shows all data without context filtering)
 
 ### New Pages (v2)
 
