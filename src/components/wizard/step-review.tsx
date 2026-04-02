@@ -155,6 +155,7 @@ export default function StepReview() {
   const setCalculationResult = useWizardStore((s) => s.setCalculationResult);
   const errors = useWizardStore((s) => s.errors);
   const setErrors = useWizardStore((s) => s.setErrors);
+  const setOrgId = useWizardStore((s) => s.setOrgId);
 
   const [calcStatus, setCalcStatus] = useState('');
 
@@ -209,6 +210,7 @@ export default function StepReview() {
       }
       const orgData = await orgRes.json();
       const organisationId = orgData.id;
+      setOrgId(organisationId);
 
       // 2. Create facilities
       setCalcStatus('Creating facilities...');

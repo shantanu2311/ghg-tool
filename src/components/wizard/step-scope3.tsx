@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useWizardStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { SCOPE3_CATEGORIES } from '@/lib/calc-engine/constants';
 import { useFuelOptions } from '@/lib/hooks/use-fuel-options';
+import { useCustomSources } from '@/lib/hooks/use-custom-sources';
 import type { ActivityEntry } from '@/lib/store';
 import type { FuelOption } from '@/lib/hooks/use-fuel-options';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -22,10 +23,11 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Inbox, ChevronRight, Info } from 'lucide-react';
+import { Plus, Trash2, Inbox, ChevronRight, Info, Beaker } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
 import { InfoTip } from '@/components/ui/info-tip';
 import { DataQualityToggle } from './data-quality-toggle';
+import { CustomSourceDialog } from './custom-source-dialog';
 
 // ── Entry Row ────────────────────────────────────────────────────────────────
 
@@ -302,6 +304,25 @@ export default function StepScope3() {
   const updateActivity = useWizardStore((s) => s.updateActivity);
   const removeActivity = useWizardStore((s) => s.removeActivity);
   const { optionsByCategory, loading } = useFuelOptions(3);
+  const orgId = useWizardStore((s) => s.orgId);
+  const { sources: customSources, refetch: refetchCustomSources } = useCustomSources(orgId ?? undefined);
+  const [customSourceDialogOpen, setCustomSourceDialogOpen] = useState(false);
+
+  // Merge custom sources into source options by category
+  const mergedOptionsByCategory = useMemo(() => {
+    const result: Record<string, FuelOption[]> = {};
+    for (const key of Object.keys(optionsByCategory)) {
+      result[key] = [...optionsByCategory[key]];
+    }
+    for (const cs of customSources.filter((s) => s.scope === 3)) {
+      const cat = cs.sourceCategory || 'custom';
+      if (!result[cat]) result[cat] = [];
+      if (!result[cat].some((o) => o.value === cs.code)) {
+        result[cat].push({ value: cs.code, label: `${cs.name} (custom)`, unit: cs.baseUnit });
+      }
+    }
+    return result;
+  }, [optionsByCategory, customSources]);
 
   const [naCategories, setNaCategories] = useState<Set<string>>(new Set());
 
@@ -378,6 +399,21 @@ export default function StepScope3() {
         </Card>
       )}
 
+      {/* Custom source button */}
+      {orgId && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCustomSourceDialogOpen(true)}
+            className="gap-1.5 text-xs"
+          >
+            <Beaker className="h-3 w-3" />
+            Add Custom Source
+          </Button>
+        </div>
+      )}
+
       {/* Collapsible sections per category */}
       {SCOPE3_CATEGORIES.map((cat) => (
         <CategorySection
@@ -385,7 +421,7 @@ export default function StepScope3() {
           category={cat.value}
           label={cat.label}
           entries={scope3Data.filter((e) => e.sourceCategory === cat.value)}
-          sourceOptions={optionsByCategory[cat.value] ?? []}
+          sourceOptions={mergedOptionsByCategory[cat.value] ?? []}
           facilities={facilities}
           onAdd={() => handleAdd(cat.value)}
           onUpdate={handleUpdate}
@@ -394,6 +430,16 @@ export default function StepScope3() {
           onToggleNA={() => toggleNA(cat.value)}
         />
       ))}
+
+      {/* Custom source dialog */}
+      {orgId && (
+        <CustomSourceDialog
+          orgId={orgId}
+          open={customSourceDialogOpen}
+          onOpenChange={setCustomSourceDialogOpen}
+          onCreated={refetchCustomSources}
+        />
+      )}
     </div>
   );
 }

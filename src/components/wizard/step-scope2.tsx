@@ -1,9 +1,11 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useWizardStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { SCOPE2_CATEGORIES } from '@/lib/calc-engine/constants';
 import { useFuelOptions } from '@/lib/hooks/use-fuel-options';
+import { useCustomSources } from '@/lib/hooks/use-custom-sources';
 import type { ActivityEntry } from '@/lib/store';
 import type { FuelOption } from '@/lib/hooks/use-fuel-options';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardAction } from '@/components/ui/card';
@@ -20,10 +22,11 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Inbox, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Inbox, AlertTriangle, Beaker } from 'lucide-react';
 import { FieldHelpButton } from '@/components/ai/field-help-button';
 import { InfoTip } from '@/components/ui/info-tip';
 import { DataQualityToggle } from './data-quality-toggle';
+import { CustomSourceDialog } from './custom-source-dialog';
 
 // ── Entry Row ────────────────────────────────────────────────────────────────
 
@@ -296,6 +299,25 @@ export default function StepScope2() {
   const updateActivity = useWizardStore((s) => s.updateActivity);
   const removeActivity = useWizardStore((s) => s.removeActivity);
   const { optionsByCategory, loading } = useFuelOptions(2);
+  const orgId = useWizardStore((s) => s.orgId);
+  const { sources: customSources, refetch: refetchCustomSources } = useCustomSources(orgId ?? undefined);
+  const [customSourceDialogOpen, setCustomSourceDialogOpen] = useState(false);
+
+  // Merge custom sources into fuel options by category
+  const mergedOptionsByCategory = useMemo(() => {
+    const result: Record<string, FuelOption[]> = {};
+    for (const key of Object.keys(optionsByCategory)) {
+      result[key] = [...optionsByCategory[key]];
+    }
+    for (const cs of customSources.filter((s) => s.scope === 2)) {
+      const cat = cs.sourceCategory || 'custom';
+      if (!result[cat]) result[cat] = [];
+      if (!result[cat].some((o) => o.value === cs.code)) {
+        result[cat].push({ value: cs.code, label: `${cs.name} (custom)`, unit: cs.baseUnit });
+      }
+    }
+    return result;
+  }, [optionsByCategory, customSources]);
 
   function handleAdd(category: string) {
     const defaultFacilityId = facilities.length > 0 ? facilities[0].id : '';
@@ -358,6 +380,21 @@ export default function StepScope2() {
         </Card>
       )}
 
+      {/* Custom source button */}
+      {orgId && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCustomSourceDialogOpen(true)}
+            className="gap-1.5 text-xs"
+          >
+            <Beaker className="h-3 w-3" />
+            Add Custom Source
+          </Button>
+        </div>
+      )}
+
       {/* One section per category */}
       {SCOPE2_CATEGORIES.map((cat) => (
         <CategorySection
@@ -365,13 +402,23 @@ export default function StepScope2() {
           category={cat.value}
           label={cat.label}
           entries={scope2Data.filter((e) => e.sourceCategory === cat.value)}
-          fuelOptions={optionsByCategory[cat.value] ?? []}
+          fuelOptions={mergedOptionsByCategory[cat.value] ?? []}
           facilities={facilities}
           onAdd={() => handleAdd(cat.value)}
           onUpdate={handleUpdate}
           onRemove={handleRemove}
         />
       ))}
+
+      {/* Custom source dialog */}
+      {orgId && (
+        <CustomSourceDialog
+          orgId={orgId}
+          open={customSourceDialogOpen}
+          onOpenChange={setCustomSourceDialogOpen}
+          onCreated={refetchCustomSources}
+        />
+      )}
     </div>
   );
 }

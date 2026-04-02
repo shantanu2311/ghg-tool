@@ -26,20 +26,19 @@ interface CustomSource {
   notes: string | null;
 }
 
-export function useCustomSources(orgId: string | undefined) {
+export function useCustomSources(orgId?: string | undefined) {
   const [sources, setSources] = useState<CustomSource[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSources = useCallback(async () => {
-    if (!orgId) {
-      setSources([]);
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/custom-sources?orgId=${encodeURIComponent(orgId)}`);
+      const url = orgId
+        ? `/api/custom-sources?orgId=${encodeURIComponent(orgId)}`
+        : '/api/custom-sources';
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch custom sources');
       const data = await res.json();
       setSources(Array.isArray(data) ? data : []);

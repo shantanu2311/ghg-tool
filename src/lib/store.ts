@@ -66,6 +66,9 @@ export interface WizardState {
   // Step 6
   scope3Data: ActivityEntry[];
 
+  // Organisation ID (set after first save — enables custom sources)
+  orgId: string | null;
+
   // Calculation context
   productionTonnes: number | null;
   annualTurnoverLakhInr: number | null;
@@ -93,6 +96,7 @@ export interface WizardActions {
   updateActivity: (scope: Scope, id: string, data: Partial<Omit<ActivityEntry, 'id'>>) => void;
   removeActivity: (scope: Scope, id: string) => void;
 
+  setOrgId: (id: string | null) => void;
   setProductionTonnes: (value: number | null) => void;
   setAnnualTurnover: (value: number | null) => void;
 
@@ -132,6 +136,7 @@ const initialState: WizardState = {
   scope1Data: [],
   scope2Data: [],
   scope3Data: [],
+  orgId: null,
   productionTonnes: null,
   annualTurnoverLakhInr: null,
   calculationResult: null,
@@ -206,6 +211,9 @@ export const useWizardStore = create<WizardState & WizardActions>()(
       [scopeKey(scope)]: s[scopeKey(scope)].filter((e) => e.id !== id),
     })),
 
+  // Organisation ID
+  setOrgId: (id) => set({ orgId: id }),
+
   // Calculation context
   setProductionTonnes: (value) => set({ productionTonnes: value }),
   setAnnualTurnover: (value) => set({ annualTurnoverLakhInr: value }),
@@ -228,6 +236,7 @@ export const useWizardStore = create<WizardState & WizardActions>()(
         scope1Data: state.scope1Data,
         scope2Data: state.scope2Data,
         scope3Data: state.scope3Data,
+        orgId: state.orgId,
         productionTonnes: state.productionTonnes,
         annualTurnoverLakhInr: state.annualTurnoverLakhInr,
         calculationResult: state.calculationResult,
