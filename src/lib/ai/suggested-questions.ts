@@ -102,11 +102,18 @@ export const SUGGESTED_QUESTIONS: Record<string, string[]> = {
 
   // Funding Directory
   funding: [
-    'What government schemes support emission reduction?',
-    'Am I eligible for BEE PAT scheme?',
-    'What is the difference between subsidy and loan schemes?',
-    'How do I apply for MSME technology upgradation fund?',
-    'Are there state-specific funding schemes?',
+    'What is the first step to apply for ADEETIE?',
+    'How much does an energy audit cost, and is it reimbursable?',
+    'Can I get a loan without collateral for energy efficiency equipment?',
+    'What is the difference between ADEETIE and SIDBI 4E?',
+    'How does the EESL ESCO model work — do I pay anything upfront?',
+    'What documents do I need for ADEETIE application?',
+    'Who is my State Designated Agency (SDA)?',
+    'How long does the entire ADEETIE process take?',
+    'What is a DPR and who prepares it?',
+    'Is CGTMSE collateral-free guarantee available for EE loans?',
+    'What subsidy can I get for rooftop solar in my state?',
+    'What is interest subvention and how does it reduce my loan cost?',
   ],
 };
 

@@ -164,7 +164,7 @@ function buildCuratedPlan(
   }
 
   // 2. Process schemes in priority order (most comprehensive first)
-  const schemeOrder = ['S001', 'S004', 'S002', 'S003', 'S006', 'S007', 'S010', 'S005', 'S008', 'S009'];
+  const schemeOrder = ['S001', 'S004', 'S003', 'S010', 'S008', 'S009'];
   const sortedSchemeIds = Array.from(techsByScheme.keys()).sort((a, b) => {
     const ia = schemeOrder.indexOf(a);
     const ib = schemeOrder.indexOf(b);

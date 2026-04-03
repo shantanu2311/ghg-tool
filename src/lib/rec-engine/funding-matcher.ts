@@ -51,7 +51,7 @@ export function matchFunding(input: FundingMatchInput): FundingMatch[] {
     if (!scheme) continue;
 
     // Filter: status
-    if (scheme.status === 'Concluded') continue;
+    if (scheme.status === 'Concluded' || scheme.status === 'Closed') continue;
     if (scheme.status === 'Proposed' && !includeProposed) continue;
 
     // Filter: turnover bracket

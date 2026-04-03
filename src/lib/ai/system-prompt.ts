@@ -290,7 +290,7 @@ IMPORTANT CAVEATS:
 5. Many MSMEs switching from furnace oil to PNG — would reduce intensity ~25-30%
 6. A detailed methodology PDF with full derivations is downloadable from the benchmark section of the dashboard`;
 
-const RECOMMENDATIONS_KNOWLEDGE = `
+export const RECOMMENDATIONS_KNOWLEDGE = `
 EMISSION REDUCTION RECOMMENDATIONS — how the simulator works:
 
 The tool recommends technologies based on the user's actual emission profile. Each technology is matched to specific fuel types and scopes in the user's inventory.
@@ -337,7 +337,7 @@ TECHNOLOGY CATEGORIES:
 - Alternative Fuels: PNG switch, biomass briquettes, CBG, solar thermal, electrification — reduces Scope 1
 
 FUNDING SCHEMES:
-- Technologies may be linked to government funding schemes (ADEETIE, BEE-GEF-UNIDO, SIDBI, PM Surya Ghar, TEQUP, ZED, SATAT, EESL ESCO)
+- Technologies may be linked to government funding schemes (ADEETIE, SIDBI PRSF, SIDBI 4E/MSE-GIFT, SATAT, EESL ESCO, State EE schemes)
 - Schemes provide subsidies, interest subvention, or zero-upfront-cost models
 - Eligibility depends on Udyam registration, sector, state, and turnover bracket
 
@@ -350,85 +350,23 @@ When the user's recommendation data is available in the ANALYSIS DATA section:
 - Mention relevant funding schemes if the technology has matches`;
 
 const FINANCING_KNOWLEDGE = `
-FINANCING JOURNEY — how MSMEs can ACCESS funding (not just what exists):
+FINANCING OVERVIEW — key terms and first steps:
 
-KEY JARGON MSMEs ASK ABOUT:
-- DEA (Detailed Energy Audit): A formal assessment of energy use in a factory by a BEE-certified auditor. Costs ₹50,000–₹2,00,000. Often reimbursed under ADEETIE (up to ₹1L for micro, ₹50K for small/medium).
-- IGEA (Investment Grade Energy Audit): A deeper audit that includes financial analysis (IRR, payback) to justify investment. Required for bank loans. Costs ₹1,00,000–₹5,00,000. Partially reimbursable.
-- DPR (Detailed Project Report): A bankable document prepared after audit — includes technical specs, cost estimates, ROI analysis. Required by banks for term loans. Costs ₹50,000–₹2,00,000.
-- ESCO (Energy Service Company): A company that implements energy efficiency projects at ZERO upfront cost and is paid from the energy savings. EESL is the largest public ESCO in India.
-- M&V (Measurement & Verification): Post-implementation measurement to verify actual energy savings vs projected savings. Done by independent auditor or ESCO.
-- CGTMSE: Credit Guarantee Fund Trust for Micro & Small Enterprises — provides COLLATERAL-FREE loan guarantee up to ₹5 crore. Banks can't ask for property collateral if CGTMSE guarantee is in place.
-- PRSF: Partial Risk Sharing Facility — SIDBI mechanism that shares default risk with banks, making them more willing to lend for energy efficiency projects.
-- SDA: State Designated Agency — the state-level body that implements BEE programs. Examples: MEDA (Maharashtra), GEDA (Gujarat), TEDA (Tamil Nadu), HAREDA (Haryana), KREDL (Karnataka).
-- EOI: Expression of Interest — the first application step for ADEETIE and similar government schemes. Usually a simple form submitted to your SDA.
-- EPC: Engineering, Procurement & Construction — turnkey project delivery model where one contractor handles everything.
-- PPA: Power Purchase Agreement — long-term contract to buy solar/wind power at a fixed rate.
-- RESCO: Renewable Energy Service Company — installs rooftop solar at zero cost and sells you the power at a discounted rate (vs grid tariff).
-
-ADEETIE SCHEME — STEP-BY-STEP PROCESS:
-1. Submit EOI (Expression of Interest) to your State Designated Agency (SDA). Simple 2-page form. Free. Takes 30 minutes.
-2. SDA assigns a BEE-empaneled Energy Auditor for a Detailed Energy Audit (DEA). Cost: ₹50K–₹2L (reimbursable: micro up to ₹1L, small/medium up to ₹50K).
-3. Auditor conducts DEA (2-4 weeks), identifies energy-saving opportunities with payback analysis.
-4. Based on DEA, prepare a DPR (Detailed Project Report) for the selected technologies. Cost: ₹50K–₹2L.
-5. Apply for term loan from bank/SIDBI using DPR. CGTMSE guarantee available for collateral-free loans up to ₹5 crore. SIDBI offers 2-3% interest subvention.
-6. Implement the project (equipment purchase, installation, commissioning). 3-12 months depending on complexity.
-7. Post-implementation M&V audit verifies actual savings. Audit cost reimbursement processed after M&V.
-
-EESL ESCO MODEL — ZERO UPFRONT COST:
-1. Contact EESL or visit eesl.co.in. Request an energy assessment.
-2. EESL conducts preliminary energy assessment (free).
-3. If viable, EESL proposes an Energy Performance Contract (EPC) — they invest, you pay from savings.
-4. EESL installs equipment. No capital expenditure from the MSME.
-5. Savings are shared per the contract (typically 5-7 year term). After contract ends, all savings accrue to the MSME.
-
-SIDBI 4E FINANCING:
-1. Get a DEA/IGEA done (can be done via ADEETIE or independently).
-2. Prepare DPR with technology specs, cost estimates, and projected savings.
-3. Apply to SIDBI directly or through partner banks. SIDBI offers: 2-3% interest subvention, longer tenure (up to 10 years), PRSF risk sharing.
-4. Loan disbursed, equipment procured and installed.
-5. Repay from energy savings. Typical payback: 2-5 years, then pure savings.
-
-SOLAR ROOFTOP (PM SURYA GHAR / RESCO):
-1. Site survey — assess roof area, structural integrity, shadow analysis. Solar installer does this free.
-2. Choose model: CAPEX (you buy, get subsidy up to ₹78,000 for ≤3kW via PM Surya Ghar) or RESCO (zero cost, buy power at discount).
-3. Installation (2-4 weeks). Installer handles permits and net metering application.
-4. Net metering approval from DISCOM. Excess power exported to grid at feed-in tariff.
+KEY JARGON: DEA = Detailed Energy Audit (₹50K–₹2L, reimbursable). DPR = Detailed Project Report (₹30K–₹75K, bankable document for loans). ESCO = Energy Service Company (zero upfront cost model). CGTMSE = Collateral-free loan guarantee up to ₹5 Cr. SDA = State Designated Agency (implements BEE programs). EOI = Expression of Interest (first application step).
 
 FIRST STEP FOR EACH SCHEME:
 - ADEETIE → Submit EOI to your SDA (free, 30 min)
+- SIDBI PRSF → Find a BEE-empaneled ESCO partner
+- SIDBI 4E ��� Get an energy audit done first
 - EESL ESCO → Contact EESL for assessment (free)
-- SIDBI 4E → Get an energy audit done first
-- PM Surya Ghar → Get a site survey from any empaneled solar installer (free)
-- BEE-GEF-UNIDO → Check bee-ind.gov.in for current open calls
-- TEQUP/CLCS-TUS → Apply through MSME DI portal
-- ZED → Register on zed.msme.gov.in
 - SATAT → Submit EOI to MNRE for CBG plant
 - State schemes → Contact your SDA (MEDA/GEDA/TEDA/HAREDA/KREDL)
 
-COMMON FINANCING QUESTIONS:
-Q: I don't have collateral for a loan. Can I still get financing?
-A: Yes. CGTMSE provides collateral-free loan guarantees up to ₹5 crore for micro and small enterprises. The bank cannot ask for property collateral if CGTMSE guarantee is approved. Apply through any CGTMSE-eligible bank.
-
-Q: What does "interest subvention" mean?
-A: The government pays part of your interest. For example, if the bank charges 12% and SIDBI provides 3% subvention, your effective rate is 9%. This is different from a subsidy on equipment cost.
-
-Q: How long does the whole process take?
-A: From EOI to project commissioning: typically 6-18 months. Breakdown: EOI + audit assignment (1-2 months), DEA (1 month), DPR (2-4 weeks), loan approval (1-2 months), implementation (3-12 months).
-
-Q: Is the energy audit cost recoverable?
-A: Under ADEETIE: micro enterprises can recover up to ₹1,00,000 for DEA; small/medium up to ₹50,000. The reimbursement comes after successful M&V (post-implementation audit).
-
-Q: What if I'm not in Iron & Steel — can I still use these schemes?
-A: Yes. ADEETIE covers 16 sectors (textiles, chemicals, food processing, ceramics, etc.). SIDBI and CGTMSE are sector-agnostic. Solar and EESL ESCO work for any MSME.
-
 ANSWERING FINANCING QUESTIONS:
-- Always recommend the FIRST actionable step (e.g. "Submit EOI to your SDA" not "explore ADEETIE")
-- Explain costs and whether they're reimbursable
-- Mention collateral-free options (CGTMSE) proactively — MSMEs worry about this
+- Always recommend the FIRST actionable step
+- Mention collateral-free options (CGTMSE) proactively
 - If the user's state is known, mention their specific SDA by name
-- Link to the /funding page's Action Plan tab for step-by-step details
-- Use the user's sub-sector to recommend the most relevant scheme`;
+- For detailed step-by-step funding guidance, direct the user to open the Ask AI button on the /funding page where the AI has full scheme data`;
 
 // ---------------------------------------------------------------------------
 // Build prompt

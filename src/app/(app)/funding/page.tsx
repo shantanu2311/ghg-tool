@@ -254,7 +254,7 @@ export default function FundingDirectoryPage() {
   const eligibleCount = hasContext ? schemes.filter((s) => s.eligible).length : null;
 
   // Scheme options for action plan selector — filter by eligibility when context exists
-  const schemesWithPlans = ['S001', 'S002', 'S003', 'S004', 'S005', 'S006', 'S007', 'S008', 'S009', 'S010'];
+  const schemesWithPlans = ['S001', 'S003', 'S004', 'S008', 'S009', 'S010'];
   const eligibleSchemesWithPlans = hasContext
     ? schemesWithPlans.filter((sid) => {
         const s = schemes.find((sc) => sc.schemeId === sid);

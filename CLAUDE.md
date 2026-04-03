@@ -82,7 +82,7 @@ src/
   generated/prisma/        # Prisma v7 generated client
 prisma/
   schema.prisma            # 14 models (7 core + 4 reference + 3 module 2/3)
-  seed.ts                  # Reference data seeder (incl. 23 techs, 10 schemes, 56 links)
+  seed.ts                  # Reference data seeder (incl. 23 techs, 6 schemes, 44 links)
 data/
   source-audit.xlsx        # Audit trail: every data point mapped to its source
 ```
@@ -140,7 +140,7 @@ For each activity data entry:
 - **Prisma v7 PostgreSQL adapter**: Uses `@prisma/adapter-pg` with `pg.Pool` — `new PrismaClient({ adapter: new PrismaPg(pool) })`
 - **Database**: Neon PostgreSQL (free tier, serverless). Connection string in `.env`
 - **AUTH_URL**: Must match the actual dev server port (e.g., `AUTH_URL=http://localhost:3001` if port 3000 is occupied). Mismatch causes NextAuth redirect failures.
-- **Funding seed data**: All 10 schemes (S001-S010) audited against official sources. Key corrections: ADEETIE sectors 5→16, SIDBI PRSF turnover micro/small not small/medium, TEQUP renamed CLCS-TUS, PM Surya Ghar subsidy rates updated, SATAT CBG pricing corrected.
+- **Funding seed data**: 6 active schemes (S001, S003, S004, S008, S009, S010) audited against official sources. Removed: S002 BEE-GEF-UNIDO (concluded 2022), S005 PM Surya Ghar (never extended to MSMEs), S006 CLCS-TUS (closed March 2020), S007 ZED (expired March 2026).
 - **Blueprint corrections**: NCV Diesel=43.0 (not 43.33), CEA national avg=0.710 (not 0.708; regional: N=0.898, W=0.672, S=0.617, E=0.826, NE=0.476), R22 GWP=1760 (not 1810, that was AR4), HFC-134a GWP=1300 (not 1430). See `data/source-audit.xlsx` "Blueprint Corrections" sheet.
 - **Financial Year**: Indian FY is April-March; BRSR reporting follows this
 - **Biogenic CO2**: From biomass combustion — reported separately, NOT added to Scope 1 total (GHG Protocol rule)
@@ -153,7 +153,7 @@ For each activity data entry:
 - **Sequential combination**: Reductions applied to residual, NOT additive. 3×20% = 48.8%, not 60%. Sorted by payback ascending. Critical logic in `rec-engine/index.ts:calculateCombinedImpact()`
 - **Client-side recalculation**: `what-if-store.ts` fetches recommendations once via POST, then all toggle/recalculation is client-side using imported pure functions
 - **JSON arrays in DB**: `matchesFuelTypes`, `matchesCategories`, etc. stored as JSON strings in PostgreSQL, parsed in JS (23 techs = trivial)
-- **Seed data**: 23 technologies (T001-T023), 10 funding schemes (S001-S010), 56 tech-funding links
+- **Seed data**: 23 technologies (T001-T023), 6 funding schemes (S001, S003, S004, S008, S009, S010), 44 tech-funding links
 
 ### Module 3: Funding Directory & Financing Journey
 

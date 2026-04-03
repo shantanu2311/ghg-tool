@@ -1822,27 +1822,6 @@ async function main() {
       sourceUrl: 'https://adeetie.beeindia.gov.in/',
     },
     {
-      schemeId: 'S002',
-      name: 'BEE-GEF-UNIDO Programme',
-      implementingAgency: 'BEE + UNIDO + GEF',
-      targetBeneficiary: 'MSMEs in designated programme clusters',
-      supportType: 'Free energy audit + DPR + tech demo',
-      financialDetails: 'GEF grant-funded; zero cost to MSME for audits and DPRs; programme started 2011, largely superseded by ADEETIE (S001) for new applicants',
-      sectorsCovered: JSON.stringify(['iron_steel', 'textiles', 'ceramics', 'dairy', 'brass', 'foundry', 'hand_tools']),
-      eligibilityCriteria: 'MSME in designated programme cluster (26 clusters across 5 sectors: foundry, ceramics, dairy, brass, hand tools)',
-      requiredDocuments: JSON.stringify(['Unit registration in programme cluster', 'Willingness to participate in energy audit']),
-      minEnergySaving: null,
-      turnoverBrackets: JSON.stringify(['micro', 'small', 'medium']),
-      applicableStates: null,
-      status: 'Active',
-      validFrom: null,
-      validTo: null,
-      applicationUrl: 'https://sidhiee.beeindia.gov.in',
-      reportedImpact: '45+ MSMEs ISO 50001 certified; 200+ energy audits completed',
-      source: 'BEE-GEF-UNIDO Programme',
-      sourceUrl: 'https://sidhiee.beeindia.gov.in/ProjectComponent/GEF_UNIDO',
-    },
-    {
       schemeId: 'S003',
       name: 'SIDBI PRSF (Partial Risk Sharing Facility)',
       implementingAgency: 'SIDBI + World Bank + GEF + CTF',
@@ -1869,7 +1848,7 @@ async function main() {
       implementingAgency: 'SIDBI',
       targetBeneficiary: 'Udyam-registered MSMEs',
       supportType: 'Concessional loans for EE/RE',
-      financialDetails: 'Loans Rs 10L-150L per borrower; interest rate 2-3.85% below SIDBI normal lending rate based on credit rating; includes walk-through audit, detailed energy audit, bankable DPR, implementation support',
+      financialDetails: 'Loans Rs 10L-150L per borrower; interest rate 2-3.85% below SIDBI normal lending rate based on credit rating; includes walk-through audit, detailed energy audit, bankable DPR, implementation support. Now operating as MSE-GIFT (MSME Green Investment Finance and Transformation) with GCF USD 215M co-funding for climate-aligned lending.',
       sectorsCovered: JSON.stringify(['iron_steel', 'textiles', 'brick_kilns']),
       eligibilityCriteria: 'Udyam registered; project must demonstrate measurable energy saving (10-25% target)',
       requiredDocuments: JSON.stringify(['Udyam certificate', 'DPR', 'Quotation', 'Energy audit report']),
@@ -1883,69 +1862,6 @@ async function main() {
       reportedImpact: null,
       source: 'SIDBI Green Finance',
       sourceUrl: 'https://www.sidbi.in/en/pages/incentive-schemes-for-green-loans',
-    },
-    {
-      schemeId: 'S005',
-      name: 'PM Surya Ghar (proposed MSME extension)',
-      implementingAgency: 'MNRE',
-      targetBeneficiary: 'Micro enterprises (proposed extension)',
-      supportType: 'Capital subsidy for rooftop solar',
-      financialDetails: 'Currently residential only (Rs 30,000/kW up to 2kW, Rs 78,000 fixed for 3kW+); MSME extension under discussion but no official announcement yet',
-      sectorsCovered: JSON.stringify(['iron_steel', 'textiles', 'brick_kilns']),
-      eligibilityCriteria: 'Micro enterprise; suitable roof area; grid-connected',
-      requiredDocuments: JSON.stringify(['Udyam certificate', 'Electricity connection proof', 'Roof ownership/lease']),
-      minEnergySaving: null,
-      turnoverBrackets: JSON.stringify(['micro']),
-      applicableStates: null,
-      status: 'Proposed',
-      validFrom: null,
-      validTo: null,
-      applicationUrl: 'https://pmsuryaghar.gov.in',
-      reportedImpact: null,
-      source: 'NITI Aayog MSME Roadmap',
-      sourceUrl: 'https://pmsuryaghar.gov.in/',
-    },
-    {
-      schemeId: 'S006',
-      name: 'CLCS-TUS (formerly TEQUP)',
-      implementingAgency: 'MoMSME (DC-MSME)',
-      targetBeneficiary: 'Micro and small enterprises',
-      supportType: 'Capital subsidy for technology upgradation',
-      financialDetails: '15% capital subsidy on institutional finance up to Rs 1 Cr (max subsidy Rs 15L); EE component: 25% subsidy on EE technology (max Rs 10L for project cost up to Rs 40L); product certification: 75% subsidy (max Rs 1.5-2L)',
-      sectorsCovered: JSON.stringify(['iron_steel', 'textiles', 'brick_kilns']),
-      eligibilityCriteria: 'Registered MSME; technology must be for quality/EE improvement; institutional finance availed',
-      requiredDocuments: JSON.stringify(['Udyam certificate', 'Technology supplier invoice', 'Bank loan sanction letter', 'Application form']),
-      minEnergySaving: null,
-      turnoverBrackets: JSON.stringify(['micro', 'small']),
-      applicableStates: null,
-      status: 'Active',
-      validFrom: null,
-      validTo: null,
-      applicationUrl: 'https://msme.gov.in/technology-and-quality-upgradation',
-      reportedImpact: null,
-      source: 'MoMSME CLCS-TUS (merged TEQUP + CLCSS)',
-      sourceUrl: 'https://msme.gov.in/technology-and-quality-upgradation',
-    },
-    {
-      schemeId: 'S007',
-      name: 'ZED Certification Incentive',
-      implementingAgency: 'MoMSME / QCI',
-      targetBeneficiary: 'Udyam-registered MSMEs',
-      supportType: 'Certification + linked subsidies',
-      financialDetails: 'Certification cost subsidy: 80% for Micro, 60% for Small, 50% for Medium (+10% for women/SC/ST entrepreneurs); ISO/BIS/CE reimbursement up to Rs 50K; energy/environment certification reimbursement up to Rs 1L; priority access to other govt subsidies',
-      sectorsCovered: JSON.stringify(['iron_steel', 'textiles', 'brick_kilns']),
-      eligibilityCriteria: 'Udyam registered; willing to undergo ZED assessment',
-      requiredDocuments: JSON.stringify(['Udyam certificate', 'ZED application']),
-      minEnergySaving: null,
-      turnoverBrackets: JSON.stringify(['micro', 'small', 'medium']),
-      applicableStates: null,
-      status: 'Active',
-      validFrom: null,
-      validTo: new Date('2026-03-31'),
-      applicationUrl: 'https://zed.msme.gov.in',
-      reportedImpact: null,
-      source: 'MoMSME ZED',
-      sourceUrl: 'https://zed.msme.gov.in/',
     },
     {
       schemeId: 'S008',
@@ -2012,6 +1928,20 @@ async function main() {
     },
   ];
 
+  // Clean up removed/expired schemes and their related data
+  const removedSchemeIds = ['S002', 'S005', 'S006', 'S007'];
+  const removedSchemes = await prisma.fundingScheme.findMany({
+    where: { schemeId: { in: removedSchemeIds } },
+    select: { id: true, schemeId: true },
+  });
+  if (removedSchemes.length > 0) {
+    const removedIds = removedSchemes.map((s) => s.id);
+    await prisma.actionPlanStep.deleteMany({ where: { schemeId: { in: removedIds } } });
+    await prisma.techFundingLink.deleteMany({ where: { fundingId: { in: removedIds } } });
+    await prisma.fundingScheme.deleteMany({ where: { id: { in: removedIds } } });
+    console.log(`  ✓ Removed ${removedSchemes.length} expired/closed schemes: ${removedSchemes.map((s) => s.schemeId).join(', ')}`);
+  }
+
   console.log('  Seeding funding schemes...');
   for (const scheme of fundingSchemes) {
     await prisma.fundingScheme.upsert({
@@ -2054,55 +1984,45 @@ async function main() {
     }
   }
 
-  // T001 VFDs → S001, S003, S004, S006, S010
+  // T001 VFDs → S001, S003, S004, S010
   addLink('T001', 'S001', 5, null, 'VFDs on BEE ADEETIE approved technology list');
   addLink('T001', 'S003', null, null, 'SIDBI partial credit guarantee for VFD loans');
   addLink('T001', 'S004', null, null, 'SIDBI concessional loan');
-  addLink('T001', 'S006', null, null, 'TEQUP capital subsidy');
   addLink('T001', 'S010', null, null, 'EESL can supply and install VFDs');
 
-  // T002 IE3 Motors → S001, S003, S004, S006, S010
+  // T002 IE3 Motors → S001, S003, S004, S010
   addLink('T002', 'S001', 5, null, 'Motors on ADEETIE approved list');
   addLink('T002', 'S003', null, null, null);
   addLink('T002', 'S004', null, null, null);
-  addLink('T002', 'S006', null, null, null);
   addLink('T002', 'S010', null, null, 'EESL can supply and install motors');
 
-  // T003 EE Boilers → S001, S002, S003, S004
+  // T003 EE Boilers → S001, S003, S004
   addLink('T003', 'S001', 5, null, 'ADEETIE covers boiler upgrades');
-  addLink('T003', 'S002', null, null, 'UNIDO programme covers free DPR (if in cluster)');
   addLink('T003', 'S003', null, null, null);
   addLink('T003', 'S004', null, null, null);
 
-  // T004 WHRS → S001, S002, S003, S004
+  // T004 WHRS → S001, S003, S004
   addLink('T004', 'S001', 5, null, 'ADEETIE interest subvention critical for high capex');
-  addLink('T004', 'S002', null, null, null);
   addLink('T004', 'S003', null, null, null);
   addLink('T004', 'S004', null, null, null);
 
-  // T005 Compressed Air → S001, S003, S006, S010
+  // T005 Compressed Air → S001, S003, S010
   addLink('T005', 'S001', 5, null, null);
   addLink('T005', 'S003', null, null, null);
-  addLink('T005', 'S006', null, null, null);
   addLink('T005', 'S010', null, null, 'EESL can do compressed air audits');
 
-  // T006 LED Lighting → S001, S006, S010
+  // T006 LED Lighting → S001, S010
   addLink('T006', 'S001', 5, null, null);
-  addLink('T006', 'S006', null, null, null);
   addLink('T006', 'S010', null, null, 'EESL primary channel for LED retrofit');
 
-  // T007 Insulation → S001, S002, S006
+  // T007 Insulation → S001
   addLink('T007', 'S001', 5, null, null);
-  addLink('T007', 'S002', null, null, null);
-  addLink('T007', 'S006', null, null, null);
 
-  // T008 ISO 50001 → S002, S007
-  addLink('T008', 'S002', null, null, 'UNIDO provides free ISO 50001 training and certification');
-  addLink('T008', 'S007', null, null, 'ZED alignment');
+  // T008 ISO 50001 → S001
+  addLink('T008', 'S001', 5, null, 'ADEETIE covers ISO 50001 as part of energy management improvement');
 
-  // T009 DBC → S001, S002, S003
+  // T009 DBC → S001, S003
   addLink('T009', 'S001', 5, null, 'Foundry-specific');
-  addLink('T009', 'S002', null, null, 'UNIDO demonstrated in Belgaum/Coimbatore foundry clusters');
   addLink('T009', 'S003', null, null, null);
 
   // T012 EE Induction Furnace → S001, S003, S004
@@ -2110,13 +2030,11 @@ async function main() {
   addLink('T012', 'S003', null, null, null);
   addLink('T012', 'S004', null, null, null);
 
-  // T014 Sand Reclamation → S001, S002, S003
+  // T014 Sand Reclamation → S001, S003
   addLink('T014', 'S001', 5, null, 'Foundry-specific');
-  addLink('T014', 'S002', null, null, null);
   addLink('T014', 'S003', null, null, null);
 
-  // T015 Solar CAPEX → S005, S009, S004
-  addLink('T015', 'S005', 40, null, 'PM Surya Ghar if extended to MSMEs');
+  // T015 Solar CAPEX → S009, S004
   addLink('T015', 'S009', 25, null, 'State-level solar subsidies (e.g. MEDA 25%)');
   addLink('T015', 'S004', null, null, 'SIDBI green loan for solar');
 
@@ -2171,7 +2089,7 @@ async function main() {
       explanation: 'A trained auditor visits your factory for 2-3 days, measures energy use in every machine, furnace, motor, compressor, and lighting system, and writes a report showing where energy is wasted and what can be saved. Think of it as a health check-up for your factory\'s energy use.',
       whoDoesIt: 'BEE-certified Energy Auditor (CEA) or Accredited Energy Auditor (AEA) firm',
       typicalCostInr: '₹50,000–₹2,00,000 (depends on factory size and complexity)',
-      isReimbursed: 'Yes, under ADEETIE: up to ₹1L (medium) / ₹75K (micro/small). Under BEE-GEF-UNIDO: completely free in programme clusters.',
+      isReimbursed: 'Yes, under ADEETIE: up to ₹1L (medium) / ₹75K (micro/small)',
       relatedTerms: JSON.stringify(['IGEA', 'CEA', 'AEA']),
       source: 'BEE ADEETIE Guidelines',
       sourceUrl: 'https://adeetie.beeindia.gov.in',
@@ -2602,125 +2520,6 @@ async function main() {
     sourceUrl: null,
   });
 
-  // ── S005 Solar (RESCO/CAPEX): 4 steps ──
-  addStep('S005', 1, {
-    title: 'Assess Roof Suitability',
-    description: 'Check your factory roof: Is there shadow-free area? (Need ~100 sqft per kWp.) Is the roof structurally strong? (Solar panels add 15-20 kg/sqm.) Most solar companies offer free site surveys — they\'ll visit, assess, and tell you how much capacity your roof can support.',
-    estimatedTime: '1 week',
-    estimatedCost: '₹0 (free site survey by solar companies)',
-    documentsNeeded: JSON.stringify(['Electricity bills (12 months)', 'Roof area estimate', 'Building structure details']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'South-facing roofs get the most sunlight. Even partial shading from a water tank or chimney can reduce output by 20-30%. Share your electricity bills so the installer can size the system correctly.',
-    source: 'MNRE',
-    sourceUrl: null,
-  });
-
-  addStep('S005', 2, {
-    title: 'Choose RESCO (Zero Cost) or CAPEX (Own the Panels)',
-    description: 'RESCO/OPEX model: Developer installs at their cost, you sign a 15-25 year PPA at ₹3-4/kWh (vs grid ₹8-12/kWh). Zero upfront investment. CAPEX model: You buy the panels (₹40-60/Watt), own them immediately, get state subsidies (10-30%), and free electricity after 3-5 year payback. Use SIDBI 4E or ADEETIE loan for CAPEX.',
-    estimatedTime: '1-2 weeks to decide and finalize agreement',
-    estimatedCost: 'RESCO: ₹0 upfront. CAPEX: ₹40-60L for 100 kWp (before subsidies)',
-    documentsNeeded: JSON.stringify(['Roof lease agreement (if rented)', 'Net metering application', 'Electricity connection details']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'If your electricity bill is above ₹1L/month and you plan to operate for 10+ years, CAPEX gives better lifetime returns. If cash flow is tight, RESCO gives instant savings with zero investment.',
-    source: 'MNRE',
-    sourceUrl: null,
-  });
-
-  addStep('S005', 3, {
-    title: 'Installation & Commissioning',
-    description: 'Selected vendor installs solar panels, inverters, and wiring. Process takes 4-8 weeks. Apply for net metering with your DISCOM (they allow you to export excess solar to the grid and get credits on your bill). DISCOM installs a bi-directional meter.',
-    estimatedTime: '4-8 weeks (installation) + 2-4 weeks (net metering approval)',
-    estimatedCost: 'DISCOM meter fee: ₹2,000-5,000',
-    documentsNeeded: JSON.stringify(['DISCOM net metering application', 'Solar system specifications', 'Vendor installation certificate', 'Electrical safety certificate']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Apply for net metering BEFORE installation starts — DISCOM approval can take 2-4 weeks. This way both complete around the same time.',
-    source: 'State DISCOM / MNRE',
-    sourceUrl: null,
-  });
-
-  addStep('S005', 4, {
-    title: 'Start Saving',
-    description: 'Solar panels generate electricity during daylight hours (6-8 hours peak). Your grid bill drops by 30-80% depending on system size. Track generation via the inverter app. Under net metering, excess units are credited to your bill. System requires minimal maintenance (panel cleaning every 2-4 weeks).',
-    estimatedTime: 'Ongoing — system life 25 years',
-    estimatedCost: 'Maintenance: ₹1,000-2,000/month (cleaning + monitoring)',
-    documentsNeeded: null,
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Clean panels regularly — dust reduces output by 10-25% in Indian conditions. Monitor daily generation through the inverter app to catch any issues early.',
-    source: 'MNRE',
-    sourceUrl: null,
-  });
-
-  // ── S002 BEE-GEF-UNIDO Programme: 5 steps ──
-  addStep('S002', 1, {
-    title: 'Check If Your Cluster Is Covered',
-    description: 'The BEE-GEF-UNIDO programme operates in 26 designated clusters across 5 sectors: foundry (Belgaum, Coimbatore, Rajkot, Kolhapur, Howrah), ceramics (Morbi, Khurja, Thanjavur), dairy (Mehsana, Anand), brass (Jamnagar, Moradabad), and hand tools (Jalandhar, Nagaur). Check if your factory is in one of these clusters. Contact the BEE facilitation centre or visit the SIDHIEE portal.',
-    estimatedTime: '15 minutes',
-    estimatedCost: '₹0',
-    documentsNeeded: JSON.stringify(['Factory address / location proof']),
-    actionUrl: 'https://sidhiee.beeindia.gov.in',
-    actionLabel: 'Visit SIDHIEE Portal',
-    tips: 'Even if your cluster isn\'t listed, check with BEE — some clusters have been added over time. If not eligible here, try ADEETIE (S001) which covers 60 clusters in 14 sectors.',
-    source: 'BEE-GEF-UNIDO Programme',
-    sourceUrl: 'https://sidhiee.beeindia.gov.in/ProjectComponent/GEF_UNIDO',
-  });
-
-  addStep('S002', 2, {
-    title: 'Register for Free Energy Audit',
-    description: 'Register with the programme\'s cluster-level facilitation centre. The programme provides a COMPLETELY FREE energy audit by a BEE-empaneled auditor — funded by the GEF grant. No cost to the MSME. The audit covers your entire factory: furnaces, motors, compressors, lighting, and process equipment.',
-    estimatedTime: '1-2 weeks (registration + scheduling)',
-    estimatedCost: '₹0 (fully funded by GEF grant)',
-    documentsNeeded: JSON.stringify(['Udyam certificate', 'Unit registration in cluster', '12 months electricity and fuel bills']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Keep your electricity and fuel bills ready — the auditor will need them. Take photos of your major equipment (nameplates showing capacity/rating) to speed up the audit.',
-    source: 'BEE-GEF-UNIDO Programme',
-    sourceUrl: null,
-  });
-
-  addStep('S002', 3, {
-    title: 'Free DPR Preparation',
-    description: 'After the energy audit identifies savings opportunities, the programme prepares a Detailed Project Report (DPR) at ZERO cost. The DPR includes technology specifications, vendor quotes, cost-benefit analysis, payback period, and financing recommendations. This is a bankable document you can take directly to SIDBI or any bank.',
-    estimatedTime: '2-4 weeks',
-    estimatedCost: '₹0 (fully funded by GEF grant)',
-    documentsNeeded: JSON.stringify(['Energy audit report (provided by programme)', 'Production data']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'The DPR is the most valuable output — it normally costs ₹50K-₹2L. Use it to apply for SIDBI 4E (S004) or ADEETIE (S001) financing.',
-    source: 'BEE-GEF-UNIDO Programme',
-    sourceUrl: null,
-  });
-
-  addStep('S002', 4, {
-    title: 'Technology Demonstration',
-    description: 'For selected technologies, the programme may fund a technology demonstration in your cluster. This lets you see the technology working in a nearby factory before committing to full investment. Technologies demonstrated include efficient furnaces, WHRS, VFDs, and ISO 50001 implementation.',
-    estimatedTime: '1-3 months',
-    estimatedCost: '₹0 (demonstration funded by programme)',
-    documentsNeeded: null,
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Visit demonstration units in your cluster — seeing real results from a neighboring factory is the best way to build confidence in the technology.',
-    source: 'BEE-GEF-UNIDO Programme',
-    sourceUrl: null,
-  });
-
-  addStep('S002', 5, {
-    title: 'Implement with Financing Support',
-    description: 'Use the free DPR to secure financing from SIDBI, CGTMSE (collateral-free guarantee), or commercial banks. The programme provides hand-holding through the financing process. Some units in the programme have also achieved ISO 50001 certification (free training + certification support provided).',
-    estimatedTime: '3-12 months',
-    estimatedCost: 'Varies by technology (use DPR estimates)',
-    documentsNeeded: JSON.stringify(['DPR from programme', 'Bank loan application', 'Udyam certificate', 'Quotations from vendors']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Ask about ISO 50001 certification — the programme offers free training and certification support. ISO 50001 certified units get priority in many government subsidy schemes.',
-    source: 'BEE-GEF-UNIDO Programme',
-    sourceUrl: null,
-  });
-
   // ── S003 SIDBI PRSF: 5 steps ──
   addStep('S003', 1, {
     title: 'Identify an ESCO Partner',
@@ -2730,7 +2529,7 @@ async function main() {
     documentsNeeded: JSON.stringify(['Energy audit report', 'List of identified EE opportunities']),
     actionUrl: 'https://prsf.sidbi.in',
     actionLabel: 'Visit PRSF Portal',
-    tips: 'If you already have an energy audit (from ADEETIE or BEE-GEF-UNIDO), share it with potential ESCOs. It helps them assess the project quickly.',
+    tips: 'If you already have an energy audit (from ADEETIE), share it with potential ESCOs. It helps them assess the project quickly.',
     source: 'SIDBI PRSF',
     sourceUrl: 'https://prsf.sidbi.in/',
   });
@@ -2787,125 +2586,6 @@ async function main() {
     sourceUrl: null,
   });
 
-  // ── S006 CLCS-TUS (TEQUP): 5 steps ──
-  addStep('S006', 1, {
-    title: 'Identify Technology for Upgrade',
-    description: 'CLCS-TUS provides capital subsidy for technology upgradation. Eligible technologies include: EE motors, VFDs, LED lighting, compressed air optimization, waste heat recovery, and other EE equipment. The technology must demonstrably improve quality or energy efficiency. Consult an energy auditor or your industry association for recommendations.',
-    estimatedTime: '1-2 weeks',
-    estimatedCost: '₹0',
-    documentsNeeded: JSON.stringify(['Current equipment inventory', 'Energy audit report (if available)']),
-    actionUrl: 'https://msme.gov.in/technology-and-quality-upgradation',
-    actionLabel: 'Visit MoMSME Portal',
-    tips: 'If you don\'t have an energy audit, get one first via ADEETIE (free/reimbursable). The audit report strengthens your CLCS-TUS application.',
-    source: 'MoMSME CLCS-TUS',
-    sourceUrl: 'https://msme.gov.in/technology-and-quality-upgradation',
-  });
-
-  addStep('S006', 2, {
-    title: 'Get Bank Loan Sanctioned',
-    description: 'CLCS-TUS subsidy is linked to institutional finance (bank loan). Apply for a term loan at any scheduled commercial bank or SIDBI for the technology purchase. Get the loan sanctioned first — the subsidy is provided as a reimbursement on the loan amount. CGTMSE collateral-free guarantee is available for loans up to ₹5 Cr.',
-    estimatedTime: '2-6 weeks',
-    estimatedCost: 'Bank processing fee (~0.5-1% of loan)',
-    documentsNeeded: JSON.stringify(['Udyam certificate', 'Quotation from technology supplier', 'Bank loan application', 'Business plan / financials']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Apply through SIDBI or a bank that knows CLCS-TUS — they can process faster. Mention CGTMSE guarantee to avoid collateral requirements.',
-    source: 'MoMSME CLCS-TUS',
-    sourceUrl: null,
-  });
-
-  addStep('S006', 3, {
-    title: 'Submit Subsidy Application',
-    description: 'After loan sanction, submit the CLCS-TUS application through your nearest MSME-DI (Development Institute) or online portal. The subsidy is: 15% of project cost (max ₹15L) for general technology; 25% (max ₹10L) for EE-specific technology on projects up to ₹40L. Attach the loan sanction letter, supplier quotation, and Udyam certificate.',
-    estimatedTime: '2-4 weeks',
-    estimatedCost: '₹0 (application is free)',
-    documentsNeeded: JSON.stringify(['Udyam certificate', 'Bank loan sanction letter', 'Supplier quotation/proforma invoice', 'CLCS-TUS application form', 'CA certificate for turnover']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'The EE component (25% subsidy) has a lower max project cost (₹40L) but higher subsidy rate. If your project is under ₹40L, apply under the EE component.',
-    source: 'MoMSME CLCS-TUS',
-    sourceUrl: null,
-  });
-
-  addStep('S006', 4, {
-    title: 'Procure & Install Technology',
-    description: 'After application approval, procure the technology from the approved supplier. Install and commission the equipment. Keep all invoices, delivery challans, and installation certificates. The MSME-DI may conduct a site inspection to verify installation.',
-    estimatedTime: '4-12 weeks',
-    estimatedCost: 'As per quotation (loan covers this)',
-    documentsNeeded: JSON.stringify(['Supplier invoice', 'Delivery challan', 'Installation certificate', 'Commissioning report']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Take dated photographs during installation — the MSME-DI inspection team may ask for them. Keep the old equipment records too for before/after comparison.',
-    source: 'MoMSME CLCS-TUS',
-    sourceUrl: null,
-  });
-
-  addStep('S006', 5, {
-    title: 'Receive Subsidy Reimbursement',
-    description: 'After installation verification by MSME-DI, the subsidy amount (15% or 25% of project cost) is credited to your bank loan account, reducing your outstanding principal. This effectively reduces your EMI going forward. Total processing time from application to disbursement: typically 3-6 months.',
-    estimatedTime: '2-3 months (after installation)',
-    estimatedCost: '₹0',
-    documentsNeeded: JSON.stringify(['Installation verification report', 'Bank loan account details', 'Utilization certificate']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Once subsidy is received, ask your bank to recalculate EMI based on reduced principal. The effective cost of technology drops significantly with both subsidy and energy savings.',
-    source: 'MoMSME CLCS-TUS',
-    sourceUrl: null,
-  });
-
-  // ── S007 ZED Certification: 4 steps ──
-  addStep('S007', 1, {
-    title: 'Register on ZED Portal',
-    description: 'Create an account on the ZED portal (zed.msme.gov.in) using your Udyam number. ZED (Zero Defect Zero Effect) is a quality + environment certification by QCI. It has 3 levels: Bronze, Silver, Gold. The certification assessment covers quality systems, energy efficiency, environmental compliance, and safety practices.',
-    estimatedTime: '30 minutes',
-    estimatedCost: '₹0 (registration is free)',
-    documentsNeeded: JSON.stringify(['Udyam certificate', 'PAN card', 'Aadhaar of proprietor/director']),
-    actionUrl: 'https://zed.msme.gov.in',
-    actionLabel: 'Register on ZED Portal',
-    tips: 'ZED certification gives you priority access to other government subsidies (CLCS-TUS, ADEETIE, procurement preference). It\'s worth doing even before applying for financing.',
-    source: 'MoMSME ZED',
-    sourceUrl: 'https://zed.msme.gov.in/',
-  });
-
-  addStep('S007', 2, {
-    title: 'Complete Self-Assessment & Apply',
-    description: 'Complete the online self-assessment questionnaire on the ZED portal. It covers 20 parameters including quality management, energy management, waste management, safety, and customer satisfaction. After self-assessment, apply for ZED certification. Certification cost subsidy: 80% for Micro, 60% for Small, 50% for Medium enterprises.',
-    estimatedTime: '2-3 hours (self-assessment)',
-    estimatedCost: 'Micro: ₹2,000-4,000 (after 80% subsidy). Small: ₹4,000-8,000. Medium: ₹5,000-10,000',
-    documentsNeeded: JSON.stringify(['Quality management documentation', 'Energy consumption data', 'Waste disposal records', 'Safety compliance certificates']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Women/SC/ST entrepreneurs get an additional 10% subsidy on certification cost. Complete the self-assessment honestly — it helps identify improvement areas.',
-    source: 'MoMSME ZED',
-    sourceUrl: null,
-  });
-
-  addStep('S007', 3, {
-    title: 'ZED Assessment & Certification',
-    description: 'QCI assigns a certified assessor who visits your factory. The assessment takes 1-2 days and covers all 20 ZED parameters. Based on the score, you receive Bronze (basic compliance), Silver (good practices), or Gold (excellence). The assessor also provides an improvement roadmap with specific recommendations.',
-    estimatedTime: '4-8 weeks (scheduling + assessment)',
-    estimatedCost: 'Included in certification fee (subsidized)',
-    documentsNeeded: JSON.stringify(['Factory access for assessor', 'All supporting documents', 'Process documentation']),
-    actionUrl: null,
-    actionLabel: null,
-    tips: 'Focus on quick wins before the assessment: proper documentation, energy monitoring, waste segregation, and safety signage. These can boost your score significantly.',
-    source: 'MoMSME ZED',
-    sourceUrl: null,
-  });
-
-  addStep('S007', 4, {
-    title: 'Claim Linked Benefits',
-    description: 'With ZED certification, you unlock multiple benefits: (1) ISO/BIS/CE certification reimbursement up to ₹50K, (2) energy/environment certification reimbursement up to ₹1L, (3) priority access to CLCS-TUS subsidy, (4) procurement preference from government departments, (5) testing/calibration charges reimbursement up to ₹2L.',
-    estimatedTime: 'Ongoing',
-    estimatedCost: '₹0 (these are reimbursements)',
-    documentsNeeded: JSON.stringify(['ZED certificate', 'Invoices for ISO/BIS certification', 'Testing/calibration receipts']),
-    actionUrl: 'https://zed.msme.gov.in',
-    actionLabel: 'Check ZED Benefits',
-    tips: 'Use ZED certification as a stepping stone: get certified → claim testing/ISO reimbursement → apply for CLCS-TUS with priority → get energy audit via ADEETIE. Each step funds the next.',
-    source: 'MoMSME ZED',
-    sourceUrl: null,
-  });
-
   // ── S008 SATAT / National Bioenergy Programme: 5 steps ──
   addStep('S008', 1, {
     title: 'Assess Biomass/CBG Feasibility',
@@ -2935,13 +2615,13 @@ async function main() {
 
   addStep('S008', 3, {
     title: 'Equipment Modification (If Needed)',
-    description: 'Switching from coal/FO to biomass may require minor furnace modifications (grate changes, feeding system). Switching to CBG from PNG requires minimal or no modifications (same pipeline + burner). Cost: ₹2-10L for furnace modifications, ₹0-2L for CBG burner adaptation. These modifications may be eligible for CLCS-TUS (S006) or ADEETIE (S001) financing.',
+    description: 'Switching from coal/FO to biomass may require minor furnace modifications (grate changes, feeding system). Switching to CBG from PNG requires minimal or no modifications (same pipeline + burner). Cost: ₹2-10L for furnace modifications, ₹0-2L for CBG burner adaptation. These modifications may be eligible for ADEETIE (S001) financing.',
     estimatedTime: '2-6 weeks',
     estimatedCost: '₹2-10L for biomass furnace mods; ₹0-2L for CBG adaptation',
     documentsNeeded: JSON.stringify(['Equipment modification plan', 'Supplier quotation', 'Existing furnace/boiler specifications']),
     actionUrl: null,
     actionLabel: null,
-    tips: 'If you need furnace modifications, apply for CLCS-TUS subsidy (15-25% of project cost). For CBG, the switch is usually plug-and-play if you already use PNG.',
+    tips: 'If you need furnace modifications, apply for ADEETIE financing. For CBG, the switch is usually plug-and-play if you already use PNG.',
     source: 'SATAT / MNRE',
     sourceUrl: null,
   });
@@ -3007,7 +2687,7 @@ async function main() {
     documentsNeeded: JSON.stringify(['Udyam certificate', 'DPR or project details', 'Supplier quotation', 'Bank loan sanction letter', 'State application form']),
     actionUrl: null,
     actionLabel: null,
-    tips: 'If your DPR was prepared under ADEETIE or BEE-GEF-UNIDO (free), use it directly for the state subsidy application. No need to prepare a separate one.',
+    tips: 'If your DPR was prepared under ADEETIE (free/reimbursable), use it directly for the state subsidy application. No need to prepare a separate one.',
     source: 'Respective State SDAs',
     sourceUrl: null,
   });

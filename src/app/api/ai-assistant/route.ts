@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUserId, isUserId } from '@/lib/auth-helpers';
 import { buildSystemPrompt, type AssistantContext } from '@/lib/ai/system-prompt';
+import { buildFundingSystemPrompt } from '@/lib/ai/funding-system-prompt';
+import { fetchFundingDataForPrompt } from '@/lib/ai/fetch-funding-data';
 import { getSuggestedQuestions } from '@/lib/ai/suggested-questions';
 
 // ---------------------------------------------------------------------------
@@ -110,7 +112,29 @@ export async function POST(request: NextRequest) {
       analysisSummary: context?.analysisSummary,
     };
 
-    const systemPrompt = buildSystemPrompt(assistantContext);
+    // Context switch: funding/recommendations page → funding-specific prompt
+    const isFundingContext =
+      assistantContext.currentStep === 'funding' ||
+      assistantContext.currentStep === 'recommendations';
+
+    let systemPrompt: string;
+    let maxTokens = 400;
+
+    if (isFundingContext) {
+      const { data, userContext } = await fetchFundingDataForPrompt(userId);
+      systemPrompt = buildFundingSystemPrompt(data, {
+        ...userContext,
+        currentStep: assistantContext.currentStep,
+        state: assistantContext.organisationState || userContext.state,
+        sector: assistantContext.organisationSector || userContext.sector,
+        subSector: assistantContext.organisationSubSector || userContext.subSector,
+        language: assistantContext.language,
+        analysisSummary: assistantContext.analysisSummary,
+      });
+      maxTokens = 600;
+    } else {
+      systemPrompt = buildSystemPrompt(assistantContext);
+    }
 
     // Check for API key
     const apiKey = process.env.OPENAI_API_KEY;
@@ -135,7 +159,7 @@ export async function POST(request: NextRequest) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message.trim() },
         ],
-        max_tokens: 400,
+        max_tokens: maxTokens,
         temperature: 0.3,
       }),
     });
