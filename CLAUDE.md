@@ -72,28 +72,33 @@ src/
     export/
       reduction-plan-pdf.ts  # PDF export for reduction plan
       reduction-plan-word.ts # Word export for reduction plan
+    ai/                    # AI assistant context
+      system-prompt.ts     # buildSystemPrompt() with knowledge base
+      funding-system-prompt.ts # Funding-specific prompt with anti-hallucination rules
+      suggested-questions.ts # Context-aware help questions per step
     db.ts                  # Prisma singleton (PostgreSQL via pg adapter)
     utils.ts               # Utility functions (cn, etc.)
   components/
     wizard/                # Wizard step components
     dashboard/             # Chart & table components
     recommendations/       # Module 2: tech cards, charts, funding panel
+    funding/               # Module 3: curated plan, eligibility, cost waterfall, providers
     ui/                    # Shared UI primitives
   generated/prisma/        # Prisma v7 generated client
 prisma/
-  schema.prisma            # 14 models (7 core + 4 reference + 3 module 2/3)
-  seed.ts                  # Reference data seeder (incl. 23 techs, 6 schemes, 44 links)
+  schema.prisma            # 21 models (4 auth + 7 core + 4 reference + 3 module 2/3 + 3 financing)
+  seed.ts                  # Reference data seeder (incl. 23 techs, 12 schemes, 98 links)
 data/
   source-audit.xlsx        # Audit trail: every data point mapped to its source
 ```
 
-### Database Schema (14 models)
+### Database Schema (21 models)
 
-**Core (7)**: Organisation, Facility, ReportingPeriod, ActivityData, EmissionFactor, CalculatedEmission, Report
-
+**Auth (4)**: User, Account, Session, VerificationToken
+**Core (7)**: Organisation (has userId FK), Facility, ReportingPeriod, ActivityData, EmissionFactor, CalculatedEmission, Report
 **Reference (4)**: FuelProperty, GwpValue, UnitConversion, SectorBenchmark
-
 **Module 2/3 (3)**: ReductionTechnology, FundingScheme, TechFundingLink
+**Financing Journey (3)**: JargonEntry, ActionPlanStep (FK to FundingScheme), ServiceProvider
 
 ### Methodology
 
@@ -140,7 +145,7 @@ For each activity data entry:
 - **Prisma v7 PostgreSQL adapter**: Uses `@prisma/adapter-pg` with `pg.Pool` — `new PrismaClient({ adapter: new PrismaPg(pool) })`
 - **Database**: Neon PostgreSQL (free tier, serverless). Connection string in `.env`
 - **AUTH_URL**: Must match the actual dev server port (e.g., `AUTH_URL=http://localhost:3001` if port 3000 is occupied). Mismatch causes NextAuth redirect failures.
-- **Funding seed data**: 6 active schemes (S001, S003, S004, S008, S009, S010) audited against official sources. Removed: S002 BEE-GEF-UNIDO (concluded 2022), S005 PM Surya Ghar (never extended to MSMEs), S006 CLCS-TUS (closed March 2020), S007 ZED (expired March 2026).
+- **Funding seed data**: 12 schemes (S001-S012) audited against official sources (April 2026). S005 PM Surya Ghar flagged as "Active (residential); Proposed (MSME)" — not yet available for MSMEs. 34 jargon entries, 50 service providers, 53 action plan steps, 98 tech-funding links.
 - **Blueprint corrections**: NCV Diesel=43.0 (not 43.33), CEA national avg=0.710 (not 0.708; regional: N=0.898, W=0.672, S=0.617, E=0.826, NE=0.476), R22 GWP=1760 (not 1810, that was AR4), HFC-134a GWP=1300 (not 1430). See `data/source-audit.xlsx` "Blueprint Corrections" sheet.
 - **Financial Year**: Indian FY is April-March; BRSR reporting follows this
 - **Biogenic CO2**: From biomass combustion — reported separately, NOT added to Scope 1 total (GHG Protocol rule)
@@ -153,20 +158,25 @@ For each activity data entry:
 - **Sequential combination**: Reductions applied to residual, NOT additive. 3×20% = 48.8%, not 60%. Sorted by payback ascending. Critical logic in `rec-engine/index.ts:calculateCombinedImpact()`
 - **Client-side recalculation**: `what-if-store.ts` fetches recommendations once via POST, then all toggle/recalculation is client-side using imported pure functions
 - **JSON arrays in DB**: `matchesFuelTypes`, `matchesCategories`, etc. stored as JSON strings in PostgreSQL, parsed in JS (23 techs = trivial)
-- **Seed data**: 23 technologies (T001-T023), 6 funding schemes (S001, S003, S004, S008, S009, S010), 44 tech-funding links
+- **Seed data**: 23 technologies (T001-T023), 12 funding schemes (S001-S012), 98 tech-funding links
 
 ### Module 3: Funding Directory & Financing Journey
 
 - Standalone page at `/funding` — not tied to any inventory period
-- **3-tab layout**: Action Plan (default) | All Schemes | Find Help
-- **Tab 1 — Action Plan**: Step-by-step guided action plans per scheme (ADEETIE, EESL, SIDBI, Solar). Expandable steps with time/cost estimates, document checklists, jargon auto-linking, tips, and action URLs.
+- **3-tab layout**: Your Plan (default) | All Schemes | Find Help
+- **Tab 1 — Your Plan**: Curated action plan matching user's selected technologies to best funding schemes. Grouped by scheme with sequential steps, expandable with time/cost estimates, document checklists (persistent via localStorage), jargon auto-linking, tips, and action URLs. Includes eligibility questionnaire (CIBIL, NPA, bank relationship, profitability) and stacking tips.
 - **Tab 2 — All Schemes**: Two-panel layout with technologies on left, schemes on right. Interactive mapping (click tech → schemes highlight, click scheme → techs highlight). Context-aware filtering by sector/sub-sector/state/turnover.
-- **Tab 3 — Find Help**: Service provider directory (SDAs, auditors, ESCOs, banks). Filterable by type.
-- **Jargon tooltips**: 15 technical terms (DEA, IGEA, DPR, ESCO, M&V, CGTMSE, etc.) with hover tooltips explaining full form, cost, reimbursement, and who does it. Auto-linked in action plan descriptions.
+- **Tab 3 — Find Help**: Service provider directory (50 providers: SDAs, auditors, ESCOs, banks, portals, consultants). Filterable by type.
+- **Eligibility engine**: `eligibility-engine.ts` evaluates scheme eligibility based on questionnaire answers (CIBIL score, NPA status incl. OTS resolution, bank relationship, profitability, UDYAM registration). Returns status items, next actions, workarounds, and alternative routes.
+- **Eligibility questionnaire**: `eligibility-questionnaire.tsx` — interactive questionnaire with NPA "Resolved (OTS)" option, CIBIL unknown guidance, and adaptive flow.
+- **Jargon tooltips**: 32 technical terms (DEA, IGEA, DPR, ESCO, M&V, CGTMSE, PSB, BRSR, ZED, CBG, OTS, DISCOM, NBFC, FI, etc.) with hover tooltips. Auto-linked in action plan descriptions via `renderWithJargon()` word boundary regex.
 - **JargonProvider**: React context wrapping the funding page, fetches `/api/jargon` once on mount.
-- **Cost calculator**: POST `/api/cost-calculator` with techId + schemeId, returns net cost after subsidy/subvention.
-- **New DB models**: JargonEntry (15 terms), ActionPlanStep (21 steps across 4 schemes), ServiceProvider (12 providers).
-- **Seed data**: 5 SDAs, 3 auditor bodies, 3 financing institutions, 1 portal.
+- **Cost calculator**: POST `/api/cost-calculator` with techId + schemeId, returns net cost after subsidy/subvention. Handles interest subvention (ADEETIE 5%/3% by enterprise size, MSE-GIFT 2%) vs capital subsidy (CLCS-TUS 25%) correctly.
+- **Cost waterfall chart**: Visual breakdown of gross cost → subsidies → net cost per technology-scheme combination.
+- **Document checklist**: Persistent via localStorage keyed by `${schemeId}-${stepNumber}`. Cross-session state preserved.
+- **Stacking tips**: Context-aware tips for combining schemes (ADEETIE + CLCS-TUS + CGTMSE, EE vs RE split, DPR energy saving thresholds). EESL correctly shown as 20% co-payment model (not zero upfront).
+- **New DB models**: JargonEntry (34 terms), ActionPlanStep (53 steps across 12 schemes), ServiceProvider (50 providers).
+- **Seed data**: 50 service providers (SDAs, auditors, ESCOs, banks, portals, consultants), 98 tech-funding links with descriptive notes, all null subsidyPct values filled.
 - `showAllTechs` toggle reveals non-relevant technologies (dimmed)
 - API response format: `{ schemes: [...with eligible/relevant flags], context: { sector, subSector, relevantTechIds } | null }`
 - Degrades gracefully when not authenticated (shows all data without context filtering)
@@ -217,10 +227,22 @@ For each activity data entry:
 - **All API routes**: Encrypt on write, decrypt on read. Auth check via `getAuthenticatedUserId()` from `src/lib/auth-helpers.ts`
 - **Row isolation**: Every query filters by `userId` (direct or via org→period chain). Users cannot see each other's data.
 
-### Database Schema (21 models)
+### AI Assistant
 
-**Auth (4)**: User, Account, Session, VerificationToken
-**Core (7)**: Organisation (has userId FK), Facility, ReportingPeriod, ActivityData, EmissionFactor, CalculatedEmission, Report
-**Reference (4)**: FuelProperty, GwpValue, UnitConversion, SectorBenchmark
-**Module 2/3 (3)**: ReductionTechnology, FundingScheme, TechFundingLink
-**Financing Journey (3)**: JargonEntry, ActionPlanStep (FK to FundingScheme), ServiceProvider
+- Floating action button on all pages (help-fab.tsx + help-panel.tsx)
+- Rate-limited: 30 questions/user/hour
+- System prompt built dynamically with context (current step, fuel type, sub-sector, analysis data)
+- **Funding-aware mode**: When on `/funding` or `/recommendations`, uses `funding-system-prompt.ts` with anti-hallucination rules, scheme database, jargon dictionary, service providers, action plans, and funding stacking knowledge
+- Reads what-if store state: knows which techs are toggled, at what implementation %, and their impacts
+- Hindi language detection (Devanagari replies)
+- Knowledge base: wizard steps, fuel types, sub-sectors, grid regions, data quality, benchmarks, recommendations
+
+### Funding Data Accuracy Notes
+
+- **ADEETIE interest subvention**: 5% for micro/small enterprises, 3% for medium — cost calculator auto-adjusts based on enterprise size
+- **CLCS-TUS**: 25% capital subsidy (max ₹10L), requires 15%+ energy saving from the technology
+- **EESL ESCO**: 20% co-payment model (NOT zero upfront) — available in 12 MSME clusters
+- **MSE-GIFT**: 2% interest subvention + 75% credit guarantee — micro/small only (not medium)
+- **NPA resolution via OTS**: 12-24 month cooling period, "Settled" (not "Closed") on CIBIL for 7 years
+- **Stacking**: ADEETIE (interest subvention) + CLCS-TUS (capital subsidy) + CGTMSE (collateral-free guarantee) confirmed stackable. ADEETIE + MSE-GIFT on same loan uncertain — pick higher one
+- **Turbopack cache**: Corrupted `.sst` files in `.next/dev/cache` can cause 404s — fix with `rm -rf .next`

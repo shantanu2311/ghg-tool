@@ -49,6 +49,15 @@ export function ServiceProviderSearch({ defaultState, className }: ServiceProvid
     ? providers
     : providers.filter((p) => p.type === typeFilter);
 
+  // Sort ADEETIE-registered banks first when viewing banks
+  const sorted = [...filtered].sort((a, b) => {
+    const aAdeetie = a.accreditation?.includes('ADEETIE Registered') ? 0 : 1;
+    const bAdeetie = b.accreditation?.includes('ADEETIE Registered') ? 0 : 1;
+    return aAdeetie - bAdeetie;
+  });
+
+  const adeetieCount = filtered.filter((p) => p.accreditation?.includes('ADEETIE Registered')).length;
+
   return (
     <div className={className}>
       {/* Filter bar */}
@@ -73,6 +82,19 @@ export function ServiceProviderSearch({ defaultState, className }: ServiceProvid
         </p>
       </div>
 
+      {/* ADEETIE bank callout */}
+      {typeFilter === 'bank' && adeetieCount > 0 && (
+        <div className="mb-3 rounded-lg border border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20 px-3 py-2">
+          <p className="text-xs text-emerald-800 dark:text-emerald-300">
+            <strong>{adeetieCount} banks</strong> are registered on the{' '}
+            <a href="https://adeetie.beeindia.gov.in/registered-fis" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
+              ADEETIE portal
+            </a>{' '}
+            with pre-approved interest subvention (5% for Micro/Small, 3% for Medium) for MSME energy efficiency loans.
+          </p>
+        </div>
+      )}
+
       {/* Results */}
       {loading ? (
         <div className="space-y-3">
@@ -80,9 +102,9 @@ export function ServiceProviderSearch({ defaultState, className }: ServiceProvid
             <Skeleton key={i} className="h-24 w-full rounded-lg" />
           ))}
         </div>
-      ) : filtered.length > 0 ? (
+      ) : sorted.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2">
-          {filtered.map((p) => (
+          {sorted.map((p) => (
             <ServiceProviderCard key={p.id} provider={p} />
           ))}
         </div>

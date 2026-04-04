@@ -53,6 +53,8 @@ export function matchFunding(input: FundingMatchInput): FundingMatch[] {
     // Filter: status
     if (scheme.status === 'Concluded' || scheme.status === 'Closed') continue;
     if (scheme.status === 'Proposed' && !includeProposed) continue;
+    // S005 PM Surya Ghar: active for residential only, not yet extended to MSMEs
+    if (scheme.status.includes('Proposed (MSME)') && !includeProposed) continue;
 
     // Filter: turnover bracket
     if (

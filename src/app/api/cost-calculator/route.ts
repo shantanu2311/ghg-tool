@@ -4,10 +4,13 @@ import { prisma } from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { techId, schemeId, projectCostLakhs } = body;
+    const { techId, schemeId, projectCostLakhs, enterpriseSize } = body;
 
     if (!techId || !schemeId) {
       return NextResponse.json({ error: 'techId and schemeId are required' }, { status: 400 });
+    }
+    if (projectCostLakhs != null && projectCostLakhs <= 0) {
+      return NextResponse.json({ error: 'projectCostLakhs must be positive' }, { status: 400 });
     }
 
     // Look up tech for capex range
@@ -38,8 +41,17 @@ export async function POST(request: NextRequest) {
 
     // Calculate costs
     const grossCostLakhs = projectCostLakhs ?? ((tech.capexMinLakhs ?? 0) + (tech.capexMaxLakhs ?? 0)) / 2;
-    const subsidyPct = link?.subsidyPct ?? 0;
+    let subsidyPct = link?.subsidyPct ?? 0;
     const maxSubsidyLakhs = link?.maxAmountLakhs ?? Infinity;
+
+    // ADEETIE: 5% for micro/small, 3% for medium
+    if (schemeId === 'S001' && enterpriseSize === 'medium') {
+      subsidyPct = 3;
+    }
+
+    // Determine tenure first (needed for interest subvention calc)
+    const tenureMonths = grossCostLakhs <= 100 ? 36 : 60;
+    const tenureYears = tenureMonths / 12;
 
     // For interest subvention schemes, estimate total savings over loan tenure
     const isInterestSubvention = scheme.supportType.toLowerCase().includes('interest');
@@ -47,23 +59,37 @@ export async function POST(request: NextRequest) {
     let effectiveRatePct: number | null = null;
 
     if (isInterestSubvention) {
-      // Estimate: subsidyPct interest saving on grossCost over 3 years
+      // Interest subvention: lower rate over full loan tenure, not principal reduction
       const loanAmount = grossCostLakhs * 0.9; // 90% financed
       const annualSaving = loanAmount * (subsidyPct / 100);
-      subsidyAmountLakhs = Math.min(annualSaving * 3, maxSubsidyLakhs);
+      subsidyAmountLakhs = Math.min(annualSaving * tenureYears, maxSubsidyLakhs);
       effectiveRatePct = 10 - subsidyPct; // assuming 10% market rate
     } else {
-      // Capital subsidy
+      // Capital subsidy — reduces principal
       subsidyAmountLakhs = Math.min(grossCostLakhs * (subsidyPct / 100), maxSubsidyLakhs);
     }
 
-    const netCostLakhs = grossCostLakhs - subsidyAmountLakhs;
-    const loanAmountLakhs = netCostLakhs * 0.9;
-    const equityLakhs = netCostLakhs * 0.1;
-    const interestRate = effectiveRatePct ?? 10;
-    const tenureMonths = grossCostLakhs <= 100 ? 36 : 60;
+    // For interest subvention: subsidy reduces interest cost, NOT principal
+    // For capital subsidy: subsidy reduces the project cost directly
+    let loanAmountLakhs: number;
+    let equityLakhs: number;
+    let netCostLakhs: number;
+
+    if (isInterestSubvention) {
+      netCostLakhs = grossCostLakhs; // no principal reduction
+      loanAmountLakhs = grossCostLakhs * 0.9;
+      equityLakhs = grossCostLakhs * 0.1;
+    } else {
+      netCostLakhs = grossCostLakhs - subsidyAmountLakhs;
+      loanAmountLakhs = netCostLakhs * 0.9;
+      equityLakhs = netCostLakhs * 0.1;
+    }
+
+    const interestRate = Math.max(effectiveRatePct ?? 10, 0.5); // floor at 0.5% to avoid division by zero
     const monthlyRate = interestRate / 100 / 12;
-    const monthlyEmiLakhs = loanAmountLakhs * (monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+    const monthlyEmiLakhs = loanAmountLakhs > 0
+      ? loanAmountLakhs * (monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1)
+      : 0;
 
     return NextResponse.json({
       technology: tech.name,

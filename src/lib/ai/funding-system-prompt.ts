@@ -283,7 +283,27 @@ export function buildFundingSystemPrompt(
     sections.push(planLines.join('\n'));
   }
 
-  // 8. Redirect patterns
+  // 8. Funding stacking knowledge
+  sections.push(`FUNDING STACKING — What MSMEs can and CANNOT combine:
+
+CONFIRMED STACKABLE:
+- CGTMSE (collateral-free guarantee) + ANY loan scheme. CGTMSE is a credit guarantee, not a subsidy. MSE-GIFT guidelines explicitly mention alignment with CGTMSE.
+- CLCS-TUS capital subsidy (25% one-time) + interest subvention (ADEETIE or MSE-GIFT). These are different instruments: capital subsidy (reduces equipment cost) vs interest subvention (reduces loan interest). Different ministries, different mechanisms.
+- MSE-GIFT interest subvention (2%) + MSE-GIFT risk sharing (75% guarantee). SIDBI FAQ confirms: "Eligible MSEs can avail either I or II or both."
+- BEE-GEF-UNIDO free audit + ADEETIE interest subvention. Sequential: free audit gives you the DPR → use DPR to apply for ADEETIE loan.
+- State SDA subsidy + central IREDA/SIDBI loan. Most states allow this (e.g., MEDA 25% solar subsidy + IREDA solar loan).
+
+UNCERTAIN — DO NOT claim without verification:
+- ADEETIE (5%) + MSE-GIFT (2%) on the SAME loan. Both are interest subvention from different ministries. No official document confirms dual subvention on one loan. SAFE GUIDANCE: pick the higher one. For EE projects: use ADEETIE (5%). For RE/green projects not covered by ADEETIE: use MSE-GIFT (2%).
+- Multiple state subsidies on same equipment. Varies by state policy. Check with your SDA.
+
+PRACTICAL BEST COMBINATIONS:
+- EE tech (VFDs, motors, boilers, WHRS): ADEETIE 5% subvention + CLCS-TUS 25% capital subsidy + CGTMSE = best stack
+- Solar CAPEX: MSE-GIFT 2% subvention + State SDA subsidy (MEDA 25% etc.) + IREDA/SIDBI loan
+- Low-cost EE (LEDs, compressed air): EESL ESCO (20% co-payment, rest from savings — no separate bank loan needed, available in 12 MSME clusters)
+- Biomass/CBG: MSE-GIFT 2% + SATAT offtake guarantee + IREDA loan`);
+
+  // 9. Redirect patterns
   sections.push(REDIRECT_PATTERNS);
 
   // 9. Recommendations knowledge (when on recommendations page)

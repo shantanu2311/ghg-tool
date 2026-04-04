@@ -7,13 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, ClipboardList, Building2, Users, Sparkles, BookOpen } from 'lucide-react';
+import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, ClipboardList, Building2, Users, Sparkles } from 'lucide-react';
 import { InfoTip } from '@/components/ui/info-tip';
 import { JargonProvider } from '@/components/funding/jargon-provider';
-import { ActionPlan } from '@/components/funding/action-plan';
 import { CuratedPlan } from '@/components/funding/curated-plan';
 import { ServiceProviderSearch } from '@/components/funding/service-provider-search';
-import { CostWaterfall } from '@/components/funding/cost-waterfall';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -58,6 +56,8 @@ interface FundingScheme {
 interface OrgContext {
   sector: string;
   subSector: string;
+  state: string;
+  turnoverBracket: string | null;
   relevantTechIds: string[];
 }
 
@@ -122,8 +122,7 @@ export default function FundingDirectoryPage() {
   const [selectedTechId, setSelectedTechId] = useState<string | null>(null);
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
   const [showAllTechs, setShowAllTechs] = useState(false);
-  const [activeTab, setActiveTab] = useState<'your-plan' | 'scheme-guide' | 'all-schemes' | 'find-help'>('your-plan');
-  const [actionPlanScheme, setActionPlanScheme] = useState('S001'); // Default to ADEETIE
+  const [activeTab, setActiveTab] = useState<'your-plan' | 'all-schemes' | 'find-help'>('your-plan');
 
   useEffect(() => {
     fetch('/api/funding')
@@ -253,25 +252,6 @@ export default function FundingDirectoryPage() {
   // Count eligible schemes
   const eligibleCount = hasContext ? schemes.filter((s) => s.eligible).length : null;
 
-  // Scheme options for action plan selector — filter by eligibility when context exists
-  const schemesWithPlans = ['S001', 'S003', 'S004', 'S008', 'S009', 'S010'];
-  const eligibleSchemesWithPlans = hasContext
-    ? schemesWithPlans.filter((sid) => {
-        const s = schemes.find((sc) => sc.schemeId === sid);
-        return s?.eligible !== false; // show if eligible or unknown (null)
-      })
-    : schemesWithPlans;
-  // Ensure at least ADEETIE is always available (most universal)
-  const displayedPlanSchemes = eligibleSchemesWithPlans.length > 0
-    ? eligibleSchemesWithPlans
-    : ['S001'];
-
-  // Reset selected plan if it's no longer in the displayed list
-  useEffect(() => {
-    if (!displayedPlanSchemes.includes(actionPlanScheme)) {
-      setActionPlanScheme(displayedPlanSchemes[0]);
-    }
-  }, [displayedPlanSchemes, actionPlanScheme]);
 
   /* ---------------------------------------------------------------- */
   /*  Loading skeleton                                                 */
@@ -341,7 +321,6 @@ export default function FundingDirectoryPage() {
       <div className="flex items-center gap-1 border-b border-border">
         {[
           { id: 'your-plan' as const, label: 'Your Plan', icon: Sparkles },
-          { id: 'scheme-guide' as const, label: 'Scheme Guide', icon: BookOpen },
           { id: 'all-schemes' as const, label: 'All Schemes', icon: Building2 },
           { id: 'find-help' as const, label: 'Find Help', icon: Users },
         ].map((tab) => (
@@ -363,70 +342,10 @@ export default function FundingDirectoryPage() {
 
       {/* ═══ TAB 1: Your Plan (Curated) ═══ */}
       {activeTab === 'your-plan' && (
-        <CuratedPlan />
+        <CuratedPlan orgContext={orgContext} />
       )}
 
-      {/* ═══ TAB 2: Scheme Guide ═══ */}
-      {activeTab === 'scheme-guide' && (
-        <div className="space-y-4">
-          {/* Scheme selector */}
-          <div className="flex items-center gap-3">
-            <p className="text-xs text-muted-foreground shrink-0">Show action plan for:</p>
-            <div className="flex flex-wrap gap-1.5">
-              {displayedPlanSchemes.map((sid) => {
-                const s = schemes.find((sc) => sc.schemeId === sid);
-                return (
-                  <button
-                    key={sid}
-                    onClick={() => setActionPlanScheme(sid)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-full text-xs font-medium transition-colors border',
-                      actionPlanScheme === sid
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border text-muted-foreground hover:border-border/80 hover:text-foreground',
-                    )}
-                  >
-                    {s?.name ?? sid}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Action plan component */}
-          <ActionPlan schemeId={actionPlanScheme} />
-
-          {/* Net cost waterfall chart */}
-          {allTechs.length > 0 && schemes.length > 0 && (
-            <CostWaterfall
-              technologies={
-                (hasContext ? relevantTechs : allTechs).map((t) => ({
-                  techId: t.techId,
-                  name: t.name,
-                }))
-              }
-              schemes={schemes.map((s) => ({
-                schemeId: s.schemeId,
-                name: s.name,
-              }))}
-            />
-          )}
-
-          {/* Info note */}
-          <Card>
-            <CardContent className="py-4">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="font-medium text-foreground">Not sure where to start?</span>{' '}
-                ADEETIE is the most widely applicable scheme for Indian MSMEs. It covers 14 sectors across 60 clusters
-                with interest subvention, free energy audits, and DPR support. Submit an Expression of Interest (EOI)
-                as your first step — it takes 30 minutes and costs nothing.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* ═══ TAB 3: All Schemes (existing two-panel layout) ═══ */}
+      {/* ═══ TAB 2: All Schemes (existing two-panel layout) ═══ */}
       {activeTab === 'all-schemes' && <>
 
       {/* Selection summary bar */}
@@ -734,7 +653,7 @@ export default function FundingDirectoryPage() {
       </div>
       </>}
 
-      {/* ═══ TAB 4: Find Help ═══ */}
+      {/* ═══ TAB 3: Find Help ═══ */}
       {activeTab === 'find-help' && (
         <div className="space-y-4">
           <Card>

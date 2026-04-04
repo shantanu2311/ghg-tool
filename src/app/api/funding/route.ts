@@ -133,6 +133,8 @@ export async function GET(request: NextRequest) {
         ? {
             sector: orgContext.sector,
             subSector: orgContext.subSector,
+            state: orgContext.state,
+            turnoverBracket: orgContext.turnoverBracket,
             relevantTechIds: Array.from(relevantTechIds),
           }
         : null,

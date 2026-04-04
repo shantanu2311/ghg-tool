@@ -1,17 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, Circle } from 'lucide-react';
+
+const STORAGE_KEY = 'funding-doc-checklist';
+
+function loadChecked(): Record<string, number[]> {
+  if (typeof window === 'undefined') return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function saveChecked(data: Record<string, number[]>) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch { /* quota exceeded — ignore */ }
+}
 
 interface DocumentChecklistProps {
   documents: string[];
+  /** Stable key to persist checkbox state (e.g. schemeId + stepNumber) */
+  stepKey?: string;
   className?: string;
 }
 
-export function DocumentChecklist({ documents, className }: DocumentChecklistProps) {
+export function DocumentChecklist({ documents, stepKey, className }: DocumentChecklistProps) {
   const [checked, setChecked] = useState<Set<number>>(new Set());
 
-  function toggle(index: number) {
+  // Load persisted state on mount
+  useEffect(() => {
+    if (!stepKey) return;
+    const stored = loadChecked();
+    const indices = stored[stepKey];
+    if (indices?.length) setChecked(new Set(indices));
+  }, [stepKey]);
+
+  const toggle = useCallback((index: number) => {
     setChecked((prev) => {
       const next = new Set(prev);
       if (next.has(index)) {
@@ -19,9 +46,15 @@ export function DocumentChecklist({ documents, className }: DocumentChecklistPro
       } else {
         next.add(index);
       }
+      // Persist
+      if (stepKey) {
+        const stored = loadChecked();
+        stored[stepKey] = Array.from(next);
+        saveChecked(stored);
+      }
       return next;
     });
-  }
+  }, [stepKey]);
 
   const completed = checked.size;
   const total = documents.length;

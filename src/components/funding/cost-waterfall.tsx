@@ -67,6 +67,8 @@ interface CostWaterfallProps {
   defaultTechId?: string;
   defaultSchemeId?: string;
   className?: string;
+  /** Hide tech/scheme selectors — auto-uses defaultTechId + defaultSchemeId */
+  hideSelectors?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -129,6 +131,7 @@ export function CostWaterfall({
   defaultTechId,
   defaultSchemeId,
   className,
+  hideSelectors,
 }: CostWaterfallProps) {
   const [techId, setTechId] = useState(defaultTechId ?? technologies[0]?.techId ?? '');
   const [schemeId, setSchemeId] = useState(defaultSchemeId ?? schemes[0]?.schemeId ?? '');
@@ -185,11 +188,14 @@ export function CostWaterfall({
           </CardTitle>
         </div>
         <CardDescription className="text-[11px]">
-          Select a technology and funding scheme to see the cost waterfall
+          {hideSelectors
+            ? `${technologies.find((t) => t.techId === techId)?.name ?? ''} + ${schemes.find((s) => s.schemeId === schemeId)?.name ?? ''}`
+            : 'Select a technology and funding scheme to see the cost waterfall'}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {/* Selectors */}
+        {!hideSelectors && (
         <div className="flex flex-wrap gap-3 mb-4">
           <Select value={techId} onValueChange={(val) => val && setTechId(val)}>
             <SelectTrigger className="w-[220px]">
@@ -221,6 +227,7 @@ export function CostWaterfall({
             </SelectContent>
           </Select>
         </div>
+        )}
 
         {/* Chart */}
         {loading ? (

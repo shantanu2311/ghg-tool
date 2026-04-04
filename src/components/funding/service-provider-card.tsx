@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, MapPin, Mail } from 'lucide-react';
+import { ExternalLink, MapPin, Mail, Phone } from 'lucide-react';
 
 export interface ServiceProviderData {
   id: string;
@@ -12,6 +12,7 @@ export interface ServiceProviderData {
   sectors: string[] | null;
   accreditation: string | null;
   contactEmail: string | null;
+  contactPhone: string | null;
   website: string | null;
   address: string | null;
 }
@@ -48,7 +49,17 @@ export function ServiceProviderCard({ provider }: { provider: ServiceProviderDat
       </div>
 
       {provider.accreditation && (
-        <p className="text-[11px] text-muted-foreground">{provider.accreditation}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-[11px] text-muted-foreground">{provider.accreditation}</p>
+          {provider.accreditation.includes('ADEETIE Registered') && (
+            <Badge
+              variant="outline"
+              className="text-[9px] border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+            >
+              ADEETIE
+            </Badge>
+          )}
+        </div>
       )}
 
       {provider.services && provider.services.length > 0 && (
@@ -82,6 +93,12 @@ export function ServiceProviderCard({ provider }: { provider: ServiceProviderDat
             <ExternalLink className="h-3 w-3" />
             Website
           </a>
+        )}
+        {provider.contactPhone && (
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+            <Phone className="h-3 w-3" />
+            {provider.contactPhone}
+          </span>
         )}
         {provider.contactEmail && (
           <a

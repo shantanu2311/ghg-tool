@@ -352,7 +352,7 @@ When the user's recommendation data is available in the ANALYSIS DATA section:
 const FINANCING_KNOWLEDGE = `
 FINANCING OVERVIEW — key terms and first steps:
 
-KEY JARGON: DEA = Detailed Energy Audit (₹50K–₹2L, reimbursable). DPR = Detailed Project Report (₹30K–₹75K, bankable document for loans). ESCO = Energy Service Company (zero upfront cost model). CGTMSE = Collateral-free loan guarantee up to ₹5 Cr. SDA = State Designated Agency (implements BEE programs). EOI = Expression of Interest (first application step).
+KEY JARGON: DEA = Detailed Energy Audit (₹50K–₹2L, reimbursable). DPR = Detailed Project Report (₹30K–₹75K, bankable document for loans). ESCO = Energy Service Company (20% co-payment model, rest from savings). CGTMSE = Collateral-free loan guarantee up to ₹5 Cr. SDA = State Designated Agency (implements BEE programs). EOI = Expression of Interest (first application step).
 
 FIRST STEP FOR EACH SCHEME:
 - ADEETIE → Submit EOI to your SDA (free, 30 min)
