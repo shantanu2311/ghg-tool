@@ -5,7 +5,6 @@ import type { InventoryResult } from '@/lib/calc-engine/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import { FileText, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { InfoTip } from '@/components/ui/info-tip';
 
@@ -84,7 +83,16 @@ const DERIVATION_DETAILS: Record<string, { scope1: string; scope2: string; assum
 export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProps) {
   const [benchmark, setBenchmark] = useState<BenchmarkData | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const intensity = result.intensityMetrics.perProduct;
+
+  // Benchmark is gate-to-gate (Scope 1+2 only), so compute intensity
+  // using only Scope 1+2 totals — NOT grandTotal which includes Scope 3.
+  const productionTonnes = result.intensityMetrics.perProduct != null
+    ? result.grandTotal / result.intensityMetrics.perProduct
+    : null;
+  const scope12Total = result.scope1.total + result.scope2Location.total;
+  const intensity = productionTonnes && productionTonnes > 0
+    ? scope12Total / productionTonnes
+    : null;
 
   useEffect(() => {
     async function loadBenchmarks() {
@@ -212,6 +220,11 @@ export default function BenchmarkGauge({ result, subSector }: BenchmarkGaugeProp
           <span className="ml-2 text-xs text-muted-foreground">
             ({intensity.toFixed(4)} tCO2e/t product)
           </span>
+          {result.scope3.total > 0 && result.intensityMetrics.perProduct != null && (
+            <p className="mt-1.5 text-[11px] text-muted-foreground/70">
+              Scope 1+2 only — full intensity incl. Scope 3: {result.intensityMetrics.perProduct.toFixed(4)} tCO2e/t
+            </p>
+          )}
         </div>
 
         {/* Source attribution + details */}

@@ -162,6 +162,13 @@ export function TechCard({ tech, enabled, implementedPct, onToggle, onImplemente
         </div>
       </div>
 
+      {/* End-use target */}
+      {tech.endUseLabel && tech.endUseShare < 1 && (
+        <p className="mt-2 text-[10px] text-muted-foreground/70 italic">
+          Targets: {tech.endUseLabel}
+        </p>
+      )}
+
       {/* ── Expandable Detail Panel (toggled by clicking tech name) ──── */}
       <AnimatePresence initial={false}>
         {showInfo && (
@@ -273,7 +280,7 @@ export function TechCard({ tech, enabled, implementedPct, onToggle, onImplemente
           <Switch
             size="sm"
             checked={implementedPct > 0}
-            onCheckedChange={(checked) => onImplementedChange(checked ? 100 : 0)}
+            onCheckedChange={(checked) => onImplementedChange(checked ? 50 : 0)}
           />
         </div>
         {implementedPct > 0 && (() => {

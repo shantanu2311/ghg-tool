@@ -22,6 +22,27 @@ export async function GET(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
+    // Fast path: return stored InventoryResult if available
+    if (period.resultJson) {
+      const result = JSON.parse(period.resultJson);
+      return NextResponse.json({
+        ...result,
+        period: {
+          id: period.id,
+          startDate: period.startDate,
+          endDate: period.endDate,
+          status: period.status,
+          organisation: {
+            id: period.organisation.id,
+            name: period.organisation.name,
+            sector: period.organisation.sector,
+            subSector: period.organisation.subSector,
+          },
+        },
+      });
+    }
+
+    // Fallback: reconstruct from calculated emissions (pre-migration periods)
     // 2. Fetch calculated emissions with related data
     const calculations = await prisma.calculatedEmission.findMany({
       where: { periodId },

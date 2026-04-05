@@ -7,9 +7,6 @@ import type {
   EmissionFactorData,
   GwpSet,
   UnitConversionData,
-  OrganisationInput,
-  FacilityInput,
-  ActivityDataInput,
 } from '@/lib/calc-engine/types';
 
 // ── GWP Sets ────────────────────────────────────────────────────────────────

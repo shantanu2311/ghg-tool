@@ -73,9 +73,18 @@ export default function KpiCards({ result }: KpiCardsProps) {
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-500" />
                 Scope 3
               </span>
-              <span className="text-sm font-semibold font-mono tabular-nums">{formatNumber(scope3.total)}</span>
+              {scope3.total > 0 ? (
+                <span className="text-sm font-semibold font-mono tabular-nums">{formatNumber(scope3.total)}</span>
+              ) : (
+                <span className="text-xs text-muted-foreground/70 italic">Not reported</span>
+              )}
             </div>
           </div>
+          {scope3.total === 0 && (
+            <p className="mt-2.5 text-[11px] leading-tight text-amber-600 dark:text-amber-400">
+              Actual emissions will be higher once Scope 3 data (purchased goods, transport, waste) is added.
+            </p>
+          )}
         </CardContent>
       </Card>
 

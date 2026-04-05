@@ -107,6 +107,7 @@ model ReportingPeriod {
   endDate        DateTime
   baseYearFlag   Boolean  @default(false)
   status         String   @default("draft") // draft | calculated | finalised
+  resultJson     String?  // Full InventoryResult JSON, stored after calculation
   createdAt      DateTime @default(now())
   activityData        ActivityData[]
   calculatedEmissions CalculatedEmission[]

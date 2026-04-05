@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useWizardStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, RotateCcw, PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import StepOrganisation from '@/components/wizard/step-organisation';
 import StepFacilities from '@/components/wizard/step-facilities';
 import StepPeriod from '@/components/wizard/step-period';
@@ -95,14 +97,26 @@ export default function WizardPage() {
   const setStep = useWizardStore((s) => s.setStep);
   const nextStep = useWizardStore((s) => s.nextStep);
   const prevStep = useWizardStore((s) => s.prevStep);
+  const calculationResult = useWizardStore((s) => s.calculationResult);
+  const reset = useWizardStore((s) => s.reset);
+  const router = useRouter();
   const [direction, setDirection] = useState(0);
-  const prevStepRef = useRef(currentStep);
+  const [showNewAnalysisPrompt, setShowNewAnalysisPrompt] = useState(
+    () => calculationResult !== null
+  );
 
-  // Track direction for animation
-  if (prevStepRef.current !== currentStep) {
-    setDirection(currentStep > prevStepRef.current ? 1 : -1);
-    prevStepRef.current = currentStep;
-  }
+  const handleNewAnalysis = useCallback((keepOrg: boolean) => {
+    reset(keepOrg);
+    setShowNewAnalysisPrompt(false);
+  }, [reset]);
+
+  const handleContinueEditing = useCallback(() => {
+    setShowNewAnalysisPrompt(false);
+  }, []);
+
+  const handleViewDashboard = useCallback(() => {
+    router.push('/dashboard');
+  }, [router]);
 
   const StepComponent = STEP_COMPONENTS[currentStep - 1];
 
@@ -111,6 +125,55 @@ export default function WizardPage() {
     center: { x: 0, opacity: 1 },
     exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
   };
+
+  if (showNewAnalysisPrompt) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <Card className="max-w-lg w-full">
+          <CardContent className="py-8 space-y-5">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold">You have an existing analysis</h2>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Would you like to start a new analysis or continue editing the current one?
+              </p>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <Button
+                onClick={() => handleNewAnalysis(true)}
+                className="gap-2 w-full"
+              >
+                <RotateCcw className="h-4 w-4" />
+                New Analysis (keep organisation &amp; facilities)
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleNewAnalysis(false)}
+                className="gap-2 w-full"
+              >
+                <RotateCcw className="h-4 w-4" />
+                New Analysis (start fresh)
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleContinueEditing}
+                className="gap-2 w-full"
+              >
+                <PenLine className="h-4 w-4" />
+                Continue Editing Current
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={handleViewDashboard}
+                className="w-full text-muted-foreground"
+              >
+                View Dashboard Instead
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-0">
@@ -130,7 +193,10 @@ export default function WizardPage() {
                   step={step}
                   currentStep={currentStep}
                   onClick={() => {
-                    if (step.number <= currentStep) setStep(step.number);
+                    if (step.number <= currentStep) {
+                      setDirection(step.number > currentStep ? 1 : -1);
+                      setStep(step.number);
+                    }
                   }}
                 />
                 {i < STEPS.length - 1 && (
@@ -168,7 +234,7 @@ export default function WizardPage() {
       <div className="flex items-center justify-between pt-6 mt-6 border-t border-border">
         <Button
           variant="outline"
-          onClick={prevStep}
+          onClick={() => { setDirection(-1); prevStep(); }}
           disabled={currentStep === 1}
           className="gap-2"
         >
@@ -176,7 +242,7 @@ export default function WizardPage() {
           Previous
         </Button>
         <Button
-          onClick={nextStep}
+          onClick={() => { setDirection(1); nextStep(); }}
           disabled={currentStep === STEPS.length}
           className="gap-2"
         >

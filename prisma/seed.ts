@@ -1372,11 +1372,11 @@ async function main() {
       applicableSectors: JSON.stringify(['iron_steel']),
       scopeAddressed: 'Scope 1 + Scope 2',
       energyTypeSaved: 'Both',
-      description: 'Implementing ISO 50001 Energy Management System with metering, monitoring, targeting, and continuous improvement. 45+ Indian MSMEs certified under BEE-GEF-UNIDO programme.',
-      energySavingMinPct: 10,
-      energySavingMaxPct: 20,
-      co2ReductionMinPct: 10,
-      co2ReductionMaxPct: 20,
+      description: 'ISO 50001 Energy Management System — metering, monitoring, scheduling, leak detection, and behavioural improvements. Excludes hardware upgrades (covered by specific technology recommendations). 45+ Indian MSMEs certified under BEE-GEF-UNIDO programme. Sources: DOE SEP (74% of EMS savings are operational/no-cost), UNIDO (5-15% with minimal capex in first 1-2 years).',
+      energySavingMinPct: 3,
+      energySavingMaxPct: 5,
+      co2ReductionMinPct: 3,
+      co2ReductionMaxPct: 5,
       paybackMinYears: 1,
       paybackMaxYears: 2,
       capexMinLakhs: 2,
@@ -1451,15 +1451,15 @@ async function main() {
       applicableSectors: JSON.stringify(['iron_steel']),
       scopeAddressed: 'Scope 1',
       energyTypeSaved: 'Thermal',
-      description: 'Shared high-efficiency cogeneration boiler for industrial clusters. Multiple MSMEs share a common facility, achieving economies of scale. 20-35% energy saving vs individual boilers.',
+      description: 'Shared high-efficiency cogeneration boiler for industrial clusters. Multiple MSMEs share a common facility, achieving economies of scale. 20-35% energy saving vs individual boilers. CAPEX shown is per-MSME share (total facility cost ₹5-20 Cr shared across 20-50 units).',
       energySavingMinPct: 20,
       energySavingMaxPct: 35,
       co2ReductionMinPct: 20,
       co2ReductionMaxPct: 35,
       paybackMinYears: 3,
       paybackMaxYears: 5,
-      capexMinLakhs: 500,
-      capexMaxLakhs: 2000,
+      capexMinLakhs: 10,
+      capexMaxLakhs: 100,
       technologyReadiness: 'Commercially mature',
       demonstratedInIndia: true,
       indianClusters: JSON.stringify(['Mandi Gobindgarh']),
@@ -2132,7 +2132,7 @@ async function main() {
   addLink('T007', 'S004', null, null, 'SIDBI concessional loan for insulation upgrade');
 
   // T008 ISO 50001 → S001, S004
-  addLink('T008', 'S001', 5, null, 'ISO 50001 EMS on ADEETIE approved list as energy management improvement. ADEETIE portal data: 10-20% savings, ₹2-10L investment');
+  addLink('T008', 'S001', 5, null, 'ISO 50001 EMS on ADEETIE approved list. Operational savings only (3-5%) — hardware savings counted under specific techs (VFD, LED, etc.)');
   addLink('T008', 'S004', null, null, 'SIDBI concessional loan for ISO 50001 implementation');
 
   // T009 DBC → S001, S003, S004

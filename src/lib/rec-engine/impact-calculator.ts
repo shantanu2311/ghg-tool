@@ -159,5 +159,7 @@ export function calculateTechImpact(input: ImpactInput): TechImpact {
     sourceUrl: tech.sourceUrl,
     warnings,
     reductionSteps: steps,
+    endUseShare: tech.endUseShare,
+    endUseLabel: tech.endUseLabel,
   };
 }

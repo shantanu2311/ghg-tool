@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, ClipboardList, Building2, Users, Sparkles } from 'lucide-react';
+import { ChevronDown, ExternalLink, Landmark, Search, Inbox, FileText, X, Eye, EyeOff, Building2, Users, Sparkles } from 'lucide-react';
 import { InfoTip } from '@/components/ui/info-tip';
 import { JargonProvider } from '@/components/funding/jargon-provider';
 import { CuratedPlan } from '@/components/funding/curated-plan';
@@ -307,7 +307,7 @@ export default function FundingDirectoryPage() {
             <>
               Showing for <span className="font-medium text-foreground">{SECTOR_LABELS[orgContext.sector] ?? orgContext.sector}</span>
               {' '}&middot; {formatSubSector(orgContext.subSector)}
-              {' '}&mdash; {relevantTechs.length} matching technologies &middot; {eligibleCount} eligible schemes
+              {' '}&mdash; {relevantTechs.length} technologies &middot; {eligibleCount} eligible schemes
             </>
           ) : (
             <>

@@ -43,19 +43,6 @@ function heading1(doc: jsPDF, text: string, y: number, page: { n: number }): num
   return y + 8;
 }
 
-function heading2(doc: jsPDF, text: string, y: number, page: { n: number }): number {
-  y = checkPage(doc, y, 12, page);
-  doc.setFontSize(12);
-  doc.setTextColor(6, 95, 70);
-  doc.setFont('helvetica', 'bold');
-  doc.text(text, MARGIN, y);
-  y += 2;
-  doc.setDrawColor(209, 213, 219);
-  doc.setLineWidth(0.2);
-  doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-  return y + 6;
-}
-
 function heading3(doc: jsPDF, text: string, y: number, page: { n: number }): number {
   y = checkPage(doc, y, 10, page);
   doc.setFontSize(10);

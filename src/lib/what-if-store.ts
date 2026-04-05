@@ -19,6 +19,7 @@ interface WhatIfState {
   isLoading: boolean;
   error: string | null;
   selectedTechId: string | null;
+  setupComplete: boolean; // Whether user has done the applicability setup
 }
 
 interface WhatIfActions {
@@ -28,6 +29,7 @@ interface WhatIfActions {
   enableAll: () => void;
   disableAll: () => void;
   selectTech: (techId: string | null) => void;
+  completeSetup: (applicableTechIds: Set<string>, implPcts: Record<string, number>) => void;
   reset: () => void;
 }
 
@@ -45,6 +47,7 @@ const initialState: WhatIfState = {
   isLoading: false,
   error: null,
   selectedTechId: null,
+  setupComplete: false,
 };
 
 function recalculate(
@@ -80,34 +83,19 @@ export const useWhatIfStore = create<WhatIfState & WhatIfActions>()((set, get) =
       const scope2 = result.combinedImpact.baselineScope2Tonnes;
       const scope3 = result.combinedImpact.baselineScope3Tonnes;
 
-      // Auto-enable: recommended option per lever group + all independent techs
-      const autoEnabled = new Set<string>();
-      for (const group of LEVER_GROUPS) {
-        const groupTechs = result.recommendations.filter((r: TechWithFunding) => group.techIds.includes(r.techId));
-        if (groupTechs.length > 0) {
-          const best = pickRecommended(groupTechs);
-          if (best) autoEnabled.add(best);
-        }
-      }
-      for (const r of result.recommendations) {
-        if (!TECH_TO_LEVER[r.techId]) autoEnabled.add(r.techId);
-      }
-
-      // Recalculate with the auto-enabled set (respects lever groups)
-      const autoImpact = calculateCombinedImpact(
-        result.recommendations.filter((r: TechWithFunding) => autoEnabled.has(r.techId)),
-        baseline, scope1, scope2, scope3,
-      );
+      // Don't auto-enable — wait for user to complete applicability setup
+      const emptyImpact = calculateCombinedImpact([], baseline, scope1, scope2, scope3);
 
       set({
         recommendations: result.recommendations,
         notApplicable: result.notApplicable,
-        combinedImpact: autoImpact,
+        combinedImpact: emptyImpact,
         baselineTotal: baseline,
         baselineScope1: scope1,
         baselineScope2: scope2,
         baselineScope3: scope3,
-        enabledTechIds: autoEnabled,
+        enabledTechIds: new Set(),
+        setupComplete: false,
         isLoading: false,
       });
     } catch (err) {
@@ -153,10 +141,16 @@ export const useWhatIfStore = create<WhatIfState & WhatIfActions>()((set, get) =
       for (const id of allGroupTechIds) {
         nextPcts[id] = pct;
       }
-      // If 100% implemented, auto-disable all group techs (no remaining potential)
       if (pct >= 100) {
+        // Fully implemented — auto-disable (no remaining potential)
         for (const id of allGroupTechIds) {
           nextEnabled.delete(id);
+        }
+      } else {
+        // Partial implementation — ensure the tech stays enabled so the
+        // remaining reduction potential appears in the waterfall
+        if (!nextEnabled.has(techId)) {
+          nextEnabled.add(techId);
         }
       }
     }
@@ -196,6 +190,38 @@ export const useWhatIfStore = create<WhatIfState & WhatIfActions>()((set, get) =
     const { recommendations, implementedPcts, baselineTotal, baselineScope1, baselineScope2, baselineScope3 } = get();
     const impact = recalculate(recommendations, new Set(), baselineTotal, baselineScope1, baselineScope2, baselineScope3, implementedPcts);
     set({ enabledTechIds: new Set(), combinedImpact: impact });
+  },
+
+  completeSetup: (applicableTechIds: Set<string>, implPcts: Record<string, number>) => {
+    const { recommendations, baselineTotal, baselineScope1, baselineScope2, baselineScope3 } = get();
+
+    // Enable applicable techs, respecting lever group exclusivity
+    const enabled = new Set<string>();
+    const seenLevers = new Set<string>();
+    // Sort by payback to pick best from lever groups
+    const sorted = recommendations
+      .filter((r) => applicableTechIds.has(r.techId))
+      .sort((a, b) => a.paybackMinYears - b.paybackMinYears);
+
+    for (const tech of sorted) {
+      // Skip 100% implemented techs BEFORE claiming the lever group,
+      // so alternatives in the same group can still be enabled
+      if ((implPcts[tech.techId] ?? 0) >= 100) continue;
+      const lever = TECH_TO_LEVER[tech.techId];
+      if (lever) {
+        if (seenLevers.has(lever)) continue;
+        seenLevers.add(lever);
+      }
+      enabled.add(tech.techId);
+    }
+
+    const impact = recalculate(recommendations, enabled, baselineTotal, baselineScope1, baselineScope2, baselineScope3, implPcts);
+    set({
+      enabledTechIds: enabled,
+      implementedPcts: implPcts,
+      combinedImpact: impact,
+      setupComplete: true,
+    });
   },
 
   selectTech: (techId: string | null) => set({ selectedTechId: techId }),

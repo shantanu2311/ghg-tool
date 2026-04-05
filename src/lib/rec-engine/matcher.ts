@@ -5,6 +5,7 @@
 import type { ActivityDataInput, CalculationRecord, FuelPropertyData } from '@/lib/calc-engine/types';
 import type { TechnologyData, MatchedTechnology } from './types';
 import { KWH_TO_GJ } from '@/lib/calc-engine/constants';
+import { getEndUseShare, getEndUseLabel } from './end-use-splits';
 
 interface MatchInput {
   organisation: { sector: string; subSector: string };
@@ -103,12 +104,20 @@ export function matchTechnologies(input: MatchInput): {
       continue;
     }
 
+    // Apply end-use share: scale matched emissions to only the portion this tech addresses
+    // E.g., LED targets "lighting" which is 2% of electricity in an induction furnace plant
+    const primaryFuel = matchedFuelTypes[0] ?? 'GRID_ELECTRICITY';
+    const endUseShare = getEndUseShare(tech.techId, organisation.sector, organisation.subSector, primaryFuel);
+    const endUseLabel = getEndUseLabel(tech.techId, organisation.sector, organisation.subSector, primaryFuel);
+
     matched.push({
       ...tech,
-      matchedEmissionsTonnes: matchedEmissions,
-      matchedEnergyGj: matchedEnergyGj,
+      matchedEmissionsTonnes: matchedEmissions * endUseShare,
+      matchedEnergyGj: matchedEnergyGj * endUseShare,
       matchedFuelTypes,
       matchedCategories,
+      endUseShare,
+      endUseLabel,
     });
   }
 

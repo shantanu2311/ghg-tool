@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { useWizardStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 import { SCOPE1_CATEGORIES } from '@/lib/calc-engine/constants';
 import { useFuelOptions } from '@/lib/hooks/use-fuel-options';
 import { useCustomSources } from '@/lib/hooks/use-custom-sources';
@@ -12,7 +11,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardAction }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import {

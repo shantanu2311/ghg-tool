@@ -192,7 +192,6 @@ function EntryRow({
 // ── Collapsible Category Section ─────────────────────────────────────────────
 
 function CategorySection({
-  category,
   label,
   entries,
   sourceOptions,
@@ -254,7 +253,7 @@ function CategorySection({
             <Switch
               size="sm"
               checked={notApplicable}
-              onCheckedChange={(checked) => {
+              onCheckedChange={() => {
                 onToggleNA();
               }}
             />

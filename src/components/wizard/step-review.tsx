@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert } from '@/components/ui/alert';
 import {
   AlertTriangle,
   AlertCircle,
@@ -153,6 +152,7 @@ export default function StepReview() {
   const setIsCalculating = useWizardStore((s) => s.setIsCalculating);
   const calculationResult = useWizardStore((s) => s.calculationResult);
   const setCalculationResult = useWizardStore((s) => s.setCalculationResult);
+  const setLastCalculatedPeriodId = useWizardStore((s) => s.setLastCalculatedPeriodId);
   const errors = useWizardStore((s) => s.errors);
   const setErrors = useWizardStore((s) => s.setErrors);
   const setOrgId = useWizardStore((s) => s.setOrgId);
@@ -279,6 +279,7 @@ export default function StepReview() {
 
       // 6. Store result
       setCalculationResult(result);
+      setLastCalculatedPeriodId(periodId);
       setCalcStatus('Done!');
 
       // Show calculation errors (unmatched EFs, conversion failures) as warnings

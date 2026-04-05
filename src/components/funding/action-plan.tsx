@@ -29,19 +29,29 @@ export function ActionPlan({ schemeId, className }: ActionPlanProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
+
     fetch(`/api/action-plans/${schemeId}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load action plan');
         return res.json();
       })
       .then((data) => {
-        setScheme(data.scheme);
-        setSteps(data.steps);
+        if (!cancelled) {
+          setScheme(data.scheme);
+          setSteps(data.steps);
+          setError(null);
+          setLoading(false);
+        }
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message);
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
   }, [schemeId]);
 
   if (loading) {

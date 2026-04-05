@@ -114,7 +114,6 @@ interface Props {
 export function EligibilityQuestionnaire({
   answers,
   onChange,
-  orgContext,
   hasEETechs,
   hasRETechs,
   hasBioTechs,

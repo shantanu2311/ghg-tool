@@ -75,6 +75,9 @@ export interface WizardState {
   calculationResult: InventoryResult | null;
   isCalculating: boolean;
   errors: string[];
+
+  // Multi-analysis: track which period was last calculated
+  lastCalculatedPeriodId: string | null;
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
@@ -104,7 +107,8 @@ export interface WizardActions {
   setIsCalculating: (value: boolean) => void;
   setErrors: (errors: string[]) => void;
 
-  reset: () => void;
+  setLastCalculatedPeriodId: (id: string | null) => void;
+  reset: (keepOrg?: boolean) => void;
 }
 
 // ── Defaults ───────────────────────────────────────────────────────────────
@@ -142,6 +146,7 @@ const initialState: WizardState = {
   calculationResult: null,
   isCalculating: false,
   errors: [],
+  lastCalculatedPeriodId: null,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -223,8 +228,17 @@ export const useWizardStore = create<WizardState & WizardActions>()(
   setIsCalculating: (value) => set({ isCalculating: value }),
   setErrors: (errors) => set({ errors }),
 
-  // Reset
-  reset: () => set({ ...initialState, organisation: { ...defaultOrganisation }, period: { ...defaultPeriod } }),
+  // Multi-analysis
+  setLastCalculatedPeriodId: (id) => set({ lastCalculatedPeriodId: id }),
+
+  // Reset (keepOrg: true preserves org/facilities for repeat analyses)
+  reset: (keepOrg) => set((s) => ({
+    ...initialState,
+    organisation: keepOrg ? s.organisation : { ...defaultOrganisation },
+    facilities: keepOrg ? s.facilities : [],
+    period: { ...defaultPeriod },
+    orgId: keepOrg ? s.orgId : null,
+  })),
 }),
     {
       name: 'ghg-wizard-store',
@@ -240,6 +254,7 @@ export const useWizardStore = create<WizardState & WizardActions>()(
         productionTonnes: state.productionTonnes,
         annualTurnoverLakhInr: state.annualTurnoverLakhInr,
         calculationResult: state.calculationResult,
+        lastCalculatedPeriodId: state.lastCalculatedPeriodId,
       }),
     }
   )

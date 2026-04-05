@@ -106,7 +106,44 @@ export function BeforeAfterChart({ impact }: Props) {
                 dot={{ r: 4, fill: chartTheme.beforeAfter.trend, stroke: chartTheme.beforeAfter.trend }}
                 isAnimationActive={false}
                 legendType="none"
-              />
+              >
+                <LabelList
+                  dataKey="trend"
+                  position="insideBottomRight"
+                  content={({ index, x, y, viewBox }) => {
+                    // Only render the label once — at the midpoint between the two dots
+                    if (index !== 0) return null;
+                    const vb = viewBox as { width?: number } | undefined;
+                    const midX = Number(x) + (Number(vb?.width ?? 0)) / 2;
+                    const midY = Number(y) + 30;
+                    return (
+                      <g>
+                        <rect
+                          x={midX - 36}
+                          y={midY - 10}
+                          width={72}
+                          height={20}
+                          rx={4}
+                          fill="var(--color-background)"
+                          stroke={chartTheme.beforeAfter.trend}
+                          strokeWidth={1}
+                          opacity={0.95}
+                        />
+                        <text
+                          x={midX}
+                          y={midY + 4}
+                          textAnchor="middle"
+                          fontSize={11}
+                          fontWeight={600}
+                          fill={chartTheme.beforeAfter.trend}
+                        >
+                          ↓ {reductionPct}%
+                        </text>
+                      </g>
+                    );
+                  }}
+                />
+              </Line>
             </ComposedChart>
           </ResponsiveContainer>
         </div>

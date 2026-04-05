@@ -18,7 +18,7 @@ import {
 } from './aggregator';
 import { runCrossChecks } from './cross-check';
 import { calculateDataQuality } from './data-quality';
-import { mapToBrsr } from './brsr-mapper';
+
 
 /**
  * Run the full GHG inventory calculation.

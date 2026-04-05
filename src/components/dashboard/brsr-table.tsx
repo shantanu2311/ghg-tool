@@ -49,7 +49,7 @@ export default function BrsrTable({ result }: BrsrTableProps) {
                 </tr>
               </thead>
               <tbody>
-                {BRSR_FIELDS.map((f, i) => {
+                {BRSR_FIELDS.map((f) => {
                   const value = brsr[f.field as keyof BrsrOutput];
                   return (
                     <tr

@@ -75,12 +75,29 @@ export interface BlockReason {
   workaroundLabel?: string;
 }
 
+export type CriterionStatus = 'pass' | 'fail' | 'warning' | 'unknown';
+
+export interface SchemeCriterion {
+  label: string;
+  status: CriterionStatus;
+  severity?: 'soft' | 'hard';
+  detail?: string;
+  detailUrl?: string;
+  detailLabel?: string;
+  /** Step group for sequential display (e.g. 'scheme', 'financial') */
+  group?: string;
+  /** Field key for deduplication across schemes (e.g. 'hasEnergyAudit', 'isNpa') */
+  field?: string;
+}
+
 export interface SchemeEligibility {
   schemeId: string;
   schemeName: string;
   verdict: Verdict;
   reasons: BlockReason[];
   missingInfo: (keyof EligibilityAnswers)[];
+  /** All criteria checked — pass, fail, warning, or unknown */
+  criteria: SchemeCriterion[];
 }
 
 export interface AlternativeRoute {
@@ -184,10 +201,26 @@ export function isSection1Complete(answers: EligibilityAnswers): boolean {
   return SECTION1_FIELDS.every((k) => answers[k] !== null);
 }
 
-export function getCompletionPct(answers: EligibilityAnswers): number {
-  const allFields = Object.keys(EMPTY_ANSWERS) as (keyof EligibilityAnswers)[];
-  const answered = allFields.filter((k) => answers[k] !== null).length;
-  return Math.round((answered / allFields.length) * 100);
+export function getCompletionPct(
+  answers: EligibilityAnswers,
+  techFlags?: { hasEETechs: boolean; hasRETechs: boolean; hasGasTechs: boolean },
+): number {
+  // Only count fields that are actually shown to the user
+  const relevantFields: (keyof EligibilityAnswers)[] = [
+    // Section 1 — always shown
+    'hasUdyam', 'operatingYears', 'isCashProfitable', 'isNpa', 'enterpriseSize', 'hasCollateral',
+    // Section 2 — always shown
+    'hasGstRegistration', 'itrFiledYears', 'cibilScore', 'hasChequeBouncesRecent',
+    // Section 3 — universal
+    'hasEnergyAudit', 'hasDPR', 'hasVendorQuotes', 'hasBankRelationship',
+  ];
+  // Section 3 — conditional
+  if (techFlags?.hasEETechs) relevantFields.push('inAdeetieCluster');
+  if (techFlags?.hasRETechs) relevantFields.push('hasRoofSpace');
+  if (techFlags?.hasGasTechs) relevantFields.push('hasPngAccess');
+
+  const answered = relevantFields.filter((k) => answers[k] !== null).length;
+  return Math.round((answered / relevantFields.length) * 100);
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,6 +278,61 @@ const BEE_GEF_SECTORS = [
   'brass', 'chemicals', 'forging', 'foundry',
 ];
 
+/**
+ * ADEETIE cluster states by sector — auto-detect from user's facility state.
+ * Source: adeetie.beeindia.gov.in cluster list (April 2026).
+ * Not exhaustive at district level, but if state + sector matches, likely in a cluster.
+ */
+const ADEETIE_CLUSTER_STATES: Record<string, string[]> = {
+  iron_steel: ['West Bengal', 'Punjab', 'Rajasthan', 'Gujarat', 'Maharashtra', 'Jharkhand', 'Chhattisgarh', 'Tamil Nadu', 'Karnataka'],
+  forging: ['Punjab', 'Rajasthan', 'Tamil Nadu', 'Maharashtra'],
+  casting_foundry: ['West Bengal', 'Punjab', 'Rajasthan', 'Gujarat', 'Tamil Nadu', 'Maharashtra', 'Karnataka'],
+  textiles: ['Tamil Nadu', 'Gujarat', 'Maharashtra', 'Rajasthan', 'Uttar Pradesh'],
+  ceramics: ['Gujarat', 'Rajasthan', 'West Bengal'],
+  brick_kilns: ['Uttar Pradesh', 'Bihar', 'West Bengal', 'Punjab', 'Haryana'],
+  dairy: ['Gujarat', 'Maharashtra', 'Rajasthan', 'Karnataka'],
+  brass: ['Uttar Pradesh', 'Rajasthan'],
+  chemicals: ['Gujarat', 'Maharashtra', 'Tamil Nadu'],
+};
+
+/** Check if user's state + sector likely maps to an ADEETIE cluster */
+function isLikelyInAdeetieCluster(sector: string | undefined, state: string | undefined): boolean | null {
+  if (!sector || !state) return null;
+  // Map sub-sectors to their ADEETIE parent
+  const sectorMap: Record<string, string> = {
+    eaf_mini_mill: 'iron_steel', induction_furnace: 'iron_steel',
+    re_rolling: 'iron_steel', forging: 'forging', casting_foundry: 'casting_foundry',
+  };
+  const effectiveSector = sectorMap[sector] ?? sector;
+  const states = ADEETIE_CLUSTER_STATES[effectiveSector];
+  if (!states) return null;
+  return states.includes(state);
+}
+
+/** Convert a negative block label into a positive pass label */
+function derivePassLabel(field: keyof EligibilityAnswers, blockLabel: string): string {
+  const passLabels: Partial<Record<keyof EligibilityAnswers, string>> = {
+    hasUdyam: 'Udyam registration',
+    operatingYears: 'Operating years requirement',
+    isCashProfitable: 'Cash profitability',
+    isNpa: 'No active loan default (NPA)',
+    enterpriseSize: 'Enterprise size eligible',
+    hasCollateral: 'Collateral available',
+    hasGstRegistration: 'GST registered',
+    itrFiledYears: 'ITR filing history',
+    cibilScore: 'CIBIL score acceptable',
+    hasChequeBouncesRecent: 'No recent cheque bounces',
+    hasEnergyAudit: 'Energy audit completed',
+    hasDPR: 'Detailed Project Report ready',
+    hasVendorQuotes: 'Vendor quotations available',
+    hasBankRelationship: 'Existing bank relationship',
+    inAdeetieCluster: 'In eligible cluster',
+    hasRoofSpace: 'Roof space available for solar',
+    hasPngAccess: 'PNG pipeline access',
+  };
+  return passLabels[field] ?? blockLabel;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Per-scheme eligibility rules                                       */
 /* ------------------------------------------------------------------ */
@@ -270,8 +358,19 @@ export function evaluateScheme(
 ): SchemeEligibility {
   const reasons: BlockReason[] = [];
   const missingInfo: (keyof EligibilityAnswers)[] = [];
+  const criteria: SchemeCriterion[] = [];
 
-  // Helper: add a reason or track missing info
+  // Field → group mapping: scheme-specific vs financial
+  const FINANCIAL_FIELDS: Set<keyof EligibilityAnswers> = new Set([
+    'isNpa', 'cibilScore', 'isCashProfitable', 'hasGstRegistration',
+    'hasChequeBouncesRecent', 'hasBankRelationship', 'hasCollateral', 'itrFiledYears',
+  ]);
+
+  function groupFor(field: keyof EligibilityAnswers): 'scheme' | 'financial' {
+    return FINANCIAL_FIELDS.has(field) ? 'financial' : 'scheme';
+  }
+
+  // Helper: add a reason or track missing info, AND track the criterion
   function check(
     field: keyof EligibilityAnswers,
     severity: 'soft' | 'hard',
@@ -281,12 +380,29 @@ export function evaluateScheme(
     workaroundUrl?: string,
     workaroundLabel?: string,
   ) {
+    // Derive a positive label for passing criteria
+    const passLabel = derivePassLabel(field, label);
+    const group = groupFor(field);
+
     if (answers[field] === null) {
       missingInfo.push(field);
+      criteria.push({ label: passLabel, status: 'unknown', group, field });
       return;
     }
     if (condition()) {
       reasons.push({ field, label, severity, workaround, workaroundUrl, workaroundLabel });
+      criteria.push({
+        label,
+        status: severity === 'hard' ? 'fail' : 'warning',
+        severity,
+        detail: workaround,
+        detailUrl: workaroundUrl,
+        detailLabel: workaroundLabel,
+        group,
+        field,
+      });
+    } else {
+      criteria.push({ label: passLabel, status: 'pass', group, field });
     }
   }
 
@@ -306,19 +422,37 @@ export function evaluateScheme(
       'Resolve NPA through One Time Settlement (OTS) with your existing bank, then reapply',
     );
     if (answers.isNpa === 'resolved') {
+      const resolvedWorkaround = 'After OTS settlement, the NPA shows as "Settled" (not "Closed") on your CIBIL for 7 years. Banks typically want 12-24 months of clean history post-OTS before approving new loans. Focus on: (1) building 12+ months clean bank statements, (2) improving CIBIL above 650, (3) filing ITR regularly. In the meantime, EESL ESCO (20% co-payment, no credit check) is available in 12 clusters.';
       reasons.push({
         field: 'isNpa',
         label: 'NPA resolved — banks may need 12-24 months cooling period',
         severity: 'soft',
-        workaround: 'After OTS settlement, the NPA shows as "Settled" (not "Closed") on your CIBIL for 7 years. Banks typically want 12-24 months of clean history post-OTS before approving new loans. Focus on: (1) building 12+ months clean bank statements, (2) improving CIBIL above 650, (3) filing ITR regularly. In the meantime, EESL ESCO (20% co-payment, no credit check) is available in 12 clusters.',
+        workaround: resolvedWorkaround,
+      });
+      criteria.push({
+        label: 'NPA resolved — banks may need 12-24 months cooling period',
+        status: 'warning',
+        severity: 'soft',
+        detail: resolvedWorkaround,
+        group: 'financial',
+        field: 'isNpa',
       });
     }
     if (answers.isNpa === 'unsure') {
+      const unsureWorkaround = 'Check with your existing bank whether any loan is classified as NPA (overdue 90+ days). If yes, resolve via OTS before applying for new loans.';
       reasons.push({
         field: 'isNpa',
         label: 'NPA status unknown — verify before applying',
         severity: 'soft',
-        workaround: 'Check with your existing bank whether any loan is classified as NPA (overdue 90+ days). If yes, resolve via OTS before applying for new loans.',
+        workaround: unsureWorkaround,
+      });
+      criteria.push({
+        label: 'NPA status unknown — verify before applying',
+        status: 'warning',
+        severity: 'soft',
+        detail: unsureWorkaround,
+        group: 'financial',
+        field: 'isNpa',
       });
     }
   };
@@ -326,97 +460,121 @@ export function evaluateScheme(
   // ── Scheme-specific rules ──
   switch (schemeId) {
     case 'S001': // ADEETIE
+      // ── Scheme eligibility ──
       checkUdyam();
-      checkNpa();
       check('operatingYears', 'soft', 'Less than 3 years in operation',
         () => answers.operatingYears === '<1' || answers.operatingYears === '1-3',
         'Some banks are flexible with CGTMSE cover. Also consider MSE-GIFT (no age restriction, 75% guarantee, 2% subvention) — may be a better fit for newer units.',
       );
-      check('isCashProfitable', 'soft', 'No cash profit in last 2 years',
-        () => answers.isCashProfitable === 'none',
-        'If your cash flow is positive (despite accounting losses), explain to the lender. Energy savings from the project itself improve your cash flow.',
-      );
-      if (answers.isCashProfitable === 'unsure') {
-        reasons.push({
-          field: 'isCashProfitable',
-          label: 'Profit status uncertain — check your P&L before applying',
-          severity: 'soft',
-          workaround: 'Check your last 2 years\' Profit & Loss statements (your CA will have them). Banks need cash profit in at least 1 of last 2 years. If unsure, ask your CA — "Am I cash profitable after adding back depreciation?"',
-        });
+      // Cluster — auto-detect from state if possible
+      {
+        const autoCluster = isLikelyInAdeetieCluster(orgContext?.subSector ?? orgContext?.sector, orgContext?.state);
+        if (autoCluster === true) {
+          criteria.push({ label: `In ADEETIE cluster (${orgContext?.state} — auto-detected from your facility)`, status: 'pass', group: 'scheme', field: 'inAdeetieCluster' });
+        } else if (autoCluster === false) {
+          criteria.push({
+            label: `Your state (${orgContext?.state}) does not have ADEETIE clusters for your sector`,
+            status: 'fail', severity: 'hard',
+            detail: 'ADEETIE only operates in designated clusters. Use MSE-GIFT (pan-India, 2% subvention + 75% guarantee) or SIDBI 4E instead.',
+            group: 'scheme',
+            field: 'inAdeetieCluster',
+          });
+          reasons.push({ field: 'inAdeetieCluster', label: `No ADEETIE cluster in ${orgContext?.state} for your sector`, severity: 'hard', workaround: 'Use MSE-GIFT (pan-India) or SIDBI 4E instead.' });
+        } else {
+          check('inAdeetieCluster', 'soft', answers.inAdeetieCluster === 'unsure' ? 'ADEETIE cluster status unknown — verify before applying' : 'Not in an ADEETIE-eligible cluster',
+            () => answers.inAdeetieCluster !== 'yes',
+            answers.inAdeetieCluster === 'unsure'
+              ? 'Check if your district is in one of 60 ADEETIE clusters at adeetie.beeindia.gov.in. If not, use MSE-GIFT (pan-India) or SIDBI 4E instead.'
+              : 'ADEETIE covers 60 clusters across 14 sectors. If you\'re not in one, use MSE-GIFT (pan-India) or SIDBI 4E instead.',
+            'https://adeetie.beeindia.gov.in',
+            'Check Cluster List',
+          );
+        }
       }
-      check('cibilScore', 'soft', answers.cibilScore === 'unknown' ? 'CIBIL score unknown — check before applying' : 'CIBIL score below 650',
-        () => answers.cibilScore === 'below_650' || answers.cibilScore === 'unknown',
-        answers.cibilScore === 'unknown'
-          ? 'Check your CIBIL score free at cibil.com (once a year). Banks use this to set your interest rate. Above 700 is ideal; below 650 may need CGTMSE cover.'
-          : 'Apply through an ADEETIE-registered PSB (SBI, BOB, PNB) with CGTMSE cover — PSBs are more flexible on CIBIL than private banks.',
-      );
       check('hasEnergyAudit', 'soft', 'No energy audit done yet',
         () => answers.hasEnergyAudit === false,
         'Get an IGEA through an ADEETIE empaneled auditor. Cost (₹50K–₹2L) is reimbursed after M&V.',
         'https://adeetie.beeindia.gov.in/accredited-energy-audit-agencies',
         'Find Empaneled Auditors',
       );
-      check('inAdeetieCluster', 'soft', answers.inAdeetieCluster === 'unsure' ? 'ADEETIE cluster status unknown — verify before applying' : 'Not in an ADEETIE-eligible cluster',
-        () => answers.inAdeetieCluster !== 'yes',
-        answers.inAdeetieCluster === 'unsure'
-          ? 'Check if your district is in one of 60 ADEETIE clusters at adeetie.beeindia.gov.in. If not, use MSE-GIFT (pan-India) or SIDBI 4E instead.'
-          : 'ADEETIE covers 60 clusters across 14 sectors. If you\'re not in one, use MSE-GIFT (pan-India) or SIDBI 4E instead.',
-        'https://adeetie.beeindia.gov.in',
-        'Check Cluster List',
-      );
+
+      // ── Financial profile ──
+      checkNpa();
       check('hasGstRegistration', 'soft', 'No GST registration',
         () => answers.hasGstRegistration === false,
-        'Banks require GST registration for loan processing. Register at gst.gov.in (free, takes 7-10 days). Some banks may proceed with application while GST is being processed.',
+        'Banks require GST registration for loan processing. Register at gst.gov.in (free, takes 7-10 days).',
       );
+      check('cibilScore', 'soft', answers.cibilScore === 'unknown' ? 'CIBIL score unknown — check before applying' : 'CIBIL score below 650',
+        () => answers.cibilScore === 'below_650' || answers.cibilScore === 'unknown',
+        answers.cibilScore === 'unknown'
+          ? 'Check your CIBIL score free at cibil.com (once a year). Above 700 is ideal; below 650 may need CGTMSE cover.'
+          : 'Apply through an ADEETIE-registered PSB (SBI, BOB, PNB) with CGTMSE cover — PSBs are more flexible on CIBIL than private banks.',
+      );
+      check('isCashProfitable', 'soft', 'No cash profit in last 2 years',
+        () => answers.isCashProfitable === 'none',
+        'If your cash flow is positive (despite accounting losses), explain to the lender. Energy savings from the project itself improve your cash flow.',
+      );
+      if (answers.isCashProfitable === 'unsure') {
+        const profitWorkaround = 'Check your last 2 years\' Profit & Loss statements. Banks need cash profit in at least 1 of last 2 years.';
+        reasons.push({ field: 'isCashProfitable', label: 'Profit status uncertain — check your P&L before applying', severity: 'soft', workaround: profitWorkaround });
+        criteria.push({ label: 'Profit status uncertain — check your P&L before applying', status: 'warning', severity: 'soft', detail: profitWorkaround, group: 'financial', field: 'isCashProfitable' });
+      }
       check('hasChequeBouncesRecent', 'soft', 'Recent cheque bounces on record',
         () => answers.hasChequeBouncesRecent === true,
-        'Maintain 6 months of clean bank statements before applying. Banks check CIBIL for cheque bounce history. Apply through a PSB (SBI, PNB) — they are more lenient on recent bounces with CGTMSE cover.',
+        'Maintain 6 months of clean bank statements before applying. Apply through a PSB — more lenient with CGTMSE cover.',
       );
       break;
 
     case 'S002': // BEE-GEF-UNIDO
+      // Step 1: Sector check (auto from org)
       if (orgContext?.sector && !BEE_GEF_SECTORS.includes(orgContext.sector)) {
-        reasons.push({
-          field: 'hasUdyam', // proxy
-          label: 'Your sector is not covered by BEE-GEF-UNIDO',
-          severity: 'hard',
-          workaround: 'This programme covers 9 sectors (iron & steel, textiles, foundry, etc.). Your sector is not included.',
-        });
+        reasons.push({ field: 'hasUdyam', label: 'Your sector is not covered by BEE-GEF-UNIDO', severity: 'hard', workaround: 'This programme covers 9 sectors (iron & steel, textiles, foundry, etc.). Your sector is not included.' });
+        criteria.push({ label: 'Your sector is not covered by BEE-GEF-UNIDO', status: 'fail', severity: 'hard', detail: 'This programme covers 9 sectors (iron & steel, textiles, foundry, etc.). Your sector is not included.', group: 'scheme', field: 'sector' });
+      } else if (orgContext?.sector) {
+        criteria.push({ label: 'Sector covered by programme', status: 'pass', group: 'scheme', field: 'sector' });
       }
-      checkNpa();
+      // ── Scheme eligibility ──
       checkUdyam('soft');
-      check('inAdeetieCluster', 'soft', answers.inAdeetieCluster === 'unsure' ? 'Programme cluster status unknown — verify before applying' : 'May not be in a BEE-GEF-UNIDO programme cluster',
-        () => answers.inAdeetieCluster !== 'yes',
-        answers.inAdeetieCluster === 'unsure'
-          ? 'Check if your district is in one of 26 programme clusters at sidhiee.beeindia.gov.in.'
-          : 'The 26 programme clusters are a subset of ADEETIE clusters. Check sidhiee.beeindia.gov.in for your district.',
-        'https://sidhiee.beeindia.gov.in',
-        'Check Cluster List',
-      );
+      // Cluster — auto-detect (always prefer over stored answers)
+      {
+        const autoCluster = isLikelyInAdeetieCluster(orgContext?.subSector ?? orgContext?.sector, orgContext?.state);
+        if (autoCluster === true) {
+          criteria.push({ label: `In programme cluster (${orgContext?.state} — auto-detected)`, status: 'pass', group: 'scheme', field: 'inAdeetieCluster' });
+        } else if (autoCluster === false) {
+          criteria.push({ label: `Your state does not have programme clusters for your sector`, status: 'fail', severity: 'hard', detail: 'This programme only operates in designated clusters.', group: 'scheme', field: 'inAdeetieCluster' });
+          reasons.push({ field: 'inAdeetieCluster', label: 'Not in a programme cluster', severity: 'hard', workaround: 'This programme only operates in designated clusters.' });
+        } else {
+          check('inAdeetieCluster', 'soft', answers.inAdeetieCluster === 'unsure' ? 'Programme cluster status unknown' : 'May not be in a programme cluster',
+            () => answers.inAdeetieCluster !== 'yes',
+            'Check if your district is in one of 26 programme clusters at sidhiee.beeindia.gov.in.',
+            'https://sidhiee.beeindia.gov.in', 'Check Cluster List',
+          );
+        }
+      }
+      // ── Financial profile ──
+      checkNpa();
       break;
 
     case 'S003': // SIDBI PRSF
+      // ── Scheme eligibility ──
       check('enterpriseSize', 'hard', 'Medium enterprises not eligible (Micro/Small only)',
         () => answers.enterpriseSize === 'medium',
         'SIDBI PRSF is for Micro and Small only. Use ADEETIE or SIDBI 4E instead — both cover Medium enterprises.',
-      );
-      checkNpa();
-      check('cibilScore', 'soft', 'CIBIL score below 650',
-        () => answers.cibilScore === 'below_650',
-        'SIDBI has its own credit assessment. Apply with a strong DPR showing clear energy savings.',
       );
       check('operatingYears', 'soft', 'Less than 2 years in operation',
         () => answers.operatingYears === '<1',
         'SIDBI PRSF typically needs some operating history. Consider MSE-GIFT or EESL ESCO instead.',
       );
+      // ── Financial profile ──
+      checkNpa();
+      check('cibilScore', 'soft', 'CIBIL score below 650',
+        () => answers.cibilScore === 'below_650',
+        'SIDBI has its own credit assessment. Apply with a strong DPR showing clear energy savings.',
+      );
       break;
 
     case 'S004': // SIDBI 4E
-      checkNpa();
-      check('isCashProfitable', 'hard', 'No cash profit in last 2 years',
-        () => answers.isCashProfitable === 'none',
-        'SIDBI 4E requires cash profit. Consider EESL ESCO (no profit history needed) or cash-flow based lending.',
-      );
+      // ── Scheme eligibility ──
       check('operatingYears', 'hard', 'Less than 3 years in operation',
         () => answers.operatingYears === '<1' || answers.operatingYears === '1-3',
         'SIDBI 4E needs 3+ years. Use MSE-GIFT (no age restriction) or EESL ESCO instead.',
@@ -425,23 +583,32 @@ export function evaluateScheme(
         () => answers.hasEnergyAudit === false,
         'SIDBI arranges audits through ISTSL at subsidised rates (₹30K–₹45K). Or get a free audit via BEE-GEF-UNIDO.',
       );
+      // ── Financial profile ──
+      checkNpa();
+      check('isCashProfitable', 'hard', 'No cash profit in last 2 years',
+        () => answers.isCashProfitable === 'none',
+        'SIDBI 4E requires cash profit. Consider EESL ESCO (no profit history needed) or cash-flow based lending.',
+      );
       break;
 
     case 'S006': // CLCS-TUS
+      // ── Scheme eligibility ──
       checkUdyam();
-      checkNpa();
-      // 15% energy saving requirement — soft block if no audit done
       check('hasEnergyAudit', 'soft', 'Need energy audit to prove 15% saving threshold',
         () => answers.hasEnergyAudit === false,
         'CLCS-TUS requires 15% minimum energy saving. Get an audit first to confirm your saving potential. If savings are 10–15%, use ADEETIE instead (only needs 10%).',
       );
+      // ── Financial profile ──
+      checkNpa();
       break;
 
     case 'S007': // ZED
+      // ── Scheme eligibility ──
       checkUdyam('soft');
       break;
 
     case 'S008': // SATAT/Bioenergy
+      // ── Scheme eligibility ──
       check('hasPngAccess', 'soft', answers.hasPngAccess === 'available' ? 'PNG available but not connected — connection needed first' : 'No PNG pipeline in your area',
         () => answers.hasPngAccess === 'no' || answers.hasPngAccess === 'available',
         answers.hasPngAccess === 'available'
@@ -457,11 +624,13 @@ export function evaluateScheme(
       break;
 
     case 'S011': // MSE-GIFT
+      // ── Scheme eligibility ──
       checkUdyam();
       check('enterpriseSize', 'hard', 'Medium enterprises not eligible (Micro/Small only)',
         () => answers.enterpriseSize === 'medium',
         'MSE-GIFT is for Micro and Small only. Use ADEETIE (3% subvention for Medium enterprises) instead.',
       );
+      // ── Financial profile ──
       checkNpa();
       check('cibilScore', 'soft', 'CIBIL score below 650',
         () => answers.cibilScore === 'below_650',
@@ -470,14 +639,16 @@ export function evaluateScheme(
       break;
 
     case 'S012': // IREDA
+      // ── Scheme eligibility ──
+      check('operatingYears', 'soft', 'Less than 3 years in operation',
+        () => answers.operatingYears === '<1' || answers.operatingYears === '1-3',
+        'IREDA prefers established units. Consider RESCO model (zero CAPEX, no loan needed) or state SDA subsidies.',
+      );
+      // ── Financial profile ──
       checkNpa();
       check('cibilScore', 'soft', 'CIBIL score below 650',
         () => answers.cibilScore === 'below_650',
         'IREDA has its own project viability assessment. A strong DPR with clear RE generation potential can compensate.',
-      );
-      check('operatingYears', 'soft', 'Less than 3 years in operation',
-        () => answers.operatingYears === '<1' || answers.operatingYears === '1-3',
-        'IREDA prefers established units. Consider RESCO model (zero CAPEX, no loan needed) or state SDA subsidies.',
       );
       break;
 
@@ -499,6 +670,7 @@ export function evaluateScheme(
     verdict,
     reasons,
     missingInfo,
+    criteria,
   };
 }
 
@@ -543,8 +715,6 @@ function getAlternativeRoutes(
   hardBlockedIds: Set<string>,
 ): AlternativeRoute[] {
   const alts: AlternativeRoute[] = [];
-  const blockedFields = new Set(reasons.map((r) => r.field));
-
   // No collateral
   if (answers.hasCollateral === 'no' || answers.hasCollateral === 'prefer_not') {
     alts.push({

@@ -135,21 +135,14 @@ function buildAnalysisSummary(): string {
     lines.push('--- Recommendation Simulator State ---');
     lines.push(`Baseline total: ${whatIf.baselineTotal.toFixed(4)} tCO2e`);
 
-    // Enabled technologies with their details
-    const enabledTechs = whatIf.recommendations.filter((r) => whatIf.enabledTechIds.has(r.techId));
-    const disabledTechs = whatIf.recommendations.filter((r) => !whatIf.enabledTechIds.has(r.techId));
-
-    if (enabledTechs.length > 0) {
-      lines.push(`Enabled technologies (${enabledTechs.length}):`);
-      for (const t of enabledTechs) {
-        const implPct = whatIf.implementedPcts[t.techId] || 0;
-        const remainingPct = implPct > 0 ? ` [${implPct}% already implemented → ${100 - implPct}% remaining]` : '';
-        lines.push(`  - ${t.name} (${t.techId}): CO2 reduction ${t.reductionMinTonnes.toFixed(2)}-${t.reductionMaxTonnes.toFixed(2)} tCO2e/yr, payback ${t.paybackMinYears}-${t.paybackMaxYears} yrs, CAPEX Rs ${t.capexMinLakhs ?? 0}-${t.capexMaxLakhs ?? 0}L${remainingPct}`);
-      }
-    }
-
-    if (disabledTechs.length > 0) {
-      lines.push(`Disabled technologies (${disabledTechs.length}): ${disabledTechs.map((t) => t.name).join(', ')}`);
+    // All matched technologies with full details (AI needs payback/CAPEX data to answer comparison questions)
+    lines.push(`Matched technologies (${whatIf.recommendations.length}):`);
+    for (const t of whatIf.recommendations) {
+      const isEnabled = whatIf.enabledTechIds.has(t.techId);
+      const implPct = whatIf.implementedPcts[t.techId] || 0;
+      const remainingPct = implPct > 0 ? ` [${implPct}% already implemented → ${100 - implPct}% remaining]` : '';
+      const statusTag = isEnabled ? '[ENABLED]' : '[not selected]';
+      lines.push(`  - ${t.name} (${t.techId}) ${statusTag}: CO2 reduction ${t.reductionMinTonnes.toFixed(2)}-${t.reductionMaxTonnes.toFixed(2)} tCO2e/yr, payback ${t.paybackMinYears}-${t.paybackMaxYears} yrs, CAPEX Rs ${t.capexMinLakhs ?? 0}-${t.capexMaxLakhs ?? 0}L${remainingPct}`);
     }
 
     // Technologies marked as already implemented
@@ -214,7 +207,7 @@ export function HelpFab() {
 
   return (
     <Button
-      className="fixed bottom-6 right-6 h-auto rounded-full shadow-lg z-30 gap-2 pl-4 pr-5 py-3"
+      className="fixed bottom-20 right-6 h-auto rounded-full shadow-lg z-50 gap-2 pl-4 pr-5 py-3"
       onClick={handleClick}
     >
       <MessageCircleQuestion className="h-4 w-4" />

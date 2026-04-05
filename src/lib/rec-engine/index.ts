@@ -13,6 +13,7 @@ import { matchTechnologies } from './matcher';
 import { calculateTechImpact } from './impact-calculator';
 import { matchFunding, bestNetCapex } from './funding-matcher';
 import { TECH_TO_LEVER } from './lever-groups';
+import { TECH_END_USE, TECH_PHASE } from './end-use-splits';
 
 export { matchTechnologies } from './matcher';
 export { calculateTechImpact } from './impact-calculator';
@@ -101,18 +102,18 @@ export function generateRecommendations(input: RecommendationInput): Recommendat
 
 /**
  * Calculate the combined impact of multiple toggled technologies.
- * CRITICAL: Reductions are applied SEQUENTIALLY, not additively.
  *
- * This function is importable client-side for the What-If simulator.
- * It must have NO server-side dependencies.
+ * ORDER-INDEPENDENT: Uses end-use pools + multiplicative combination.
+ * Result is the same regardless of which order techs are processed.
  *
- * Technologies are sorted by payback (lowest first = quick wins first).
- * Each tech's reduction is applied to the RESIDUAL emissions, not the baseline.
+ * Two-phase approach (standard energy planning hierarchy):
+ *   Phase 1 — Efficiency measures: Each targets a specific end-use pool
+ *     (lighting, motors, compressed air, etc.). Different end-uses are independent.
+ *     Same end-use → multiplicative combination: 1 - ∏(1 - rᵢ)
+ *   Phase 2 — Source switching (solar, fuel switch): Applies to residual
+ *     after Phase 1 efficiency savings. Reduce demand first, then switch source.
  *
- * Example: VFDs (30%) + Solar (50%) on same emissions:
- *   VFDs: 100 × 0.30 = 30 saved, residual = 70
- *   Solar: 70 × 0.50 = 35 saved, residual = 35
- *   Total: 65% reduction (NOT 80%)
+ * End-use splits sourced from BEE energy audits, SAMEEEKSHA, UNIDO.
  */
 export function calculateCombinedImpact(
   enabledTechs: TechImpact[],
@@ -140,62 +141,129 @@ export function calculateCombinedImpact(
     };
   }
 
-  // Sort by payback ascending for sequential application
-  const sorted = [...enabledTechs].sort((a, b) => a.paybackMinYears - b.paybackMinYears);
-
   // Enforce lever group exclusivity: only keep the first (best payback) tech per lever group
+  const sorted = [...enabledTechs].sort((a, b) => a.paybackMinYears - b.paybackMinYears);
   const seenLevers = new Set<string>();
   const deduped = sorted.filter((tech) => {
     const lever = TECH_TO_LEVER[tech.techId];
-    if (!lever) return true; // Independent tech — always include
-    if (seenLevers.has(lever)) return false; // Already have one from this lever group
+    if (!lever) return true;
+    if (seenLevers.has(lever)) return false;
     seenLevers.add(lever);
     return true;
   });
 
-  let residual = baselineTotal;
+  // ── Phase 1: Efficiency measures (reduce demand) ──────────────────────
+  // Group by end-use. Techs targeting the same end-use are combined multiplicatively.
+  // Different end-uses are independent (additive on baseline).
+  // Default to 'efficiency' for unknown tech IDs (e.g., test fixtures)
+  const phase1 = deduped.filter((t) => (TECH_PHASE[t.techId] ?? 'efficiency') === 'efficiency');
+  const phase2 = deduped.filter((t) => TECH_PHASE[t.techId] === 'source_switching');
+
+  // For each end-use pool, compute the combined reduction fraction
+  // using multiplicative combination: 1 - ∏(1 - rᵢ)
+  const endUseReductions = new Map<string, { totalReduction: number; techs: TechImpact[] }>();
+
+  for (const tech of phase1) {
+    const endUse = TECH_END_USE[tech.techId] ?? 'all';
+    if (!endUseReductions.has(endUse)) {
+      endUseReductions.set(endUse, { totalReduction: 0, techs: [] });
+    }
+    endUseReductions.get(endUse)!.techs.push(tech);
+  }
+
+  // Calculate per-enduse reduction (multiplicative within each pool)
   const sequence: CombinedImpact['technologySequence'] = [];
   let totalCapexMin = 0;
   let totalCapexMax = 0;
   let totalSavingMin = 0;
   let totalSavingMax = 0;
 
-  for (const tech of deduped) {
-    // Apply this tech's mid reduction % to the residual
-    const midPct = (tech.reductionMidTonnes / tech.matchedEmissionsTonnes) * 100;
-    // But the reduction applies only to the fraction of residual that this tech addresses
-    // Scale: what fraction of the ORIGINAL matched emissions is still in the residual?
-    const residualFraction = residual / baselineTotal;
-    const effectiveMatchedEmissions = tech.matchedEmissionsTonnes * residualFraction;
+  // Track residual for the waterfall display (cosmetic ordering by payback)
+  let residual = baselineTotal;
 
-    // Scale by remaining potential: if 40% already implemented, only 60% of reduction remains
+  for (const [, group] of endUseReductions) {
+    // Sort by payback within the end-use group for display order
+    group.techs.sort((a, b) => a.paybackMinYears - b.paybackMinYears);
+
+    // Multiplicative combination within this end-use pool
+    let retainedFraction = 1.0;
+    for (const tech of group.techs) {
+      const midPct = tech.matchedEmissionsTonnes > 0
+        ? (tech.reductionMidTonnes / tech.matchedEmissionsTonnes) * 100
+        : 0;
+      const alreadyPct = implementedPcts?.[tech.techId] ?? 0;
+      const remainingFactor = (100 - alreadyPct) / 100;
+      const effectivePct = (midPct / 100) * remainingFactor;
+
+      // Each tech's actual reduction is its % of what's retained in this pool
+      const techReduction = tech.matchedEmissionsTonnes * retainedFraction * effectivePct;
+      retainedFraction *= (1 - effectivePct);
+
+      residual -= techReduction;
+      if (residual < 0) residual = 0;
+
+      sequence.push({
+        techId: tech.techId,
+        name: tech.name,
+        reductionTonnes: techReduction,
+        residualAfterTonnes: residual,
+      });
+
+      totalCapexMin += tech.capexMinLakhs ?? 0;
+      totalCapexMax += tech.capexMaxLakhs ?? 0;
+      totalSavingMin += tech.costSavingMinInr * ((100 - alreadyPct) / 100);
+      totalSavingMax += tech.costSavingMaxInr * ((100 - alreadyPct) / 100);
+    }
+  }
+
+  // ── Phase 2: Source switching (green the supply) ──────────────────────
+  // Applied to residual after Phase 1 efficiency savings
+  for (const tech of phase2) {
+    const midPct = tech.matchedEmissionsTonnes > 0
+      ? (tech.reductionMidTonnes / tech.matchedEmissionsTonnes) * 100
+      : 0;
     const alreadyPct = implementedPcts?.[tech.techId] ?? 0;
     const remainingFactor = (100 - alreadyPct) / 100;
-    const actualReduction = effectiveMatchedEmissions * (midPct / 100) * remainingFactor;
 
-    residual -= actualReduction;
+    // Source switching applies to the residual emissions, not original matched
+    // Scale matched emissions by how much residual remains vs baseline
+    const residualFraction = residual / baselineTotal;
+    const effectiveMatched = tech.matchedEmissionsTonnes * residualFraction;
+    const techReduction = effectiveMatched * (midPct / 100) * remainingFactor;
+
+    residual -= techReduction;
     if (residual < 0) residual = 0;
 
     sequence.push({
       techId: tech.techId,
       name: tech.name,
-      reductionTonnes: actualReduction,
+      reductionTonnes: techReduction,
       residualAfterTonnes: residual,
     });
 
     totalCapexMin += tech.capexMinLakhs ?? 0;
     totalCapexMax += tech.capexMaxLakhs ?? 0;
-    totalSavingMin += tech.costSavingMinInr * residualFraction;
-    totalSavingMax += tech.costSavingMaxInr * residualFraction;
+    totalSavingMin += tech.costSavingMinInr * remainingFactor;
+    totalSavingMax += tech.costSavingMaxInr * remainingFactor;
   }
 
   const totalReduction = baselineTotal - residual;
   const totalReductionPct = baselineTotal > 0 ? (totalReduction / baselineTotal) * 100 : 0;
 
-  // Blended payback: total capex / total annual saving (capped at 50 years)
-  const capexMidInr = ((totalCapexMin + totalCapexMax) / 2) * 100000;
-  const savingMidInr = (totalSavingMin + totalSavingMax) / 2;
-  let blendedPaybackYears: number | null = savingMidInr > 0 ? capexMidInr / savingMidInr : null;
+  // Blended payback: CAPEX-weighted harmonic mean
+  let blendedCapexLakhs = 0;
+  let blendedImpliedSavingLakhs = 0;
+  for (const tech of deduped) {
+    const capexMid = ((tech.capexMinLakhs ?? 0) + (tech.capexMaxLakhs ?? 0)) / 2;
+    const paybackMid = (tech.paybackMinYears + tech.paybackMaxYears) / 2;
+    if (capexMid > 0 && paybackMid > 0) {
+      blendedCapexLakhs += capexMid;
+      blendedImpliedSavingLakhs += capexMid / paybackMid;
+    }
+  }
+  let blendedPaybackYears: number | null = blendedImpliedSavingLakhs > 0
+    ? blendedCapexLakhs / blendedImpliedSavingLakhs
+    : null;
   if (blendedPaybackYears !== null && blendedPaybackYears > 50) blendedPaybackYears = 50;
 
   return {

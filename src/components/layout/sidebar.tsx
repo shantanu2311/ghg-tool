@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
@@ -41,14 +41,11 @@ export function Sidebar() {
   const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
   const orgName = useWizardStore((s) => s.organisation.name);
-  const [collapsed, setCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem('sidebar-collapsed');
-    if (stored === 'true') setCollapsed(true);
-  }, []);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
   const toggleCollapsed = () => {
     const next = !collapsed;

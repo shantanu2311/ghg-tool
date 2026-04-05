@@ -209,7 +209,7 @@ export async function POST(
       // Update period status
       await tx.reportingPeriod.update({
         where: { id: periodId },
-        data: { status: 'calculated' },
+        data: { status: 'calculated', resultJson: JSON.stringify(result) },
       });
     });
 

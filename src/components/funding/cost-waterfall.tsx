@@ -136,13 +136,13 @@ export function CostWaterfall({
   const [techId, setTechId] = useState(defaultTechId ?? technologies[0]?.techId ?? '');
   const [schemeId, setSchemeId] = useState(defaultSchemeId ?? schemes[0]?.schemeId ?? '');
   const [result, setResult] = useState<CostCalcResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!(defaultTechId ?? technologies[0]?.techId) && !!(defaultSchemeId ?? schemes[0]?.schemeId));
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!techId || !schemeId) return;
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
+
     fetch('/api/cost-calculator', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -152,12 +152,22 @@ export function CostWaterfall({
         if (!res.ok) throw new Error('Could not calculate costs');
         return res.json();
       })
-      .then(setResult)
-      .catch((err) => {
-        setError(err.message);
-        setResult(null);
+      .then((data) => {
+        if (!cancelled) {
+          setResult(data);
+          setError(null);
+          setLoading(false);
+        }
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message);
+          setResult(null);
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
   }, [techId, schemeId]);
 
   // Build waterfall data
@@ -197,7 +207,7 @@ export function CostWaterfall({
         {/* Selectors */}
         {!hideSelectors && (
         <div className="flex flex-wrap gap-3 mb-4">
-          <Select value={techId} onValueChange={(val) => val && setTechId(val)}>
+          <Select value={techId} onValueChange={(val) => { if (val) { setTechId(val); setLoading(true); } }}>
             <SelectTrigger className="w-[220px]">
               <SelectValue>
                 {technologies.find((t) => t.techId === techId)?.name ?? 'Select technology'}
@@ -212,7 +222,7 @@ export function CostWaterfall({
             </SelectContent>
           </Select>
 
-          <Select value={schemeId} onValueChange={(val) => val && setSchemeId(val)}>
+          <Select value={schemeId} onValueChange={(val) => { if (val) { setSchemeId(val); setLoading(true); } }}>
             <SelectTrigger className="w-[220px]">
               <SelectValue>
                 {schemes.find((s) => s.schemeId === schemeId)?.name ?? 'Select scheme'}

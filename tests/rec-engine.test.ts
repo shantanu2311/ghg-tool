@@ -12,7 +12,7 @@
 import { describe, it, expect } from 'vitest';
 import { matchTechnologies } from '@/lib/rec-engine/matcher';
 import { calculateTechImpact } from '@/lib/rec-engine/impact-calculator';
-import { matchFunding, bestNetCapex } from '@/lib/rec-engine/funding-matcher';
+import { matchFunding } from '@/lib/rec-engine/funding-matcher';
 import { calculateCombinedImpact } from '@/lib/rec-engine/index';
 import type {
   TechnologyData,
@@ -234,7 +234,7 @@ describe('Recommendation Engine', () => {
     const dieselCalc = makeCalc('a-diesel', 27);
 
     it('should match VFDs, solar, RESCO for EAF with electricity', () => {
-      const { matched, notApplicable } = matchTechnologies({
+      const { matched } = matchTechnologies({
         organisation: { sector: 'iron_steel', subSector: 'eaf_mini_mill' },
         activityData: [elecActivity, dieselActivity],
         calculations: [elecCalc, dieselCalc],
@@ -458,6 +458,7 @@ describe('Recommendation Engine', () => {
         scopeAddressed: 'Scope 2', technologyReadiness: 'Commercially mature',
         demonstratedInIndia: true, description: '', source: '', sourceUrl: null,
         warnings: [], reductionSteps: [],
+        endUseShare: 1, endUseLabel: 'All',
       };
       const tech2 = { ...tech1, techId: 'T-B', name: 'Tech B', paybackMinYears: 2 };
       const tech3 = { ...tech1, techId: 'T-C', name: 'Tech C', paybackMinYears: 3 };
@@ -499,6 +500,7 @@ describe('Recommendation Engine', () => {
         scopeAddressed: 'Scope 1', technologyReadiness: 'Commercially mature',
         demonstratedInIndia: true, description: '', source: '', sourceUrl: null,
         warnings: [], reductionSteps: [],
+        endUseShare: 1, endUseLabel: 'All',
       };
       const bigTech2 = { ...bigTech, techId: 'T-BIG2', paybackMinYears: 2 };
 

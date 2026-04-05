@@ -10,7 +10,7 @@ import type {
   UnitConversionData,
   CalculationRecord,
   CalculationStep,
-  EmissionBreakdown,
+
 } from './types';
 import { convertUnits, fuelToEnergyTJ } from './unit-converter';
 

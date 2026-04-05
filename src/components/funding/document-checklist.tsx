@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 const STORAGE_KEY = 'funding-doc-checklist';
@@ -28,15 +28,12 @@ interface DocumentChecklistProps {
 }
 
 export function DocumentChecklist({ documents, stepKey, className }: DocumentChecklistProps) {
-  const [checked, setChecked] = useState<Set<number>>(new Set());
-
-  // Load persisted state on mount
-  useEffect(() => {
-    if (!stepKey) return;
+  const [checked, setChecked] = useState<Set<number>>(() => {
+    if (!stepKey) return new Set();
     const stored = loadChecked();
     const indices = stored[stepKey];
-    if (indices?.length) setChecked(new Set(indices));
-  }, [stepKey]);
+    return indices?.length ? new Set(indices) : new Set();
+  });
 
   const toggle = useCallback((index: number) => {
     setChecked((prev) => {

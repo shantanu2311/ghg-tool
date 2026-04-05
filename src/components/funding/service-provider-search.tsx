@@ -32,17 +32,24 @@ export function ServiceProviderSearch({ defaultState, className }: ServiceProvid
   const [typeFilter, setTypeFilter] = useState('all');
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     const params = new URLSearchParams();
     if (defaultState) params.set('state', defaultState);
 
     fetch(`/api/service-providers?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
-        setProviders(Array.isArray(data) ? data : []);
+        if (!cancelled) {
+          setProviders(Array.isArray(data) ? data : []);
+          setLoading(false);
+        }
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        console.error(err);
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
   }, [defaultState]);
 
   const filtered = typeFilter === 'all'

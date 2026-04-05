@@ -6,7 +6,7 @@ import {
   ArrowRight,
   ClipboardList,
   Calculator,
-  Download,
+
   CheckCircle2,
   ShieldCheck,
   Lightbulb,

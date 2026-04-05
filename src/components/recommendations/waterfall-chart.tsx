@@ -61,6 +61,7 @@ interface WaterfallRow {
   capexLabel: string | null; // e.g. "Rs.5-10L"
   paybackLabel: string | null; // e.g. "2.5yr"
   annotation: string | null; // Combined: "Rs.5-10L · 2.5yr"
+  endUseLabel: string | null;
 }
 
 interface Props {
@@ -112,7 +113,7 @@ export function WaterfallChart({ impact, technologies, enabledTechIds }: Props) 
     const tier = classifyTier(pctOfTotal, paybackMid, medianPct, medianPayback);
     const capexMin = tech?.capexMinLakhs ?? null;
     const capexMax = tech?.capexMaxLakhs ?? null;
-    return { ...step, tier, paybackMid, pctOfTotal, capexMin, capexMax };
+    return { ...step, tier, paybackMid, pctOfTotal, capexMin, capexMax, endUseLabel: tech?.endUseLabel ?? null, endUseShare: tech?.endUseShare ?? 1 };
   });
 
   // Sort: Quick Wins first (top), then Strategic, Easy, Low Priority
@@ -140,6 +141,7 @@ export function WaterfallChart({ impact, technologies, enabledTechIds }: Props) 
     capexLabel: null,
     paybackLabel: null,
     annotation: null,
+    endUseLabel: null,
   });
 
   let running = impact.baselineTotalTonnes;
@@ -171,6 +173,7 @@ export function WaterfallChart({ impact, technologies, enabledTechIds }: Props) 
       capexLabel,
       paybackLabel,
       annotation: annotation || null,
+      endUseLabel: step.endUseShare < 1 ? step.endUseLabel : null,
     });
   }
 
@@ -187,6 +190,7 @@ export function WaterfallChart({ impact, technologies, enabledTechIds }: Props) 
     capexLabel: null,
     paybackLabel: null,
     annotation: null,
+    endUseLabel: null,
   });
 
   const barCount = waterfallData.length;
@@ -259,6 +263,7 @@ export function WaterfallChart({ impact, technologies, enabledTechIds }: Props) 
                     <div style={chartTheme.tooltipStyle}>
                       <p className="text-xs font-semibold mb-1">{d.fullName}</p>
                       {d.tier && <p className="text-[11px] font-medium" style={{ color: TIER_COLORS[d.tier] }}>{TIER_LABELS[d.tier]}</p>}
+                      {d.endUseLabel && <p className="text-[10px] text-muted-foreground/70 italic mb-0.5">Targets: {d.endUseLabel}</p>}
                       <p className="text-[11px] text-muted-foreground">Reduction: {fmtCO2(d.value)} tCO2e</p>
                       {d.pctOfTotal != null && <p className="text-[11px] text-muted-foreground">Impact: {d.pctOfTotal.toFixed(1)}% of total</p>}
                       {d.capexLabel && <p className="text-[11px] text-muted-foreground">CAPEX: {d.capexLabel}</p>}

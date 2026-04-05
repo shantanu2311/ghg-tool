@@ -17,12 +17,6 @@ function fmt(n: number | null | undefined, decimals = 4): number | string {
   return Math.round(n * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 
-function scopeLabel(scope: number): string {
-  if (scope === 1) return 'Scope 1';
-  if (scope === 2) return 'Scope 2';
-  return 'Scope 3';
-}
-
 function buildSummarySheet(data: ExcelExportData): XLSX.WorkSheet {
   const { organisation, period, result, brsr } = data;
   const rows = [
@@ -178,10 +172,6 @@ export function generateExcelReport(data: ExcelExportData): void {
   // Partition calculation records by looking at the scope totals.
   // Each CalculationRecord has an activityDataId but no scope field directly.
   // We match by: sum records per scope category to figure out which scope they belong to.
-  const scope1Ids = new Set<string>();
-  const scope2Ids = new Set<string>();
-  const scope3Ids = new Set<string>();
-
   // Build category-to-scope map from scope totals
   const catToScope = new Map<string, number>();
   for (const cat of result.scope1.categories) catToScope.set(cat.category, 1);

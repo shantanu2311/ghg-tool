@@ -73,6 +73,12 @@ export interface MatchedTechnology extends TechnologyData {
   matchedEnergyGj: number;
   matchedFuelTypes: string[];
   matchedCategories: string[];
+  /** End-use share: fraction (0-1) of matched emissions this tech actually addresses.
+   *  E.g., LED = 0.02 of electricity (only lighting), VFD = 0.08 (only motors).
+   *  Source switching techs (solar, etc.) = 1.0 (replace entire source). */
+  endUseShare: number;
+  /** Human-readable end-use label, e.g. "Lighting (2% of electricity)" */
+  endUseLabel: string;
 }
 
 // ── Impact Estimate ────────────────────────────────────────────────────────
@@ -106,6 +112,10 @@ export interface TechImpact {
   sourceUrl: string | null;
   warnings: string[];
   reductionSteps: ReductionStep[];
+  /** End-use share applied to matched emissions (0-1) */
+  endUseShare: number;
+  /** Human-readable end-use label */
+  endUseLabel: string;
 }
 
 export interface ReductionStep {

@@ -145,7 +145,7 @@ export function PlanCostSummary({ techs, pickBestScheme, className }: PlanCostSu
   // Fetch all cost calculations in parallel
   useEffect(() => {
     if (pairs.length === 0) return;
-    setLoading(true);
+    let cancelled = false;
 
     Promise.all(
       pairs.map(({ tech, scheme }) =>
@@ -159,6 +159,7 @@ export function PlanCostSummary({ techs, pickBestScheme, className }: PlanCostSu
           .catch(() => [tech.techId, null] as [string, null])
       )
     ).then((entries) => {
+      if (cancelled) return;
       const map = new Map<string, CostCalcResult>();
       for (const [id, data] of entries) {
         if (data) map.set(id, data);
@@ -166,6 +167,8 @@ export function PlanCostSummary({ techs, pickBestScheme, className }: PlanCostSu
       setResults(map);
       setLoading(false);
     });
+
+    return () => { cancelled = true; };
   }, [pairs]);
 
   // Build chart data

@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { useWizardStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 import { SCOPE2_CATEGORIES } from '@/lib/calc-engine/constants';
 import { useFuelOptions } from '@/lib/hooks/use-fuel-options';
 import { useCustomSources } from '@/lib/hooks/use-custom-sources';

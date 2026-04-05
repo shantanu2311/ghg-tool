@@ -233,9 +233,28 @@ For each activity data entry:
 - Rate-limited: 30 questions/user/hour
 - System prompt built dynamically with context (current step, fuel type, sub-sector, analysis data)
 - **Funding-aware mode**: When on `/funding` or `/recommendations`, uses `funding-system-prompt.ts` with anti-hallucination rules, scheme database, jargon dictionary, service providers, action plans, and funding stacking knowledge
+- **Full tech context**: ALL matched technologies sent to AI with full details (payback, CAPEX, reduction ranges) regardless of enabled/disabled state — tagged `[ENABLED]` or `[not selected]`
 - Reads what-if store state: knows which techs are toggled, at what implementation %, and their impacts
 - Hindi language detection (Devanagari replies)
 - Knowledge base: wizard steps, fuel types, sub-sectors, grid regions, data quality, benchmarks, recommendations
+
+### Curated Action Plan (Funding)
+
+- **Eligibility criteria**: Split into `scheme` (scheme-specific) and `financial` (CIBIL, NPA, etc.) groups via `groupFor()` — scheme-specific shown first
+- **Consolidated actions**: Cross-scheme deduplication by `field` property — e.g., "get energy audit" from CLCS-TUS and ADEETIE merged into one action showing both scheme badges
+- **Hard-block filtering**: Schemes with unfixable hard blocks (e.g., no ADEETIE cluster in user's state) are completely hidden from the curated plan — users only see schemes they can actually fix/qualify for
+- **`pickBestScheme()` skips hard-blocked schemes**: When assigning techs to scheme cards, hard-blocked schemes are excluded so techs fall through to the next-best eligible scheme. Prevents tech count mismatch (summary showing more techs than visible pills).
+- **Cluster auto-detection priority**: `isLikelyInAdeetieCluster()` always fires when state+sector data yields a definitive result (true/false), regardless of stored localStorage answers
+- **Hook ordering**: All `useMemo` hooks (`sortedSections`, `visibleTechCount`, `eligibleSchemeGroups`, `consolidatedActions`) must be declared before early returns to avoid React hooks ordering violations
+
+### Lever Group Advisor (Recommendations)
+
+- **Location**: `src/components/recommendations/applicability-setup.tsx`
+- **Purpose**: Inline qualifying questions within each lever group (Renewable Electricity, Fuel Switching, Process Heat) to auto-select the best technology for the user's facility context
+- **Decision functions**: `pickRETech()`, `pickFuelTech()`, `pickHeatTech()` — deterministic decision trees based on answers (roof space, budget preference, gas pipeline access, etc.)
+- **Persistence**: `LeverAnswers` saved to localStorage (`ghg-lever-answers`)
+- **Lever groups are mutually exclusive**: Enabling an advised tech auto-disables siblings in the same group
+- **UI**: Pill-button questions with recommendation box showing reason text
 
 ### Funding Data Accuracy Notes
 

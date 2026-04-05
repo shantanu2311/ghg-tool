@@ -326,18 +326,11 @@ describe('Agent 2: Meena — Induction Furnace (High Volume Monthly)', () => {
 
   it('coal is the dominant Scope 1 source', () => {
     // ~750 tonnes coal/year at ~96100 kgCO2/TJ should dwarf diesel/LPG
-    const coalEmissions = result.calculations
-      .filter(c => {
-        const act = result.calculations.find(x => x.activityDataId === c.activityDataId);
-        return act !== undefined;
-      })
-      .reduce((s, c) => s + c.totalCo2eTonnes, 0);
     expect(result.scope1.total).toBeGreaterThan(500); // Substantial scope 1
   });
 
   it('intensity is in IF range (0.6-0.9 tCO2e/tonne) or triggers warning', () => {
     const intensity = result.grandTotal / PRODUCTION;
-    const intensityWarning = result.crossCheckWarnings.find(w => w.category === 'intensity');
     // Either in range or there's a warning about it
     if (intensity >= 0.3 && intensity <= 1.8) {
       // Acceptable — coal-heavy IF can exceed benchmark
